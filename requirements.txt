@@ -1,2 +1,6 @@
 Flask
+# Flask extenstions
 Flask-SQLAlchemy
+
+# Additional libraries
+psycopg2
