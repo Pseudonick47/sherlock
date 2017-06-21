@@ -26,12 +26,36 @@ from sherlock.api.models import Tour
 mod = Blueprint('api', __name__)
 
 
-#TODO(aleksandar-varga): More verbose add documentation and function response.
-
 @mod.route('/tours', methods=['POST'])
 #TODO(pseudonick47): Authentification required decorator.
 def add_tour():
-    """Add new tour."""
+    """Add new tour.
+
+    Request should be formated as JSON file. For example:
+
+        {
+            "name": "",
+            "description": "",
+            "quide_fee": 10.25,
+            "locations": [2, 51, 16, 43]
+        }
+
+    Returns:
+        JSON file. For example:
+
+        Addtion succeeded
+
+            {
+                "success": true
+            }
+
+        Addition failed
+
+            {
+                "success": false
+            }
+
+    """
 
     req = request.get_json(force=True, silent=True)
     if req:
@@ -43,15 +67,79 @@ def add_tour():
         )
 
         for location in req['locations']:
-            loc = db.session.query(Locaiton).filter_by(location['id']).one()
+            loc = db.session.query(Location).filter_by(location['id']).one()
             loc.tours.append(tour)
 
         db.session.add(tour)
         db.session.commit()
 
-        return jsonify('Succeeded')
+        return jsonify({'success': True})
 
-    return jsonify('Failed')
+    return jsonify({'success': False})
+
+
+@mod.route('/tours/<int:oid>', methods=['POST'])
+def modify_tour(oid):
+    """Modify already existing tour.
+
+    Request should be formated as JSON file. For example:
+
+        {
+            "name": "",
+            "description": "",
+            "quide_fee": 10.25,
+            "locations": [2, 51, 16, 43]
+        }
+
+    Fileds can be omitted.
+
+    Returns:
+        JSON file. For example:
+
+        Modification succeeded
+
+            {
+                "success": true
+            }
+
+        Modification failed
+
+            {
+                "success": false
+            }
+
+    """
+
+    req = request.get_json(force=True, silent=True)
+    if req:
+
+        tour = db.session.query(Tour).filter_by(oid=oid).one_or_none()
+
+        if not tour:
+            return jsonify({'success': False})
+
+        for key in req.keys():
+            if key == 'name':
+                tour.name = req[key]
+
+            elif key == 'description':
+                tour.description = req[key]
+
+            elif key == 'guide_fee':
+                tour.guide_fee = req[key]
+
+            else:
+                for location in req['locations']:
+                    loc = db.session.query(Location).filter_by(location['id'])\
+                            .one()
+                    loc.tours.append(tour)
+
+        db.session.commit()
+
+        return jsonify({'success': True})
+
+    return jsonify({'success': False})
+
 
 @mod.route("/tours", methods=['GET'])
 def get_tours():
@@ -61,7 +149,6 @@ def get_tours():
         JSON file containing id, name, description, guide_fee and location
         identifiers of all selected tours. For example:
 
-        {
             [
                 {
                     "id": 17,
@@ -82,8 +169,10 @@ def get_tours():
                 },
                 ...
             ]
-        }
+
+        If database is not populated, then JSON file has an empty array.
     """
+
     response = []
     for tour in db.session.query(Tour).all():
         response.append(
@@ -106,15 +195,18 @@ def get_tour(oid):
         JSON file containing id, name, description, guide_fee and locaiton
         identifiers of selected tour. For example:
 
-        {
-            "id": 17,
-            "name": "Walk Through History",
-            "description": "Visit some of the finest castles and
-                            mansions in all of Europe.",
-            "guide_fee": 10,
-            "locations": [...]
-        }
+            {
+                "id": 17,
+                "name": "Walk Through History",
+                "description": "Visit some of the finest castles and
+                                mansions in all of Europe.",
+                "guide_fee": 10,
+                "locations": [...]
+            }
+
+        If a requested tour is not found, then JSON file has an empty object.
     """
+
     response = {}
     tour = db.session.query(Tour).filter_by(oid=oid).one_or_none()
     if tour:
@@ -131,7 +223,33 @@ def get_tour(oid):
 
 @mod.route('/locations', methods=['POST'])
 def add_location():
-    """Add new location."""
+    """Add new location.
+
+    Request should be formated as JSON file. For example:
+
+        {
+            "name": "",
+            "description": "",
+            "address_id": 15,
+            "city_id": 2,
+            "country_id: 4,
+        }
+
+    Returns:
+        JSON file. For example:
+
+        Addtion succeeded
+
+            {
+                "success": true
+            }
+
+        Addition failed
+
+            {
+                "success": false
+            }
+    """
 
     req = request.get_json(force=True, silent=True)
     if req:
@@ -149,9 +267,9 @@ def add_location():
         db.session.add(price)
         db.session.commit()
 
-        return jsonify("Succeeded")
+        return jsonify({'success': True})
 
-    return jsonify("Failed")
+    return jsonify({'success': False})
 
 @mod.route('/locations', methods=['GET'])
 def get_locations():
@@ -161,7 +279,6 @@ def get_locations():
         JSON file containing id, name, description, price, address, city and
         country identifiers of all selected locations. For example:
 
-        {
             [
                 {
                     "id": 17,
@@ -183,8 +300,10 @@ def get_locations():
                 },
                 ...
             ]
-        }
+
+        If database is not populated, then JSON file has an empty array.
     """
+
     response = []
     for location in db.session.query(Location).all():
         response.append(
@@ -209,15 +328,18 @@ def get_location(oid):
         JSON file containing id, name, description, price, address, city and
         country identifiers of the selected location. For example:
 
-        {
-            "id": 17,
-            "name": "Jovan Jovanovic Zmaj",
-            "description": "Gimnazija",
-            "price": 0,
-            "address_id": 17
-            "city_id": 1,
-            "country_id": 207
-        }
+            {
+                "id": 17,
+                "name": "Jovan Jovanovic Zmaj",
+                "description": "Gimnazija",
+                "price": 0,
+                "address_id": 17
+                "city_id": 1,
+                "country_id": 207
+            }
+
+        If a requested location is not found, then JSON file has an empty
+        object.
     """
 
     response = {}
@@ -237,7 +359,32 @@ def get_location(oid):
 
 @mod.route('/addresses', methods=['POST'])
 def add_address():
-    """Add new location."""
+    """Add new address.
+
+    Request should be formated as JSON file. For example:
+
+        {
+            "street_name": "",
+            "city_id": 10,
+            "number": "14a"
+        }
+
+    Returns:
+        JSON file. For example:
+
+        Addtion succeeded
+
+            {
+                "success": true
+            }
+
+        Addition failed
+
+            {
+                "success": false
+            }
+    """
+
     req = request.get_json(force=True, silent=True)
     if req:
         address = Address(
@@ -249,10 +396,9 @@ def add_address():
         db.session.add(address)
         db.session.commit()
 
-        return jsonify("Succeeded")
+        return jsonify({'success': True})
 
-    return jsonify("Failed")
-
+    return jsonify({'success': False})
 
 @mod.route('/addresses', methods=['GET'])
 def get_addresses():
@@ -262,24 +408,25 @@ def get_addresses():
         JSON file containing id, street_name, city identifier and number of all
         addresses. For example:
 
-        {
             [
                 {
                     "id": 17,
                     "street_name": "Zlatne grede",
                     "city_id": 1,
-                    "number": 4
+                    "number": "4"
                 },
                 {
                     "id": 522,
                     "street_name": "Champs Elysées",
                     "city_id": 52,
-                    "number": 15
+                    "number": "15"
                 },
                 ...
             ]
-        }
+
+        If database is not populated, then JSON file has an empty array.
     """
+
     response = []
     for address in db.session.query(Address).all():
         response.append(
@@ -302,12 +449,14 @@ def get_address(oid):
         JSON file containing id, street_name, city identifier and number of the
         selected address. For example:
 
-        {
-            "id": 17,
-            "street_name": "Zlatne grede",
-            "number": 4,
-            "city_id": 1
-        }
+            {
+                "id": 17,
+                "street_name": "Zlatne grede",
+                "number": "4",
+                "city_id": 1
+            }
+
+        If a requested address is not found, then JSON file has an empty object.
     """
     address = db.session.query(Address).filter_by(oid=oid).one_or_none()
 
@@ -325,7 +474,30 @@ def get_address(oid):
 
 @mod.route('/cities', methods=['POST'])
 def add_city():
-    """Adds new city."""
+    """Adds new city.
+
+    Request should be formated as JSON file. For example:
+
+        {
+            "name": "",
+            "country_id": 10
+        }
+
+    Returns:
+        JSON file. For example:
+
+        Addtion succeeded
+
+            {
+                "success": true
+            }
+
+        Addition failed
+
+            {
+                "success": false
+            }
+    """
 
     req = request.get_json(force=True, silent=True)
     if req:
@@ -337,9 +509,9 @@ def add_city():
         db.session.add(city)
         db.commit()
 
-        return jsonify("Succeeded")
+        return jsonify({'success': True})
 
-    return jsonify("Failed")
+    return jsonify({'success': False})
 
 @mod.route('/cities', methods=['GET'])
 def get_cities():
@@ -349,30 +521,21 @@ def get_cities():
         JSON file containing id, name, country identifier and addresses of all
         cities. For example:
 
-        {
             [
                 {
                     "id": 1,
                     "name": "Novi Sad",
-                    "country_id": 207,
-                    "addresses": [
-                        {
-                            "id": 17,
-                            "street_name": "Zlatne grede",
-                            "number": "4"
-                        },
-                        ...
-                    ]
+                    "country_id": 207
                 },
                 {
                     "id": 10,
                     "name": "New York",
-                    "country_id": 249,
-                    "addresses": [...]
+                    "country_id": 249
                 },
                 ...
             ]
-        }
+
+        If a requested city is not found, then JSON file has an empty array.
     """
 
     response = []
@@ -382,15 +545,7 @@ def get_cities():
             {
                 'id': city.id,
                 'name': city.name,
-                'country_id': city.country_id,
-                'addresses': [
-                    {
-                        'id': address.oid,
-                        'street_name': address.street_name,
-                        'number': address.number,
-                    }
-                    for address in city.addresses
-                ]
+                'country_id': city.country_id
             }
         )
 
@@ -405,19 +560,13 @@ def get_city(oid):
         JSON file containing id, name, country identifier and addresses of the
         selected city. For example:
 
-        {
-            "id": 1,
-            "name": "Novi Sad",
-            "country_id": 1,
-            "addresses": [
-                {
-                    "id": 17,
-                    "street_name": "Zlatne grede",
-                    "number": "4"
-                },
-                ...
-            ]
-        }
+            {
+                "id": 1,
+                "name": "Novi Sad",
+                "country_id": 1
+            }
+
+        If a requested city is not found, then JSON file has empty object.
     """
 
     city = db.session.query(City).filter_by(oid=oid).one_or_none()
@@ -427,15 +576,7 @@ def get_city(oid):
         response = {
             'id': city.id,
             'name': city.name,
-            'country_id': city.country_id,
-            'addresses': [
-                {
-                    'id': address.oid,
-                    'street_name': address.street_name,
-                    'number': address.number,
-                }
-                for address in city.addresses
-            ]
+            'country_id': city.country_id
         }
 
         return jsonify(response)
@@ -452,7 +593,27 @@ def add_country():
     webapp deployement and this function is intended to allow the addition of
     new countries that could become new UN member states in the future.
 
+    Request should be formated as JSON file. For example:
 
+        {
+            "name": "",
+            "continent": 1,
+        }
+
+    Returns:
+        JSON file. For example:
+
+        Addtion succeeded
+
+            {
+                "success": true
+            }
+
+        Addition failed
+
+            {
+                "success": false
+            }
     """
     req = request.get_json(force=True, silent=True)
     if req:
@@ -464,9 +625,9 @@ def add_country():
         db.session.add(country)
         db.session.commit()
 
-        return jsonify("Succeeded")
+        return jsonify({'success': True})
 
-    return jsonify("Failed")
+    return jsonify({'success': False})
 
 @mod.route('/countries', methods=['GET'])
 def get_countries():
@@ -476,7 +637,6 @@ def get_countries():
         JSON file containing id, name and continent identifier fields of all
         countries. For example:
 
-        {
             [
                 {
                     "id": 207,
@@ -490,7 +650,8 @@ def get_countries():
                 },
                 ...
             ]
-        }
+
+        If database is not populated, then JSON file has an empty array.
     """
 
     response = []
@@ -517,14 +678,13 @@ def get_country(oid):
         JSON file containing id, name and continent identifier fields of the
         selected country. For example:
 
-        {
-            "id": 207,
-            "name": "Serbia",
-            "continent": 5
-        }
+            {
+                "id": 207,
+                "name": "Serbia",
+                "continent": 5
+            }
 
-        If a requested country is not found, then return JSON file is empty.
-#TODO(aleksandar): Test this claim.
+        If a requested country is not found, then JSON file has an empty object.
     """
 
     country = db.session.query(Country).filter_by(oid=oid).one_or_none()

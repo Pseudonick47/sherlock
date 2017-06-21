@@ -1,3 +1,4 @@
+# -*- coding=utf-8 -*-
 """
     Init applicaiton and register blueprints.
 
@@ -11,9 +12,12 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
+from sherlock import config
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://aleksandar:ftn@localhost/sherlock'
+app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
+
 
 from sherlock.site.views import mod as site_mod
 from sherlock.api.views import mod as api_mod

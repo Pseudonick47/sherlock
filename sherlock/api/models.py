@@ -35,7 +35,7 @@ class Continent(enum.Enum):
 class Country(db.Model):
     """SQLAlchemy table representing countries.
 
-    Atributes:
+    Attributes:
         oid (int): Unique identifier.
         name (str): Country name.
         continent (int): Continent identifier.
@@ -44,15 +44,11 @@ class Country(db.Model):
 
     __tablename__ = 'countries'
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.Unicode, nullable=False)
-#TODO(aleksandar-varga): Add Unique constraint on name
+    name = db.Column(db.Unicode, nullable=False) #, unique=True)
     continent = db.Column(db.Integer, nullable=False)
     cities = db.relationship('City', backref='country', lazy='dynamic')
 
     def __init__(self, name, continent):
-
-        assert name
-
         self.name = name
         self.continent = continent
 
@@ -61,7 +57,7 @@ class Country(db.Model):
 class City(db.Model):
     """SQLAlchemy table representing cities.
 
-    Atributes:
+    Attributes:
         oid (int): Unique identifier.
         name (str): City name.
         country_id (int): Country identifier in which the city is located.
@@ -77,9 +73,6 @@ class City(db.Model):
     addresses = db.relationship('Address', backref='city', lazy='dynamic')
 
     def __init__(self, name, country_id):
-
-        assert name
-
         self.name = name
         self.country_id = country_id
 
@@ -88,7 +81,7 @@ class City(db.Model):
 class Address(db.Model):
     """SQLAlchemy table representing addresses.
 
-    Atributes:
+    Attributes:
         oid (int): Unique identifier.
         street_name (str): Street name.
         number (str): Building identifier.
@@ -103,40 +96,50 @@ class Address(db.Model):
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
 
     def __init__(self, street_name, city_id, number=''):
-
-        assert street_name
-        assert city_id is not None
-
         self.street_name = street_name
         self.number = number
+        self.city_id = city_id
 
-#TODO(aleksandar-varga): Finish docs.
 
 class Price(db.Model):
+
+    """SQLAlchemy table representing addresses.
+
+    Attributes:
+        location_id (int): Reference to the location whice price describes. It
+                           is also an unique identifier of the price.
+        amount (float): Amount of money that is requested.
+    """
     __tablename__ = 'prices'
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'),
                             primary_key=True)
-    amount = db.Column(db.Integer, nullable=False)
+    amount = db.Column(db.Float, nullable=False)
 
 #TODO(all): Discuss limit_for_children.
 
     def __init__(self, location_id, amount):
-
-        assert amount
-
         self.location_id = location_id
         self.amount = amount
 
 
+#TODO(all): Discuss the idea to create a new class which would
+#           describe what sort of activity would be done on a location.
+
 class Location(db.Model):
     """SQLAlchemy table representing locations.
 
-    Atributes:
+    Attributes:
         oid (int): Unique identifier.
         name (str): Location name.
         description (str): Location description.
-        city_id (int): City identifier to which the address belongs to.
-        city (City): Reference to a city to which the address belongs to.
+        price (Price): Reference to the price object belonging to the location.
+        city_id (int): City identifier to which the location belongs to.
+        city (City): Reference to a city to which the location belongs to.
+        address_id (int): Address identifier on which the location is located.
+        address (Address): Reference to an address on which the address is
+                           located.
+        country_id (int): Country identifier to which the location belongs to.
+        country (Country): Reference to a city to which the location belongs to.
     """
 
     __tablename__ = 'locations'
@@ -151,18 +154,8 @@ class Location(db.Model):
     city = db.relationship('City', backref='locations')
     country = db.relationship('Country', backref='locations')
 
-#TODO(all): Discuss the idea to create a new class which would
-#           describe what sort of activity would be done on a location.
-
     def __init__(self, name, description, address_id=None,
                  city_id=None, country_id=None):
-        
-        # at least one of these informations must be provided
-        assert address_id or city_id or country_id
-
-#TODO(aleksandar-varga): Check if provided address is in the provided city
-#TODO(aleksandar-varga): Check if provided city is in the provided country
-
         self.name = name
         self.description = description
         self.address_id = address_id
@@ -178,6 +171,17 @@ tours_on_locations = db.Table(
 
 
 class Tour(db.Model):
+    """SQLAlchemy table representing tour.
+
+    Attributes:
+        oid (int): Unique identifier.
+        name (str): Tour name.
+        description (str): Tour description.
+        guide_fee (float): Fee that guide demands for organizing tours.
+        locations (list): References to locations that will be visited by the
+                          participants of the tour.
+    """
+
     __tablename__ = 'toures'
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode, nullable=False)
