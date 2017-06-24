@@ -4,14 +4,12 @@
 """
 
 from flask import Blueprint
+from flask import render_template
 
 mod = Blueprint('site', __name__)
 
 @mod.route('/')
 def homepage():
-    """
-        Homepage
-        
-    """
+    """Homepage"""
 
-    return "Let's travel!"
+    return render_template('index.html')
