@@ -62,7 +62,6 @@ class City(db.Model):
         name (str): City name.
         country_id (int): Country identifier in which the city is located.
         country: Reference to a country in which the city is located.
-        addresses (list): References to addresses belonging to the city.
     """
 
     __tablename__ = 'cities'
@@ -70,35 +69,10 @@ class City(db.Model):
     name = db.Column(db.Unicode, nullable=False)
     country_id = db.Column(db.Integer, db.ForeignKey('countries.id'),
                            nullable=False)
-    addresses = db.relationship('Address', backref='city', lazy='dynamic')
 
     def __init__(self, name, country_id):
         self.name = name
         self.country_id = country_id
-
-#TODO(all): Discuss eliminating addresses.
-
-class Address(db.Model):
-    """SQLAlchemy table representing addresses.
-
-    Attributes:
-        oid (int): Unique identifier.
-        street_name (str): Street name.
-        number (str): Building identifier.
-        city_id (int): City identifier to which the address belongs to.
-        city (City): Reference to a city to which the address belongs to.
-    """
-
-    __tablename__ = 'addresses'
-    oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
-    street_name = db.Column(db.Unicode, nullable=False)
-    number = db.Column(db.Unicode)
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
-
-    def __init__(self, street_name, city_id, number=''):
-        self.street_name = street_name
-        self.number = number
-        self.city_id = city_id
 
 
 class Price(db.Model):
@@ -135,9 +109,6 @@ class Location(db.Model):
         price (Price): Reference to the price object belonging to the location.
         city_id (int): City identifier to which the location belongs to.
         city (City): Reference to a city to which the location belongs to.
-        address_id (int): Address identifier on which the location is located.
-        address (Address): Reference to an address on which the address is
-                           located.
         country_id (int): Country identifier to which the location belongs to.
         country (Country): Reference to a city to which the location belongs to.
     """
@@ -146,19 +117,15 @@ class Location(db.Model):
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode, nullable=False)
     description = db.Column(db.Unicode)
-    address_id = db.Column(db.ForeignKey('addresses.id'))
     city_id = db.Column(db.ForeignKey('cities.id'))
     country_id = db.Column(db.ForeignKey('countries.id'))
     price = db.relationship('Price', backref='location', lazy='dynamic')
-    address = db.relationship('Address', backref='locations')
     city = db.relationship('City', backref='locations')
     country = db.relationship('Country', backref='locations')
 
-    def __init__(self, name, description, address_id=None,
-                 city_id=None, country_id=None):
+    def __init__(self, name, description, city_id=None, country_id=None):
         self.name = name
         self.description = description
-        self.address_id = address_id
         self.city_id = city_id
         self.country_id = country_id
 

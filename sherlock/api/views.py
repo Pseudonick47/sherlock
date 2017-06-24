@@ -8,14 +8,11 @@
 
 """
 
-
-from flask import Blueprint
-from flask import jsonify
 from flask import request
-
+from flask import Blueprint
+from flask_restful import Api
+from flask_restful import Resource
 from sherlock import db
-
-from sherlock.api.models import Address
 from sherlock.api.models import City
 from sherlock.api.models import Country
 from sherlock.api.models import Location
@@ -24,132 +21,80 @@ from sherlock.api.models import Tour
 
 
 mod = Blueprint('api', __name__)
+api = Api(mod)
 
 
-@mod.route('/tours', methods=['POST'])
-#TODO(pseudonick47): Authentification required decorator.
-def add_tour():
-    """Add new tour.
-
-    Request should be formated as JSON file. For example:
-
-        {
-            "name": "",
-            "description": "",
-            "quide_fee": 10.25,
-            "locations": [2, 51, 16, 43]
-        }
-
-    Returns:
-        JSON file. For example:
-
-        Addtion succeeded
-
-            {
-                "success": true
-            }
-
-        Addition failed
-
-            {
-                "success": false
-            }
-
+class TourAPI(Resource):
+    """Services that allow user to get, update or delete tour identified
+       with the given key.
     """
 
-    req = request.get_json(force=True, silent=True)
-    if req:
+    def put(self, oid):
+        """Update already existing tour.
 
-        tour = Tour(
-            name=req['name'],
-            guide_fee=req['guide_fee'],
-            description=req['description']
-        )
-
-        for location in req['locations']:
-            loc = db.session.query(Location).filter_by(location['id']).one()
-            loc.tours.append(tour)
-
-        db.session.add(tour)
-        db.session.commit()
-
-        return jsonify({'success': True})
-
-    return jsonify({'success': False})
-
-
-@mod.route('/tours/<int:oid>', methods=['POST'])
-def modify_tour(oid):
-    """Modify already existing tour.
-
-    Request should be formated as JSON file. For example:
-
-        {
-            "name": "",
-            "description": "",
-            "quide_fee": 10.25,
-            "locations": [2, 51, 16, 43]
-        }
-
-    Fileds can be omitted.
-
-    Returns:
-        JSON file. For example:
-
-        Modification succeeded
+        Request should be formated as JSON file. For example:
 
             {
-                "success": true
+                "name": "",
+                "description": "",
+                "guide_fee": 10.25,
+                "locations": [2, 51, 16, 43]
             }
 
-        Modification failed
+        Available fields are:
+            name (str), description (str), guide_fee (float),
+            locations (list of integers)
 
-            {
-                "success": false
-            }
+        Fields can be omitted.
 
-    """
+        Returns:
+            JSON file. For example:
 
-    req = request.get_json(force=True, silent=True)
-    if req:
+            Update succeeded
 
-        tour = db.session.query(Tour).filter_by(oid=oid).one_or_none()
+                {
+                    "success": true
+                }
 
-        if not tour:
-            return jsonify({'success': False})
+            Update failed
 
-        for key in req.keys():
-            if key == 'name':
-                tour.name = req[key]
+                {
+                    "success": false,
+                    "message": "Field name incorrect"
+                }
+        """
 
-            elif key == 'description':
-                tour.description = req[key]
+        req = request.get_json(force=True, silent=True)
+        if req:
+            tour = db.session.query(Tour).filter_by(oid=oid,).one_or_none()
+            if not tour:
+                return ({'success':False,
+                         'message':'Specified tour not found.'}, 404)
 
-            elif key == 'guide_fee':
-                tour.guide_fee = req[key]
+            for key in req.keys():
+                if key == 'locations':
+                    for location in req['locations']:
+                        loc = db.session.query(Location).filter_by(oid=location,).one()
+                        loc.tours.append(tour)
 
-            else:
-                for location in req['locations']:
-                    loc = db.session.query(Location).filter_by(location['id'])\
-                            .one()
-                    loc.tours.append(tour)
+                elif hasattr(tour, key):
+                    setattr(tour, key, req[key])
+                else:
+                    return ({'success':False, 'message':'Field name incorrect'},
+                            400)
 
-        db.session.commit()
+            db.session.commit()
+            return ({'success': True}, 200)
 
-        return jsonify({'success': True})
+        return ({'success':False, 'message':'Not JSON'}, 400)
 
-    return jsonify({'success': False})
+    def get(self, oid):
+        """Fetch tour corresponding to the given identifier.
 
+        Returns:
+            JSON file containing id, name, description, guide_fee and location
+            identifiers of selected tour. For example:
 
-@mod.route("/tours", methods=['GET'])
-def get_tours():
-    """Fetch all tours.
-
-    Returns:
-        JSON file containing id, name, description, guide_fee and location
-        identifiers of all selected tours. For example:
-
-            [
                 {
                     "id": 17,
                     "name": "Walk Through History",
@@ -157,544 +102,777 @@ def get_tours():
                                     mansions in all of Europe.",
                     "guide_fee": 10,
                     "locations": [...]
-                },
+                }
+
+            If a requested tour is not found, then JSON file has an empty
+            object.
+        """
+
+        response = {}
+        tour = db.session.query(Tour).filter_by(oid=oid,).one_or_none()
+        if tour:
+            response = {
+                'id':tour.oid,
+                'name':tour.name,
+                'description':tour.description,
+                'guide_fee':tour.guide_fee,
+                'locations':[location.oid for location in tour.locations]
+            }
+
+            return (response, 200)
+
+        return (response, 404)
+
+    def delete(self, oid):
+        """Delete tour corresponding to the given identifier.
+
+        Returns:
+            JSON file. For example:
+
+            Deletion succeeded
+
                 {
-                    "id": 17,
-                    "name": "It's Time to Party",
-                    "description": "Have a wonderful time with young and
-                                    wicked people in Sydney's most spectacular
-                                    night clubs.",
-                    "guide_fee": 14,
-                    "locations": [...]
-                },
-                ...
-            ]
+                    "success": true
+                }
 
-        If database is not populated, then JSON file has an empty array.
+            Deletion failed
+
+                {
+                    "success": false,
+                    "message": "Specified tour not found"
+                }
+        """
+
+        num = db.session.query(Tour).filter_by(oid=oid,).delete()
+        if num:
+            return ({'success': True}, 200)
+
+        return ({'success':False,
+                 'message':'Specified tour not found'}, 404)
+
+
+class TourListAPI(Resource):
+    """Services that allow user to get all tours or to add new tour."""
+
+    def post(self):
+        """Add new tour.
+
+        Request should be formated as JSON file. For example:
+
+            {
+                "name": "",
+                "description": "",
+                "guide_fee": 10.25,
+                "locations": [2, 51, 16, 43]
+            }
+
+        Returns:
+            JSON file. For example:
+
+            Addition succeeded
+
+                {
+                    "success": true
+                }
+
+            Addition failed
+
+                {
+                    "success": false,
+                    "message": "Not JSON"
+                }
+        """
+
+        req = request.get_json(force=True, silent=True)
+        if req:
+            tour = Tour(
+                name=req['name'],
+                guide_fee=req['guide_fee'],
+                description=req['description']
+            )
+
+            for location in req['locations']:
+                loc = db.session.query(Location).filter_by(oid=location,).one()
+                loc.tours.append(tour)
+
+            db.session.add(tour)
+            db.session.commit()
+
+            return ({'success': True}, 200)
+
+        return ({'success':False, 'message':'Not JSON'}, 400)
+
+    def get(self):
+        """Fetch all tours.
+
+        Returns:
+            JSON file containing id, name, description, guide_fee and location
+            identifiers of all selected tours. For example:
+
+                [
+                    {
+                        "id": 17,
+                        "name": "Walk Through History",
+                        "description": "Visit some of the finest castles and
+                                        mansions in all of Europe.",
+                        "guide_fee": 10,
+                        "locations": [...]
+                    },
+                    {
+                        "id": 17,
+                        "name": "It's Time to Party",
+                        "description": "Have a wonderful time with young and
+                                        wicked people in Sydney's most
+                                        spectacular night clubs.",
+                        "guide_fee": 14,
+                        "locations": [...]
+                    },
+                    ...
+                ]
+
+            If database is not populated, then JSON file has an empty array.
+        """
+
+        response = []
+        for tour in db.session.query(Tour).all():
+            response.append(
+                {
+                    'id':tour.oid,
+                    'name':tour.name,
+                    'description':tour.description,
+                    'guide_fee':tour.guide_fee,
+                    'locations':[location.oid for location in tour.locations]
+                }
+            )
+
+        return (response, 200)
+
+
+class LocationAPI(Resource):
+    """Services that allow user to get, update or delete location identified
+       with the given key.
     """
 
-    response = []
-    for tour in db.session.query(Tour).all():
-        response.append(
-            {
-                'id': tour.oid,
-                'name': tour.name,
-                'description': tour.description,
-                'guide_fee': tour.guide_fee,
-                'locations': [location.oid for location in tour.locations]
-            }
-        )
+    def put(self, oid):
+        """Update already existing location.
 
-    return jsonify(response)
-
-@mod.route("/tours/<int:oid>", methods=['GET'])
-def get_tour(oid):
-    """Fetch tour corresponding to the given identifier.
-
-    Returns:
-        JSON file containing id, name, description, guide_fee and locaiton
-        identifiers of selected tour. For example:
+        Request should be formated as JSON file. For example:
 
             {
-                "id": 17,
-                "name": "Walk Through History",
-                "description": "Visit some of the finest castles and
-                                mansions in all of Europe.",
-                "guide_fee": 10,
-                "locations": [...]
+                "name": "",
+                "description": "",
+                "city_id": 2,
+                "country_id: 4,
+                "price": 10.25
             }
 
-        If a requested tour is not found, then JSON file has an empty object.
-    """
+        Available fields are:
+            name (str), description (str), city_id (int), country_id (int)
 
-    response = {}
-    tour = db.session.query(Tour).filter_by(oid=oid).one_or_none()
-    if tour:
-        response = {
-            'id': tour.oid,
-            'name': tour.name,
-            'description': tour.description,
-            'guide_fee': tour.guide_fee,
-            'locations': [location.oid for location in tour.locations]
-        }
+        Fields can be omitted.
 
-    return jsonify(response)
+        Returns:
+            JSON file. For example:
 
+            Update succeeded
 
-@mod.route('/locations', methods=['POST'])
-def add_location():
-    """Add new location.
+                {
+                    "success": true
+                }
 
-    Request should be formated as JSON file. For example:
+            Update failed
 
-        {
-            "name": "",
-            "description": "",
-            "address_id": 15,
-            "city_id": 2,
-            "country_id: 4,
-        }
+                {
+                    "success": false,
+                    "message": "Field name incorrect"
+                }
 
-    Returns:
-        JSON file. For example:
+        """
 
-        Addtion succeeded
+        req = request.get_json(force=True, silent=True)
+        if req:
+            location = db.session.query(Location).filter_by(oid=oid,).one_or_none()
+            if not location:
+                return ({'success':False,
+                         'message':'Specified location not found.'}, 404)
 
-            {
-                "success": true
-            }
+            for key in req.keys():
+                if key == 'price':
+                    location.price.amount = req[key]
+                elif hasattr(location, key):
+                    setattr(location, key, req[key])
+                else:
+                    return ({'success':False,
+                             'message':'Field name incorrect'}, 400)
 
-        Addition failed
+            db.session.commit()
 
-            {
-                "success": false
-            }
-    """
+            return ({'success': True}, 200)
 
-    req = request.get_json(force=True, silent=True)
-    if req:
-        location = Location(
-            name=req['name'],
-            description=req['description'],
-            address_id=req['address_id'] if req.has_key('address_id') else None,
-            city_id=req['city_id'] if req.has_key('city_id') else None,
-            country_id=req['country_id'] if req.has_key('country_id') else None
-        )
+        return ({'success':False, 'message':'Not JSON'}, 400)
 
-        price = Price(location.oid, req['price'])
+    def get(self, oid):
+        """Fetch location corresponding to the given identifier.
 
-        db.session.add(location)
-        db.session.add(price)
-        db.session.commit()
+        Returns:
+            JSON file containing id, name, description, price, city and
+            country identifiers of the selected location. For example:
 
-        return jsonify({'success': True})
-
-    return jsonify({'success': False})
-
-@mod.route('/locations', methods=['GET'])
-def get_locations():
-    """Fetch all locations.
-
-    Returns:
-        JSON file containing id, name, description, price, address, city and
-        country identifiers of all selected locations. For example:
-
-            [
                 {
                     "id": 17,
                     "name": "Jovan Jovanovic Zmaj",
                     "description": "Gimnazija",
                     "price": 0,
-                    "address_id": 17
                     "city_id": 1,
                     "country_id": 207
-                },
+                }
+
+            If a requested location is not found, then JSON file has an empty
+            object.
+        """
+
+        response = {}
+        location = db.session.query(Location).filter_by(oid=oid,).one_or_none()
+        if location:
+            response = {
+                'id':location.oid,
+                'name':location.name,
+                'description':location.description,
+                'price':location.price.amount,
+                'city_id':location.city_id,
+                'country_id':location.country_id
+            }
+
+            return (response, 200)
+
+        return (response, 404)
+
+    def delete(self, oid):
+        """Delete location corresponding to the given identifier.
+
+        Returns:
+            JSON file. For example:
+
+            Deletion succeeded
+
                 {
-                    "id": 17,
-                    "name": "Jovan Jovanovic Zmaj",
-                    "description": "Gimnazija",
-                    "price": 0,
-                    "address_id": 522
-                    "city_id": 52,
-                    "country_id": 78
-                },
-                ...
-            ]
+                    "success": true
+                }
 
-        If database is not populated, then JSON file has an empty array.
-    """
+            Deletion failed
 
-    response = []
-    for location in db.session.query(Location).all():
-        response.append(
-            {
-                'id': location.oid,
-                'name': location.name,
-                'description': location.description,
-                'price': location.price.amount,
-                'address_id': location.address_id,
-                'city_id': location.city_id,
-                'country_id': location.counrty_id
-            }
-        )
-
-    return jsonify(response)
-
-@mod.route('/locations/<int:oid>', methods=['GET'])
-def get_location(oid):
-    """Fetch location corresponding to the given identifier.
-
-    Returns:
-        JSON file containing id, name, description, price, address, city and
-        country identifiers of the selected location. For example:
-
-            {
-                "id": 17,
-                "name": "Jovan Jovanovic Zmaj",
-                "description": "Gimnazija",
-                "price": 0,
-                "address_id": 17
-                "city_id": 1,
-                "country_id": 207
-            }
-
-        If a requested location is not found, then JSON file has an empty
-        object.
-    """
-
-    response = {}
-    location = db.session.query(Location).filter_by(oid=oid).one_or_none()
-    if location:
-        response = {
-            'id': location.oid,
-            'name': location.name,
-            'description': location.description,
-            'price': location.price.amount,
-            'address_id': location.address_id,
-            'city_id': location.city_id,
-            'country_id': location.counrty_id
-        }
-
-    return jsonify(response)
-
-@mod.route('/addresses', methods=['POST'])
-def add_address():
-    """Add new address.
-
-    Request should be formated as JSON file. For example:
-
-        {
-            "street_name": "",
-            "city_id": 10,
-            "number": "14a"
-        }
-
-    Returns:
-        JSON file. For example:
-
-        Addtion succeeded
-
-            {
-                "success": true
-            }
-
-        Addition failed
-
-            {
-                "success": false
-            }
-    """
-
-    req = request.get_json(force=True, silent=True)
-    if req:
-        address = Address(
-            street_name=req['street_name'],
-            city_id=int(req['city_id']),
-            number=req['number'] if req['number'] else ''
-        )
-
-        db.session.add(address)
-        db.session.commit()
-
-        return jsonify({'success': True})
-
-    return jsonify({'success': False})
-
-@mod.route('/addresses', methods=['GET'])
-def get_addresses():
-    """Fetch all addresses.
-
-    Returns:
-        JSON file containing id, street_name, city identifier and number of all
-        addresses. For example:
-
-            [
                 {
-                    "id": 17,
-                    "street_name": "Zlatne grede",
-                    "city_id": 1,
-                    "number": "4"
-                },
+                    "success": false,
+                    "message": "Specified location not found"
+                }
+        """
+
+        num = db.session.query(Location).filter_by(oid=oid,).delete()
+        if num:
+            return ({'success': True}, 200)
+
+        return ({'success':False,
+                 'message':'Specified location not found'}, 404)
+
+
+class LocationListAPI(Resource):
+    """Services that allow user to get all locations or to add new tour."""
+
+    def post(self):
+        """Add new location.
+
+        Request should be formated as JSON file. For example:
+
+            {
+                "name": "",
+                "description": "",
+                "city_id": 2,
+                "country_id: 4,
+                "price": 10.25
+            }
+
+        Returns:
+            JSON file. For example:
+
+            Addition succeeded
+
                 {
-                    "id": 522,
-                    "street_name": "Champs Elysées",
-                    "city_id": 52,
-                    "number": "15"
-                },
-                ...
-            ]
+                    "success": true
+                }
 
-        If database is not populated, then JSON file has an empty array.
+            Addition failed
+
+                {
+                    "success": false,
+                    "message": "Not JSON"
+                }
+        """
+
+        req = request.get_json(force=True, silent=True)
+        if req:
+            location = Location(
+                name=req['name'],
+                description=req['description'],
+                city_id=req['city_id'] if req.has_key('city_id') else None,
+                country_id=req['country_id']
+                if req.has_key('country_id') else None
+            )
+
+            price = Price(location.oid, req['price'])
+
+            db.session.add(location)
+            db.session.add(price)
+            db.session.commit()
+
+            return ({'success': True}, 200)
+
+        return ({'success':False, 'message':'Not JSON'}, 400)
+
+    def get(self):
+        """Fetch all locations.
+
+        Returns:
+            JSON file containing id, name, description, price, city and
+            country identifiers of all selected locations. For example:
+
+                [
+                    {
+                        "id": 17,
+                        "name": "Jovan Jovanovic Zmaj",
+                        "description": "Gimnazija",
+                        "price": 0,
+                        "city_id": 1,
+                        "country_id": 207
+                    },
+                    {
+                        "id": 17,
+                        "name": "Jovan Jovanovic Zmaj",
+                        "description": "Gimnazija",
+                        "price": 0,
+                        "city_id": 52,
+                        "country_id": 78
+                    },
+                    ...
+                ]
+
+            If database is not populated, then JSON file has an empty array.
+        """
+
+        response = []
+        for location in db.session.query(Location).all():
+            response.append(
+                {
+                    'id':location.oid,
+                    'name':location.name,
+                    'description':location.description,
+                    'price':location.price.amount,
+                    'city_id':location.city_id,
+                    'country_id':location.country_id
+                }
+            )
+
+        return (response, 200)
+
+
+class CityAPI(Resource):
+    """Services that allow user to get, update or delete city identified
+       with the given key.
     """
 
-    response = []
-    for address in db.session.query(Address).all():
-        response.append(
-            {
-                'id': address.oid,
-                'street_name': address.street_name,
-                'number': address.number,
-                'city_id': address.city_id
-            }
-        )
+    def put(self, oid):
+        """Update already existing city.
 
-    return jsonify(response)
-
-
-@mod.route('/addresses/<int:oid>', methods=['GET'])
-def get_address(oid):
-    """Fetch one address.
-
-    Returns:
-        JSON file containing id, street_name, city identifier and number of the
-        selected address. For example:
+        Request should be formated as JSON file. For example:
 
             {
-                "id": 17,
-                "street_name": "Zlatne grede",
-                "number": "4",
-                "city_id": 1
+                "name": "",
+                "country_id: 4
             }
 
-        If a requested address is not found, then JSON file has an empty object.
-    """
-    address = db.session.query(Address).filter_by(oid=oid).one_or_none()
+        Available fields are:
+            name (str), country_id (int)
 
-    response = {}
-    if address:
-        response = {
-            'id': address.oid,
-            'street_name': address.street_name,
-            'number': address.number,
-            'city_id': address.city_id
-        }
+        Fields can be omitted.
 
-    return jsonify(response)
+        Returns:
+            JSON file. For example:
 
+            Update succeeded
 
-@mod.route('/cities', methods=['POST'])
-def add_city():
-    """Adds new city.
+                {
+                    "success": true
+                }
 
-    Request should be formated as JSON file. For example:
+            Update failed
 
-        {
-            "name": "",
-            "country_id": 10
-        }
+                {
+                    "success": false,
+                    "message": "Field name incorrect"
+                }
+        """
 
-    Returns:
-        JSON file. For example:
+        req = request.get_json(force=True, silent=True)
+        if req:
+            city = db.session.query(City).filter_by(oid=oid,).one_or_none()
+            if not city:
+                return ({'success':False,
+                         'message':'Specified city not found.'}, 404)
 
-        Addtion succeeded
+            for key in req.keys():
+                if hasattr(city, key):
+                    setattr(city, key, req[key])
+                else:
+                    return ({'success':False,
+                             'message':'Field name incorrect'}, 400)
 
-            {
-                "success": true
-            }
+            db.session.commit()
 
-        Addition failed
+            return ({'success': True}, 200)
 
-            {
-                "success": false
-            }
-    """
+        return ({'success':False, 'message':'Not JSON'}, 400)
 
-    req = request.get_json(force=True, silent=True)
-    if req:
-        city = City(
-            name=req['name'],
-            country_id=int(req['counrty_id'])
-        )
+    def get(self, oid):
+        """Fetches city corresponding to the given identifier.
 
-        db.session.add(city)
-        db.commit()
+        Returns:
+            JSON file containing id, name, country identifier and addresses of
+            the selected city. For example:
 
-        return jsonify({'success': True})
-
-    return jsonify({'success': False})
-
-@mod.route('/cities', methods=['GET'])
-def get_cities():
-    """Fetch all cities.
-
-    Returns:
-        JSON file containing id, name, country identifier and addresses of all
-        cities. For example:
-
-            [
                 {
                     "id": 1,
                     "name": "Novi Sad",
-                    "country_id": 207
-                },
+                    "country_id": 1
+                }
+
+            If a requested city is not found, then JSON file has empty object.
+        """
+
+        city = db.session.query(City).filter_by(oid=oid,).one_or_none()
+        response = {}
+        if city:
+            response = {
+                'id':city.id,
+                'name':city.name,
+                'country_id':city.country_id
+            }
+            return (response, 200)
+
+        return (response, 404)
+
+    def delete(self, oid):
+        """Delete city corresponding to the given identifier.
+
+        Returns:
+            JSON file. For example:
+
+            Deletion succeeded
+
                 {
-                    "id": 10,
-                    "name": "New York",
-                    "country_id": 249
-                },
-                ...
-            ]
+                    "success": true
+                }
 
-        If a requested city is not found, then JSON file has an empty array.
+            Deletion failed
+
+                {
+                    "success": false,
+                    "message": "Specified city not found"
+                }
+        """
+
+        num = db.session.query(City).filter_by(oid=oid,).delete()
+        if num:
+            return ({'success': True}, 200)
+
+        return ({'success':False,
+                 'message':'Specified city not found'}, 404)
+
+
+class CityListAPI(Resource):
+    """Services that allow user to get all cities or to add new tour."""
+
+    def post(self):
+        """Adds new city.
+
+        Request should be formated as JSON file. For example:
+
+            {
+                "name": "",
+                "country_id": 10
+            }
+
+        Returns:
+            JSON file. For example:
+
+            Addition succeeded
+
+                {
+                    "success": true
+                }
+
+            Addition failed
+
+                {
+                    "success": false,
+                    "message": "Not JSON"
+                }
+        """
+
+        req = request.get_json(force=True, silent=True)
+        if req:
+            city = City(name=req['name'], country_id=int(req['country_id']),)
+
+            db.session.add(city)
+            db.commit()
+
+            return ({'success': True}, 200)
+
+        return ({'success':False, 'message':'Not JSON'}, 400)
+
+    def get(self):
+        """Fetch all cities.
+
+        Returns:
+            JSON file containing id, name, country identifier and addresses of
+            all cities. For example:
+
+                [
+                    {
+                        "id": 1,
+                        "name": "Novi Sad",
+                        "country_id": 207
+                    },
+                    {
+                        "id": 10,
+                        "name": "New York",
+                        "country_id": 249
+                    },
+                    ...
+                ]
+
+            If a requested city is not found, then JSON file has an empty array.
+        """
+
+        response = []
+        for city in db.session.query(City).all():
+            response.append(
+                {
+                    'id':city.id,
+                    'name':city.name,
+                    'country_id':city.country_id
+                }
+            )
+
+        return (response, 200)
+
+
+class CountryAPI(Resource):
+    """Services that allow user to get, update or delete country identified
+       with the given key.
     """
 
-    response = []
+    def put(self, oid):
+        """Update already existing country.
 
-    for city in db.session.guery(City).all():
-        response.append(
-            {
-                'id': city.id,
-                'name': city.name,
-                'country_id': city.country_id
-            }
-        )
-
-    return jsonify(response)
-
-
-@mod.route('/cities/<int:oid>', methods=['GET'])
-def get_city(oid):
-    """Fetches city corresponding to the given identifier.
-
-    Returns:
-        JSON file containing id, name, country identifier and addresses of the
-        selected city. For example:
+        Request should be formated as JSON file. For example:
 
             {
-                "id": 1,
-                "name": "Novi Sad",
-                "country_id": 1
+                "name": "",
             }
 
-        If a requested city is not found, then JSON file has empty object.
-    """
+        Available fields are:
+            name (str)
 
-    city = db.session.query(City).filter_by(oid=oid).one_or_none()
+        Fields can be omitted.
 
-    response = {}
-    if city:
-        response = {
-            'id': city.id,
-            'name': city.name,
-            'country_id': city.country_id
-        }
+        Returns:
+            JSON file. For example:
 
-        return jsonify(response)
+            Update succeeded
 
+                {
+                    "success": true
+                }
 
-@mod.route('/countries', methods=['POST'])
-#TODO(pseudonick47): Authentification required decorator.
-def add_country():
-    """Adds new country.
+            Update failed
 
-    This function is reserved for administrators.
+                {
+                    "success": false,
+                    "message": "Field name incorrect"
+                }
 
-    All countries recognized by the UN, by the year 2017, are added before
-    webapp deployement and this function is intended to allow the addition of
-    new countries that could become new UN member states in the future.
+        """
 
-    Request should be formated as JSON file. For example:
+        req = request.get_json(force=True, silent=True)
+        if req:
+            country = db.session.query(Country).filter_by(oid=oid,).one_or_none()
+            if not country:
+                return ({'success':False,
+                         'message':'Specified country not found.'}, 404)
 
-        {
-            "name": "",
-            "continent": 1,
-        }
+            for key in req.keys():
+                if hasattr(country, key):
+                    setattr(country, key, req[key])
+                else:
+                    return ({'success':False,
+                             'message':'Field name incorrect'}, 400)
 
-    Returns:
-        JSON file. For example:
+            db.session.commit()
 
-        Addtion succeeded
+            return ({'success': True}, 200)
 
-            {
-                "success": true
-            }
+        return ({'success':False, 'message':'Not JSON'}, 400)
 
-        Addition failed
+    def get(self, oid):
+        """Fetches country corresponding to the given identifier.
 
-            {
-                "success": false
-            }
-    """
-    req = request.get_json(force=True, silent=True)
-    if req:
-        country = Country(
-            name=req['name'],
-            continent=req['continent']
-        )
+        Args:
+            oid: An int that is the unique identifier of a object to fetch.
 
-        db.session.add(country)
-        db.session.commit()
+        Returns:
+            JSON file containing id, name and continent identifier fields of the
+            selected country. For example:
 
-        return jsonify({'success': True})
-
-    return jsonify({'success': False})
-
-@mod.route('/countries', methods=['GET'])
-def get_countries():
-    """Fetches all countries.
-
-    Returns:
-        JSON file containing id, name and continent identifier fields of all
-        countries. For example:
-
-            [
                 {
                     "id": 207,
                     "name": "Serbia",
                     "continent": 5
-                },
+                }
+
+            If a requested country is not found, then JSON file has an empty
+            object.
+        """
+
+        country = db.session.query(Country).filter_by(oid=oid,).one_or_none()
+
+        response = {}
+        if country:
+            response = {
+                'id':country.oid,
+                'name':country.name,
+                'continent':country.continent
+            }
+
+            return (response, 200)
+
+        return (response, 404)
+
+    def delete(self, oid):
+        """Delete country corresponding to the given identifier.
+
+        Returns:
+            JSON file. For example:
+
+            Deletion succeeded
+
                 {
-                    "id": 107,
-                    "name": "India",
-                    "continent": 3
-                },
-                ...
-            ]
+                    "success": true
+                }
 
-        If database is not populated, then JSON file has an empty array.
-    """
+            Deletion failed
 
-    response = []
-    for country in db.session.query(Country).all():
-        response.append(
+                {
+                    "success": false,
+                    "message": "Specified country not found"
+                }
+        """
+
+        num = db.session.query(Country).filter_by(oid=oid,).delete()
+        if num:
+            return ({'success': True}, 200)
+
+        return ({'success':False,
+                 'message':'Specified country not found'}, 404)
+
+
+class CountryListAPI(Resource):
+    """Services that allow user to get all countries or to add new tour."""
+
+    def post(self):
+        """Adds new country.
+
+        This function is reserved for administrators.
+
+        All countries recognized by the UN, by the year 2017, are added before
+        webapp deployment and this function is intended to allow the addition
+        of new countries that could become new UN member states in the future.
+
+        Request should be formated as JSON file. For example:
+
             {
-                'id': country.oid,
-                'name': country.name,
-                'continent': country.continent
-            }
-        )
-
-    return jsonify(response)
-
-
-@mod.route('/countries/<int:oid>', methods=['GET'])
-def get_country(oid):
-    """Fetches country corresponding to the given identifier.
-
-    Args:
-        oid: An int that is the unique identifier of a object to fetch.
-
-    Returns:
-        JSON file containing id, name and continent identifier fields of the
-        selected country. For example:
-
-            {
-                "id": 207,
-                "name": "Serbia",
-                "continent": 5
+                "name": "",
+                "continent": 1,
             }
 
-        If a requested country is not found, then JSON file has an empty object.
-    """
+        Returns:
+            JSON file. For example:
 
-    country = db.session.query(Country).filter_by(oid=oid).one_or_none()
+            Addition succeeded
 
-    response = {}
-    if country:
-        response = {
-            'id': country.oid,
-            'name': country.name,
-            'continent': country.continent
-        }
+                {
+                    "success": true
+                }
 
-    return jsonify(response)
+            Addition failed
+
+                {
+                    "success": false,
+                    "message": "Field name incorrect"
+                }
+        """
+
+        req = request.get_json(force=True, silent=True)
+        if req:
+            country = Country(name=req['name'], continent=req['continent'])
+
+            db.session.add(country)
+            db.session.commit()
+
+            return ({'success': True}, 200)
+
+        return ({'success':False, 'message':'Not JSON'}, 400)
+
+    def get(self):
+        """Fetches all countries.
+
+        Returns:
+            JSON file containing id, name and continent identifier fields of all
+            countries. For example:
+
+                [
+                    {
+                        "id": 207,
+                        "name": "Serbia",
+                        "continent": 5
+                    },
+                    {
+                        "id": 107,
+                        "name": "India",
+                        "continent": 3
+                    },
+                    ...
+                ]
+
+            If database is not populated, then JSON file has an empty array.
+        """
+
+        response = []
+        for country in db.session.query(Country).all():
+            response.append(
+                {
+                    'id':country.oid,
+                    'name':country.name,
+                    'continent':country.continent
+                }
+            )
+
+        return (response, 200)
+
+
+api.add_resource(TourListAPI, '/tours')
+api.add_resource(TourAPI, '/tours/<int:oid>')
+api.add_resource(LocationListAPI, '/locations')
+api.add_resource(LocationAPI, '/locations/<int:oid>')
+api.add_resource(CityListAPI, '/cities')
+api.add_resource(CityAPI, '/cities/<int:oid>')
+api.add_resource(CountryListAPI, '/countries')
+api.add_resource(CountryAPI, '/countries/<int:oid>')
