@@ -1,3 +1,5 @@
+node_modules/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -56,7 +58,6 @@ local_settings.py
 # Flask stuff:
 instance/
 .webassets-cache
-config.py
 
 # Scrapy stuff:
 .scrapy

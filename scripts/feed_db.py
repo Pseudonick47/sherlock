@@ -78,7 +78,8 @@ def main():
                         and_dependent_territories_by_continent_(data_file)')
     html = response.read()
 
-    conn = psycopg2.connect('dbname=sherlock user=aleksandar password=ftn')
+#TODO: set dbname, user and password
+    conn = psycopg2.connect('dbname=db user=u password=p')
     curr = conn.cursor()
 
     for country in extract_countries(str(html)):
