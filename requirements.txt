@@ -1,6 +1,7 @@
 Flask
 # Flask extenstions
 Flask-SQLAlchemy
+Flask-RESTful
 
 # Additional libraries
 psycopg2

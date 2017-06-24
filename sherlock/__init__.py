@@ -14,7 +14,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 from sherlock import config
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='site/static', 
+            template_folder='site/templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 
