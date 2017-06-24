@@ -8,10 +8,11 @@ import {
     REGISTER_USER_FAILURE,
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
+    TOURES_SUCCESS,
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';
-import { get_token, create_user } from '../utils/http_functions';
+import { get_token, create_user, get_toures } from '../utils/http_functions';
 
 
 export function loginUserSuccess(token) {
@@ -92,7 +93,6 @@ export function loginUser(email, password) {
     };
 }
 
-
 export function registerUserRequest() {
     return {
         type: REGISTER_USER_REQUEST,
@@ -147,5 +147,28 @@ export function registerUser(email, password) {
                 }
                 ));
             });
+    };
+}
+
+export function getTouresSuccess(data) {
+    localStorage.setItem('data', data);
+    return {
+        type: TOURES_SUCCESS,
+        payload: data,
+    };
+}
+
+export function searchToures(searchTerm) {
+    return function (dispatch) {
+        return get_toures()
+            .then(parseJSON)
+            .then(response => {
+                try {
+                    dispatch(getTouresSuccess(response));
+                } catch (e) {
+                    alert(e);
+                }
+            })
+            .catch(error => {});
     };
 }

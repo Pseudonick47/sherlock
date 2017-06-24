@@ -12,6 +12,7 @@ import ProtectedView from './components/ProtectedView';
 import Analytics from './components/Analytics';
 import NotFound from './components/NotFound';
 import CountriesView from './components/CountriesView';
+import SearchToures from './components/SearchToures';
 
 import { DetermineAuth } from './components/DetermineAuth';
 import { requireAuthentication } from './components/AuthenticatedComponent';
@@ -21,6 +22,7 @@ export default (
     <Route path="/" component={App}>
         <Route path="main" component={requireAuthentication(ProtectedView)} />
         <Route path="login" component={requireNoAuthentication(LoginView)} />
+        <Route path="toures" component={requireNoAuthentication(SearchToures)} />
         <Route path="register" component={requireNoAuthentication(RegisterView)} />
         <Route path="home" component={requireNoAuthentication(HomeContainer)} />
         <Route path="analytics" component={requireAuthentication(Analytics)} />
