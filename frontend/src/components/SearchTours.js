@@ -10,11 +10,11 @@ import * as actionCreators from '../actions/auth';
 import { validateEmail } from '../utils/misc';
 import SearchBar from 'material-ui-search-bar' 
 
-import Toures from './Toures';
+import Tours from './Tours';
 
 function mapStateToProps(state) {
     return {
-        toures: state.auth.toures,
+        tours: state.auth.tours,
         isLoading: state.auth.isLoading,
     };
 }
@@ -33,41 +33,36 @@ const style = {
 };
 
 @connect(mapStateToProps, mapDispatchToProps)
-export default class SearchToures extends React.Component {
+export default class SearchTours extends React.Component {
 
     constructor(props) {
         super(props);
         const redirectRoute = '';
         this.state = {
-            isLoading: true,
-            toures: [],
             searchTerm: '',
         };
-    }
-
-    componentWillMount() {
-        this.props.searchToures(this.state.searchTerm);
     }
 
     render() {
         return (
             <div className="col-md-6 col-md-offset-3">
                 <SearchBar
-                    onRequestSearch={() => this.props.searchToures(this.state.searchTerm)}
+                    onChange={this.props.searchTours}
+                    onRequestSearch={this.props.searchTours}
                     style={{
                         margin: '0 auto',
                         maxWidth: 800,
                     }}
                 />
-                <Toures data={this.props.toures}/>
+                <Tours data={this.props.tours ? this.props.tours : []}/>
             </div>
         );
 
     }
 }
 
-SearchToures.propTypes = {
-    toures: React.PropTypes.array,
+SearchTours.propTypes = {
+    tours: React.PropTypes.array,
     searchTerm: React.PropTypes.string,
-    searchToures: React.PropTypes.func,
+    searchTours: React.PropTypes.func,
 };

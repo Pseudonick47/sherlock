@@ -47,6 +47,6 @@ export function get_countries() {
     return axios.get('api/countries');
 }
 
-export function get_toures() {
-    return axios.get('api/toures');
+export function get_tours() {
+    return axios.get('api/tooo');
 }

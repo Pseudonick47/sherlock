@@ -8,11 +8,11 @@ import {
     REGISTER_USER_FAILURE,
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
-    TOURES_SUCCESS,
+    TOURS_SUCCESS,
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';
-import { get_token, create_user, get_toures } from '../utils/http_functions';
+import { get_token, create_user, get_tours } from '../utils/http_functions';
 
 
 export function loginUserSuccess(token) {
@@ -150,21 +150,21 @@ export function registerUser(email, password) {
     };
 }
 
-export function getTouresSuccess(data) {
+export function getToursSuccess(data) {
     localStorage.setItem('data', data);
     return {
-        type: TOURES_SUCCESS,
+        type: TOURS_SUCCESS,
         payload: data,
     };
 }
 
-export function searchToures(searchTerm) {
+export function searchTours(searchTerm) {
     return function (dispatch) {
-        return get_toures()
+        return get_tours()
             .then(parseJSON)
             .then(response => {
                 try {
-                    dispatch(getTouresSuccess(response));
+                    dispatch(getToursSuccess(response));
                 } catch (e) {
                     alert(e);
                 }
