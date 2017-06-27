@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from flask_bcrypt import Bcrypt
+import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from config import BaseConfig
@@ -10,8 +10,11 @@ app.config.from_object(BaseConfig)
 
 db = SQLAlchemy(app)
 
-bcrypt = Bcrypt(app)
+# bcrypt = Bcrypt(app)
+from models.users import User
 
+db.create_all()
+db.session.commit()
 
 from api.auth import mod as api_auth_mod
 from api.data import mod as api_data_mod

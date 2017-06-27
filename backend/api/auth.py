@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask import jsonify
 from flask import render_template
 from flask import request
+from flask import g
 
 from sqlalchemy.exc import IntegrityError
 
@@ -23,6 +24,7 @@ def get_user():
 
 @mod.route("/create_user", methods=["POST"])
 def create_user():
+    print('biooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo')
     incoming = request.get_json()
     user = User(
         email=incoming["email"],
