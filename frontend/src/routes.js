@@ -13,6 +13,7 @@ import Analytics from './components/Analytics';
 import NotFound from './components/NotFound';
 import CountriesView from './components/CountriesView';
 import SearchTours from './components/SearchTours';
+import ProfileView from './components/ProfileView';
 
 import { DetermineAuth } from './components/DetermineAuth';
 import { requireAuthentication } from './components/AuthenticatedComponent';
@@ -27,6 +28,7 @@ export default (
         <Route path="home" component={requireNoAuthentication(HomeContainer)} />
         <Route path="analytics" component={requireAuthentication(Analytics)} />
         <Route path="countries" component={requireNoAuthentication(CountriesView)} />
-        <Route path="*" component={DetermineAuth(NotFound)} />
+	<Route path="profile" component={requireAuthentication(ProfileView)} />                
+	<Route path="*" component={DetermineAuth(NotFound)} />
     </Route>
 );

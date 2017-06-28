@@ -82,7 +82,10 @@ export class Header extends Component {
                                     Analytics
                                 </MenuItem>
                                 <Divider />
-
+				<MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
+                                    ProfileView
+                                </MenuItem>
+				<Divider />
                                 <MenuItem onClick={(e) => this.logout(e)}>
                                     Logout
                                 </MenuItem>

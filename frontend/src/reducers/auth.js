@@ -10,6 +10,7 @@ import {
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     TOURS_SUCCESS,
+    PROFILE_SUCCESS,
 } from '../constants/index';
 
 const initialState = {
@@ -79,4 +80,10 @@ export default createReducer(initialState, {
             tours: payload,   
             isLoading:false,
         }),
+    [PROFILE_SUCCESS]: (state, payload) =>
+	Object.assign({}, state, {
+	    userName: jwtDecode(payload.token).email,
+	    isLoading:false,
+	    statusText: "Your profile",
+	}),
 });
