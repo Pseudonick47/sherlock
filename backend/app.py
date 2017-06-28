@@ -1,16 +1,12 @@
 from flask import Flask, jsonify
-import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from config import BaseConfig
 
-
 app = Flask(__name__, static_folder="./static/dist", template_folder="./static")
 app.config.from_object(BaseConfig)
-
 db = SQLAlchemy(app)
 
-# bcrypt = Bcrypt(app)
 from models.users import User
 
 db.create_all()

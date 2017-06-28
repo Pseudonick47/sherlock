@@ -8,18 +8,11 @@
 
 """
 
-from flask import Blueprint
-from flask import request
-from flask_restful import Api
-from flask_restful import Resource
+from flask import Blueprint, request
+from flask_restful import Api, Resource
 
 from app import db
-from models.data import City
-from models.data import Country
-from models.data import Location
-from models.data import Price
-from models.data import Tour
-
+from models.data import City, Country, Location, Price, Tour
 
 mod = Blueprint('api/data', __name__)
 api = Api(mod)

@@ -10,7 +10,6 @@ class User(db.Model):
         self.email = email
         self.active = True
         self.password = User.hashed_password(password)
-        # self.password = password
 
     @staticmethod
     def hashed_password(password):
@@ -21,7 +20,6 @@ class User(db.Model):
     def get_user_with_email_and_password(email, password):
         user = User.query.filter_by(email=email).first()
         if user and argon2.verify(password, user.password):
-        # if user and (user.password == password):
             return user
         else:
             return None

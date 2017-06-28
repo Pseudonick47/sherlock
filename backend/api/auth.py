@@ -1,17 +1,9 @@
-from flask import Blueprint
-from flask import jsonify
-from flask import render_template
-from flask import request
-from flask import g
-
+from flask import Blueprint, jsonify, render_template, request, g
 from sqlalchemy.exc import IntegrityError
 
 from app import db
 from models.users import User
-from utils.auth import generate_token
-from utils.auth import requires_auth
-from utils.auth import verify_token
-
+from utils.auth import generate_token, requires_auth, verify_token
 
 mod = Blueprint('api/auth', __name__)
 
@@ -24,7 +16,6 @@ def get_user():
 
 @mod.route("/create_user", methods=["POST"])
 def create_user():
-    print('biooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo')
     incoming = request.get_json()
     user = User(
         email=incoming["email"],
