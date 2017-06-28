@@ -1,46 +1,23 @@
-import { FETCH_PROTECTED_DATA_REQUEST, RECEIVE_PROTECTED_DATA, 
-         FETCH_COUNTRIES_REQUEST, RECEIVE_COUNTRIES } from '../constants/index';
-import { parseJSON } from '../utils/misc';
-import { data_about_user, get_countries } from '../utils/http_functions';
-import { logoutAndRedirect } from './auth';
+import {
+    FETCH_COUNTRIES_REQUEST,
+    FETCH_COUNTRIES_FAILED,
+    RECEIVE_COUNTRIES,
+    INSERT_CITY_SUCCEEDED,
+    INSERT_CITY_FAILED,
+} from '../constants/index';
+import { get_countries, post_city } from '../utils/http_functions';
 
-export function receiveProtectedData(data) {
-    return {
-        type: RECEIVE_PROTECTED_DATA,
-        payload: {
-            data,
-        },
-    };
-}
-
-export function fetchProtectedDataRequest() {
-    return {
-        type: FETCH_PROTECTED_DATA_REQUEST,
-    };
-}
-
-export function fetchProtectedData(token) {
-    return (dispatch) => {
-        dispatch(fetchProtectedDataRequest());
-        data_about_user(token)
-            .then(parseJSON)
-            .then(response => {
-                dispatch(receiveProtectedData(response.result));
-            })
-            .catch(error => {
-                if (error.status === 401) {
-                    dispatch(logoutAndRedirect(error));
-                }
-            });
-    };
-}
 
 export function receiveCountries(data) {
     return {
         type: RECEIVE_COUNTRIES,
-        payload: {
-            data,
-        },
+        payload: data,
+    };
+}
+
+export function fetchCountriesFailed() {
+    return {
+        type: FETCH_COUNTRIES_FAILED,
     };
 }
 
@@ -55,10 +32,40 @@ export function fetchCountries() {
         dispatch(fetchCountriesRequest());
         get_countries()
             .then(response => {
-                alert(response.data);
-                dispatch(receiveCountries(response.data))
+                dispatch(receiveCountries(response.data));
             })
             .catch(error => {
+                dispatch(fetchCountriesFailed());
+            });
+    };
+}
+
+export function insertCitySucceeded() {
+    return {
+        type: INSERT_CITY_SUCCEEDED,
+    };
+}
+
+export function insertCityFailed(message) {
+    return {
+        type: INSERT_CITY_FAILED,
+        payload: {
+            message: message,
+        }
+    };
+}
+
+export function insertCity(name, country_id) {
+    return (dispatch) => {
+        alert(name);
+        alert(country_id);
+        post_city(name, country_id)
+            .then(response => {
+                if (response.status === 200) {
+                    dispatch(insertCitySucceeded());
+                } else if (response.status === 409){
+                    dispatch(insertCityFailed('City with that name already exists.'));
+                }
             });
     };
 }

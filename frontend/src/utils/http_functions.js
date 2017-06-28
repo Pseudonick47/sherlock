@@ -50,3 +50,9 @@ export function get_countries() {
 export function get_tours() {
     return axios.get('api/tooo');
 }
+
+export function post_city(name, country_id) {
+    return axios.post('api/cities', {
+        name, country_id,
+    });
+}

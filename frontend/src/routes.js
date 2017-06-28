@@ -13,6 +13,7 @@ import Analytics from './components/Analytics';
 import NotFound from './components/NotFound';
 import CountriesView from './components/CountriesView';
 import SearchTours from './components/SearchTours';
+import AddNewCityDialog from './components/Dialogs/AddNewCityDialog';
 
 import { DetermineAuth } from './components/DetermineAuth';
 import { requireAuthentication } from './components/AuthenticatedComponent';
@@ -27,6 +28,7 @@ export default (
         <Route path="home" component={requireNoAuthentication(HomeContainer)} />
         <Route path="analytics" component={requireAuthentication(Analytics)} />
         <Route path="countries" component={requireNoAuthentication(CountriesView)} />
+        <Route path="addcity" component={requireNoAuthentication(AddNewCityDialog)} />
         <Route path="*" component={DetermineAuth(NotFound)} />
     </Route>
 );

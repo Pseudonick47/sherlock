@@ -616,7 +616,7 @@ class CityListAPI(Resource):
             city = City(name=req['name'], country_id=int(req['country_id']),)
 
             db.session.add(city)
-            db.commit()
+            db.session.commit()
 
             return ({'success': True}, 200)
 
