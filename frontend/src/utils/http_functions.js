@@ -70,3 +70,15 @@ export function post_location(name, description, city_id, country_id, price) {
         name, description, city_id, country_id, price,
     });
 }
+
+export function upload_file(file) {
+    var data = new FormData();
+    alert('axios  ' + file[0]);
+    data.append('file', file[0]);
+    const options = {
+        headers: {
+            'Content-Type': 'multipart/ form - data'
+        }
+    };
+    return axios.post('api/upload', data, options);
+}

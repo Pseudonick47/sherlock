@@ -1,4 +1,6 @@
 import { 
+    RECEIVE_PROTECTED_DATA, 
+    FETCH_PROTECTED_DATA_REQUEST,
     RECEIVE_COUNTRIES,
     FETCH_COUNTRIES_REQUEST,
     FETCH_COUNTRIES_FAILED,
@@ -12,20 +14,30 @@ import {
     RECEIVE_CITIES_BY_COUNTRY,
     INSERT_LOCATION_SUCCEEDED,
     INSERT_LOCATION_FAILED,
+    FILE_UPLOAD_SUCCESS
 } from '../constants';
 
 import { createReducer } from '../utils/misc';
 
 const initialState = {
-    countries: [],
-    cities: [],
+    data: null,
     isFetching: false,
-    error: false,
-    message: '',
-    insert_error: false,
+    loaded: false,
+    isUploaded: false,
+    imageIds: [],
 };
 
 export default createReducer(initialState, {
+    [RECEIVE_PROTECTED_DATA]: (state, payload) =>
+        Object.assign({}, state, {
+            data: payload.data,
+            isFetching: false,
+            loaded: true,
+        }),
+    [FETCH_PROTECTED_DATA_REQUEST]: (state) =>
+        Object.assign({}, state, {
+            isFetching: true,
+        }),
     [RECEIVE_COUNTRIES]: (state, payload) =>
         Object.assign({}, state, {
             countries: payload,
@@ -86,4 +98,8 @@ export default createReducer(initialState, {
             insert_error: true,
             message: payload.message,
         }),
+    [FILE_UPLOAD_SUCCESS]: (state, payload) =>
+        Object.assign({}, state, {
+            imageIds: payload.imageIds,
+        }),    
 });

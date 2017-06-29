@@ -5,8 +5,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actionCreators from '../actions/data'
 
-import AddLocationDialog from './Dialogs/AddLocationDialog';
-
 function mapStateToProps(state) {
     return {
         data: state.data.data,
@@ -26,11 +24,29 @@ export default class CountriesView extends React.Component {
         super(props);
     }
 
+    componentDidMount() {
+        this.fetchData();
+        
+    }
+
+    fetchData() {
+        this.props.fetchCountries();
+    }
+
     render() {
+        
+        var countries = [];
+        if(this.props.loaded) {
+            this.props.data.forEach(function(e) {
+                countries.push(<h3>{e.name}</h3>)
+            });
+        }
 
         return (
              <div>
-                <AddLocationDialog />
+                 {!this.props.loaded ? <h1>Loading data..</h1> : 
+                 <h1>{countries}</h1>}
+                
             </div>
         );
 

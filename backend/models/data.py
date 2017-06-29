@@ -161,3 +161,16 @@ class Tour(db.Model):
         self.name = name
         self.guide_fee = guide_fee
         self.description = description
+
+
+class Image(db.Model):
+    """SQLAlchemy table representing images.
+
+    """
+
+    __tablename__ = 'images'
+    oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    file_name = db.Column(db.Unicode, nullable=False, unique=True)
+    
+    def __init__(self, file_name):
+        self.file_name = file_name

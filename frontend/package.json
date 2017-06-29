@@ -118,6 +118,7 @@
   },
   "dependencies": {
     "material-ui-search-bar": "^0.2.1",
-    "material-ui-number-input": "^5.0.19"
+    "react-dropzone": "^3.13.3",
+    "react-upload-file": "^2.0.0-beta.6"
   }
 }
