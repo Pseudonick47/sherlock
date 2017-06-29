@@ -9,6 +9,7 @@ import {
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     TOURS_SUCCESS,
+    PROFILE_SUCCESS,
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';

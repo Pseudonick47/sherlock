@@ -15,6 +15,7 @@ import CountriesView from './components/CountriesView';
 import SearchTours from './components/SearchTours';
 import NewCityDialog from './components/Dialogs/NewCityDialog';
 import NewLocationDialog from './components/Dialogs/NewLocationDialog';
+import ProfileView from './components/ProfileView';
 
 import { DetermineAuth } from './components/DetermineAuth';
 import { requireAuthentication } from './components/AuthenticatedComponent';
@@ -31,6 +32,8 @@ export default (
         <Route path="countries" component={requireNoAuthentication(CountriesView)} />
         <Route path="new_city" component={requireNoAuthentication(NewCityDialog)} />
         <Route path="new_location" component={requireNoAuthentication(NewLocationDialog)} />
+        <Route path="*" component={DetermineAuth(NotFound)} />
+        <Route path="profile" component={requireAuthentication(ProfileView)} />                
         <Route path="*" component={DetermineAuth(NotFound)} />
     </Route>
 );
