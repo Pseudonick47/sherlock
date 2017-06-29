@@ -407,14 +407,19 @@ class LocationListAPI(Resource):
             location = Location(
                 name=req['name'],
                 description=req['description'],
-                city_id=req['city_id'] if req.has_key('city_id') else None,
-                country_id=req['country_id']
-                if req.has_key('country_id') else None
+                city_id=req['city_id'] if 'city_id' in req else None,
+                country_id=req['country_id'] if 'country_id' in req else None
             )
 
-            price = Price(location.oid, req['price'])
 
             db.session.add(location)
+            db.session.commit()
+            
+            print("")
+            print(location.oid)
+            print("")
+            price = Price(location.oid, req['price'])
+
             db.session.add(price)
             db.session.commit()
 
@@ -862,6 +867,46 @@ class CountryListAPI(Resource):
         return (response, 200)
 
 
+class CitiesByCountry(Resource):
+
+    def get(self, oid):
+        """Fetches all cities that belong to the requested country.
+
+        Returns:
+            JSON file containing id and name all cities belonging to the
+            requested country. For example:
+
+                [
+                    {
+                        "id": 1,
+                        "name": "Novi Sad",
+                    },
+                    {
+                        "id": 10,
+                        "name": "New York",
+                    },
+                    ...
+                ]
+
+            If there isn't any city found, then JSON file has an empty array.
+        """
+        response = []
+        country = db.session.query(Country).filter_by(oid=oid).one_or_none()
+        if country:
+            for city in country.cities:
+                response.append(
+                    {
+                        'id': city.oid,
+                        'name': city.name,
+                    }
+                )
+
+            return (response, 200)
+
+        return ({'success':False,
+                 'message':'Specified country not found'}, 404)
+
+
 api.add_resource(TourListAPI, '/tours')
 api.add_resource(TourAPI, '/tours/<int:oid>')
 api.add_resource(LocationListAPI, '/locations')
@@ -870,3 +915,4 @@ api.add_resource(CityListAPI, '/cities')
 api.add_resource(CityAPI, '/cities/<int:oid>')
 api.add_resource(CountryListAPI, '/countries')
 api.add_resource(CountryAPI, '/countries/<int:oid>')
+api.add_resource(CitiesByCountry, '/country/<int:oid>/cities')

@@ -51,8 +51,22 @@ export function get_tours() {
     return axios.get('api/tooo');
 }
 
+export function get_cities() {
+    return axios.get('api/cities');
+}
+
 export function post_city(name, country_id) {
     return axios.post('api/cities', {
         name, country_id,
+    });
+}
+
+export function get_cities_by_country(country_id) {
+    return axios.get('api/country/' + country_id + '/cities');
+}
+
+export function post_location(name, description, city_id, country_id, price) {
+    return axios.post('api/locations', {
+        name, description, city_id, country_id, price,
     });
 }

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actionCreators from '../actions/data'
 
-import AddNewCityDialog from './Dialogs/AddNewCityDialog';
+import AddLocationDialog from './Dialogs/AddLocationDialog';
 
 function mapStateToProps(state) {
     return {
@@ -30,7 +30,7 @@ export default class CountriesView extends React.Component {
 
         return (
              <div>
-                <AddNewCityDialog />
+                <AddLocationDialog />
             </div>
         );
 

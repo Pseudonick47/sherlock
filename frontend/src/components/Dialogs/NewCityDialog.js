@@ -13,7 +13,7 @@ import * as actionCreators from '../../actions/data'
 
 function mapStateToProps(state) {
     return {
-        countries: state.data.data,
+        countries: state.data.countries,
         isFetching: state.data.isFetching,
         error: state.data.error,
         insert_error: state.data.insert_error,
@@ -26,7 +26,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 @connect(mapStateToProps, mapDispatchToProps)
-export default class AddNewCityDialog extends React.Component {
+export default class NewCityDialog extends React.Component {
 
     constructor(props) {
         super(props);
@@ -59,7 +59,7 @@ export default class AddNewCityDialog extends React.Component {
     };
 
     handleSubmit = () => {
-        const { city_name, country_name} = this.state;
+        const {city_name, country_name} = this.state;
         const index = this.state.country_names.indexOf(country_name);
 
         if (city_name.length === 0) {
@@ -82,7 +82,7 @@ export default class AddNewCityDialog extends React.Component {
             const country = this.props.countries[index];
             this.props.insertCity(city_name, country.id);
             if (this.props.insert_error) {
-                this.setState({name_error: this.props.message});
+                this.setState({city_name_error: this.props.message});
             } else {
                 this.setState({open: false});
             }
@@ -141,7 +141,7 @@ export default class AddNewCityDialog extends React.Component {
                     open={this.state.open}
                 >
                     <TextField
-                        hintText="Name"
+                        hintText="City name"
                         errorText={this.state.city_name_error}
                         onChange={(event, value) => this.nameChanged(event, value)}
                         fullWidth
@@ -160,8 +160,9 @@ export default class AddNewCityDialog extends React.Component {
     };
 }
 
-AddNewCityDialog.propTypes = {
+NewCityDialog.propTypes = {
     fetchCountries: React.PropTypes.func,
+    insertCity: React.PropTypes.func,
     countries: React.PropTypes.array,
     isFetching: React.PropTypes.bool,
     error: React.PropTypes.bool,
