@@ -2,7 +2,8 @@ import {
     RECEIVE_PROTECTED_DATA, 
     FETCH_PROTECTED_DATA_REQUEST,
     RECEIVE_COUNTRIES,
-    FETCH_COUNTRIES_REQUEST
+    FETCH_COUNTRIES_REQUEST,
+    FILE_UPLOAD_SUCCESS
 } from '../constants';
 
 import { createReducer } from '../utils/misc';
@@ -11,6 +12,8 @@ const initialState = {
     data: null,
     isFetching: false,
     loaded: false,
+    isUploaded: false,
+    imageIds: [],
 };
 
 export default createReducer(initialState, {
@@ -34,4 +37,8 @@ export default createReducer(initialState, {
         Object.assign({}, state, {
             isFetching: true,
         }),
+    [FILE_UPLOAD_SUCCESS]: (state, payload) =>
+        Object.assign({}, state, {
+            imageIds: payload.imageIds,
+        }),    
 });

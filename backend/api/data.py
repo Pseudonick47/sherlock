@@ -10,9 +10,11 @@
 
 from flask import Blueprint, request
 from flask_restful import Api, Resource
+import os
+from datetime import datetime
 
 from app import db
-from models.data import City, Country, Location, Price, Tour
+from models.data import City, Country, Location, Price, Tour, Image
 
 mod = Blueprint('api/data', __name__)
 api = Api(mod)
@@ -861,6 +863,20 @@ class CountryListAPI(Resource):
 
         return (response, 200)
 
+class FilesAPI(Resource):
+    def post(self):
+        UPLOAD_FOLDER = '../static'
+        image_ids = []
+        for fi in request.files:
+            extension = request.files[fi].filename.split('.')[-1]
+            filename = datetime.now().strftime("%d_%m_%Y_%H_%M_%S_%f" + '.' + extension)
+            request.files[fi].save(os.path.join(UPLOAD_FOLDER, filename))
+            image = Image(filename)
+            db.session.add(image)
+            db.session.commit()
+            image_ids.append(image.oid)
+        return (image_ids)
+
 
 api.add_resource(TourListAPI, '/tours')
 api.add_resource(TourAPI, '/tours/<int:oid>')
@@ -870,3 +886,4 @@ api.add_resource(CityListAPI, '/cities')
 api.add_resource(CityAPI, '/cities/<int:oid>')
 api.add_resource(CountryListAPI, '/countries')
 api.add_resource(CountryAPI, '/countries/<int:oid>')
+api.add_resource(FilesAPI, '/upload')

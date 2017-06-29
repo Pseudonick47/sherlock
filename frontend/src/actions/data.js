@@ -1,7 +1,9 @@
-import { FETCH_PROTECTED_DATA_REQUEST, RECEIVE_PROTECTED_DATA, 
-         FETCH_COUNTRIES_REQUEST, RECEIVE_COUNTRIES } from '../constants/index';
+import {
+    FETCH_PROTECTED_DATA_REQUEST, RECEIVE_PROTECTED_DATA,
+    FETCH_COUNTRIES_REQUEST, RECEIVE_COUNTRIES, FILE_UPLOAD_SUCCESS
+} from '../constants/index';
 import { parseJSON } from '../utils/misc';
-import { data_about_user, get_countries } from '../utils/http_functions';
+import { data_about_user, get_countries, upload_file } from '../utils/http_functions';
 import { logoutAndRedirect } from './auth';
 
 export function receiveProtectedData(data) {
@@ -59,6 +61,28 @@ export function fetchCountries() {
                 dispatch(receiveCountries(response.data))
             })
             .catch(error => {
+            });
+    };
+}
+
+export function fileUploadSuccess(response) {
+    return {
+        type: FILE_UPLOAD_SUCCESS,
+        payload: {
+            response,
+        },
+    };
+}
+
+export function fileUpload(fileList, callback) { 
+    return (dispatch) => {
+        upload_file(fileList)    
+            .then(parseJSON)
+            // .then(alert(response))
+            // .then((response) => alert(response))
+            .then(callback)
+            .catch(error => {
+                alert('nesto poslo po zlu')
             });
     };
 }

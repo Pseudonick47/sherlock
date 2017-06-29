@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
-
+import FileUpload from './FileUpload';
 import * as actionCreators from '../actions/auth';
 
 import { validateEmail } from '../utils/misc';
@@ -108,6 +108,10 @@ export default class ProfileView extends React.Component {
             }
         }
     }
+    
+    imageUploadCallback(imageIds) { 
+        alert(imageIds[0]);
+    }
 
     edit(e) {
 	var novo = window.prompt("Edit info","Name");
@@ -159,7 +163,7 @@ export default class ProfileView extends React.Component {
                     label="✎"
                     onClick={(e) => this.edit(e)}
                 />
-		
+        <FileUpload callback={this.imageUploadCallback} />
 	    </div>   
         );
 

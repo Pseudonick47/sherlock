@@ -50,3 +50,15 @@ export function get_countries() {
 export function get_tours() {
     return axios.get('api/tooo');
 }
+
+export function upload_file(file) {
+    var data = new FormData();
+    alert('axios  ' + file[0]);
+    data.append('file', file[0]);
+    const options = {
+        headers: {
+            'Content-Type': 'multipart/ form - data'
+        }
+    };
+    return axios.post('api/upload', data, options);
+}

@@ -14,6 +14,7 @@ import NotFound from './components/NotFound';
 import CountriesView from './components/CountriesView';
 import SearchTours from './components/SearchTours';
 import ProfileView from './components/ProfileView';
+import FileUpload from './components/FileUpload';
 
 import { DetermineAuth } from './components/DetermineAuth';
 import { requireAuthentication } from './components/AuthenticatedComponent';
@@ -24,6 +25,7 @@ export default (
         <Route path="main" component={requireAuthentication(ProtectedView)} />
         <Route path="login" component={requireNoAuthentication(LoginView)} />
         <Route path="tours" component={requireNoAuthentication(SearchTours)} />
+        <Route path="upload" component={requireAuthentication(FileUpload)} />
         <Route path="register" component={requireNoAuthentication(RegisterView)} />
         <Route path="home" component={requireNoAuthentication(HomeContainer)} />
         <Route path="analytics" component={requireAuthentication(Analytics)} />
