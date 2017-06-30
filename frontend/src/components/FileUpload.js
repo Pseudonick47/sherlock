@@ -36,8 +36,10 @@ export default class FileUpload extends React.Component {
     }
 
     onDrop(acceptedFiles, rejectedFiles) {
-        var filesToBeSent = [];
-        filesToBeSent.push(acceptedFiles[0]);
+        var filesToBeSent = this.state.filesToBeSent;
+        for (var f in acceptedFiles) {
+            filesToBeSent.push(acceptedFiles[f]);            
+        }
         this.setState({
             filesToBeSent: filesToBeSent,
         });

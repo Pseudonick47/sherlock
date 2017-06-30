@@ -51,10 +51,11 @@ export function get_tours() {
     return axios.get('api/tooo');
 }
 
-export function upload_file(file) {
+export function upload_file(files) {
     var data = new FormData();
-    alert('axios  ' + file[0]);
-    data.append('file', file[0]);
+    for (var f in files) {
+        data.append('file' + f, files[f]);        
+    }
     const options = {
         headers: {
             'Content-Type': 'multipart/ form - data'
