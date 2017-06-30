@@ -48,7 +48,7 @@ export function get_countries() {
 }
 
 export function get_tours() {
-    return axios.get('api/tooo');
+    return axios.get('api/tours');
 }
 
 export function upload_file(files) {
