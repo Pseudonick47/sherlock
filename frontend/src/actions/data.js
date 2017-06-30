@@ -57,7 +57,6 @@ export function fetchCountries() {
         dispatch(fetchCountriesRequest());
         get_countries()
             .then(response => {
-                alert(response.data);
                 dispatch(receiveCountries(response.data))
             })
             .catch(error => {
@@ -78,11 +77,9 @@ export function fileUpload(fileList, callback) {
     return (dispatch) => {
         upload_file(fileList)    
             .then(parseJSON)
-            // .then(alert(response))
-            // .then((response) => alert(response))
             .then(callback)
             .catch(error => {
-                alert('nesto poslo po zlu')
+                alert('Error uploading file!')
             });
     };
 }

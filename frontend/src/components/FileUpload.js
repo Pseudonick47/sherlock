@@ -51,20 +51,34 @@ export default class FileUpload extends React.Component {
     
     render() {
 
+        const dropStyle = {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: 250,
+            width: 250,
+            margin: 5,
+            padding: 10,
+            border: "2px dashed #2323cf",
+            borderRadius: 20,
+        };
+
+        const style = {
+
+        }
+
         return (
             <div className="App">
-                <center>
-                    <Dropzone onDrop={(files) => this.onDrop(files)}>
-                        <div>Drop files here, or click to select files to upload.</div>
-                    </Dropzone>
-                    {/*<div>
-                        Files to be printed are:
-                        {this.state.filesPreview}
-                    </div>*/}
-                </center>
+                <Dropzone
+                    style={dropStyle}
+                    onDrop={(files) => this.onDrop(files)}
+                >
+                    <div style={{textAlign: "center",}}>Drop files here, or click to select files to upload.</div>
+                </Dropzone>
                 <MuiThemeProvider>
                     <RaisedButton
                         label="Upload Files"
+                        style={{margin: 5,}}
                         onClick={(e) => this.uploadFile(e)} />
                 </MuiThemeProvider>
             </div>
