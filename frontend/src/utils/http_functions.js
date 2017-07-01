@@ -47,9 +47,6 @@ export function get_countries() {
     return axios.get('api/countries');
 }
 
-export function get_tours() {
-    return axios.get('api/tooo');
-}
 
 export function get_cities() {
     return axios.get('api/cities');
@@ -79,6 +76,14 @@ export function upload_file(file) {
     var data = new FormData();
     alert('axios  ' + file[0]);
     data.append('file', file[0]);
+    return axios.get('api/tours');
+}
+
+export function upload_file(files) {
+    var data = new FormData();
+    for (var f in files) {
+        data.append('file' + f, files[f]);        
+    }
     const options = {
         headers: {
             'Content-Type': 'multipart/ form - data'

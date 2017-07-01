@@ -45,7 +45,7 @@ export default class SearchTours extends React.Component {
 
     render() {
         return (
-            <div className="col-md-6 col-md-offset-3">
+            <div>
                 <SearchBar
                     onChange={this.props.searchTours}
                     onRequestSearch={this.props.searchTours}

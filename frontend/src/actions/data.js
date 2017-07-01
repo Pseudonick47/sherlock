@@ -265,3 +265,23 @@ export function fileUpload(fileList, callback) {
             });
     };
 }
+
+export function fileUploadSuccess(response) {
+    return {
+        type: FILE_UPLOAD_SUCCESS,
+        payload: {
+            response,
+        },
+    };
+}
+
+export function fileUpload(fileList, callback) { 
+    return (dispatch) => {
+        upload_file(fileList)    
+            .then(parseJSON)
+            .then(callback)
+            .catch(error => {
+                alert('Error uploading file!')
+            });
+    };
+}

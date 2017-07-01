@@ -904,6 +904,7 @@ class CountryListAPI(Resource):
 
         return (response, 200)
 
+
 class CitiesByCountryAPI(Resource):
 
     def get(self, oid):

@@ -19,6 +19,7 @@ import NewCityDialog from './components/Dialogs/NewCityDialog';
 import NewLocationDialog from './components/Dialogs/NewLocationDialog';
 import AddLocations from './components/Dialogs/AddLocations';
 import AddTour from './components/AddTour';
+import SingleTour from './components/SingleTour'
 
 import { DetermineAuth } from './components/DetermineAuth';
 import { requireAuthentication } from './components/AuthenticatedComponent';
@@ -29,6 +30,9 @@ export default (
         <Route path="main" component={requireAuthentication(ProtectedView)} />
         <Route path="login" component={requireNoAuthentication(LoginView)} />
         <Route path="tours" component={requireNoAuthentication(SearchTours)} />
+        <Route path="tour" component="div">
+            <Route path=":id" component={requireNoAuthentication(SingleTour)} />
+        </Route>
         <Route path="upload" component={requireAuthentication(FileUpload)} />
         <Route path="register" component={requireNoAuthentication(RegisterView)} />
         <Route path="home" component={requireNoAuthentication(HomeContainer)} />

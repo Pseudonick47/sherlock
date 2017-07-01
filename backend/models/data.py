@@ -200,6 +200,7 @@ class Tour(db.Model):
 class Image(db.Model):
     """SQLAlchemy table representing images.
 
+    Attributes:
         oid (int): Unique identifier.
         file_name (str): Name of the file as it is stored on the server.
     """
