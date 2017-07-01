@@ -8,7 +8,7 @@
 
 """
 
-from flask import Blueprint, request
+from flask import Blueprint, request, send_from_directory
 from flask_restful import Api, Resource
 import os
 from datetime import datetime
@@ -34,12 +34,13 @@ class TourAPI(Resource):
                 "name": "",
                 "description": "",
                 "guide_fee": 10.25,
+                "thumbnail_id": 2,
                 "locations": [2, 51, 16, 43]
             }
 
         Available fields are:
             name (str), description (str), guide_fee (float),
-            locations (list of integers)
+            thumbnail_id (int), locations (list of integers)
 
         Fields can be omitted.
 
@@ -80,6 +81,7 @@ class TourAPI(Resource):
                             400)
 
             db.session.commit()
+
             return ({'success': True}, 200)
 
         return ({'success':False, 'message':'Not JSON'}, 400)
@@ -88,8 +90,8 @@ class TourAPI(Resource):
         """Fetch tour corresponding to the given identifier.
 
         Returns:
-            JSON file containing id, name, description, guide_fee and location
-            identifiers of selected tour. For example:
+            JSON file containing id, name, description, guide_fee, thumbnail_id
+            and location identifiers of selected tour. For example:
 
                 {
                     "id": 17,
@@ -97,6 +99,7 @@ class TourAPI(Resource):
                     "description": "Visit some of the finest castles and
                                     mansions in all of Europe.",
                     "guide_fee": 10,
+                    "thumbnail_id": 2,
                     "locations": [...]
                 }
 
@@ -112,6 +115,7 @@ class TourAPI(Resource):
                 'name':tour.name,
                 'description':tour.description,
                 'guide_fee':tour.guide_fee,
+                'thumbnail_id': tour.thumbnail_id,
                 'locations':[location.oid for location in tour.locations]
             }
 
@@ -159,6 +163,7 @@ class TourListAPI(Resource):
                 "name": "",
                 "description": "",
                 "guide_fee": 10.25,
+                "thumbnail_id": 2,
                 "locations": [2, 51, 16, 43]
             }
 
@@ -184,7 +189,8 @@ class TourListAPI(Resource):
             tour = Tour(
                 name=req['name'],
                 guide_fee=req['guide_fee'],
-                description=req['description']
+                description=req['description'],
+                thumbnail_id=req['thumbnail_id']
             )
 
             for location in req['locations']:
@@ -202,8 +208,8 @@ class TourListAPI(Resource):
         """Fetch all tours.
 
         Returns:
-            JSON file containing id, name, description, guide_fee and location
-            identifiers of all selected tours. For example:
+            JSON file containing id, name, description, guide_fee, thumbnail_id
+            and location identifiers of all selected tours. For example:
 
                 [
                     {
@@ -212,6 +218,7 @@ class TourListAPI(Resource):
                         "description": "Visit some of the finest castles and
                                         mansions in all of Europe.",
                         "guide_fee": 10,
+                        "thumbnail_id": 2,
                         "locations": [...]
                     },
                     {
@@ -221,6 +228,7 @@ class TourListAPI(Resource):
                                         wicked people in Sydney's most
                                         spectacular night clubs.",
                         "guide_fee": 14,
+                        "thumbnail_id": 403,
                         "locations": [...]
                     },
                     ...
@@ -237,6 +245,7 @@ class TourListAPI(Resource):
                     'name':tour.name,
                     'description':tour.description,
                     'guide_fee':tour.guide_fee,
+                    'thumbnail_id': tour.thumbnail_id,
                     'locations':[location.oid for location in tour.locations]
                 }
             )
@@ -393,7 +402,8 @@ class LocationListAPI(Resource):
             Addition succeeded
 
                 {
-                    "success": true
+                    "success": true,
+                    "id": 43
                 }
 
             Addition failed
@@ -422,7 +432,7 @@ class LocationListAPI(Resource):
             db.session.add(price)
             db.session.commit()
 
-            return ({'success': True}, 200)
+            return ({'success': True, 'id': location.oid}, 200)
 
         return ({'success':False, 'message':'Not JSON'}, 400)
 
@@ -463,13 +473,35 @@ class LocationListAPI(Resource):
                     'id':location.oid,
                     'name':location.name,
                     'description':location.description,
-                    'price':location.price.amount,
+                    'price':location.price[0].amount,
                     'city_id':location.city_id,
                     'country_id':location.country_id
                 }
             )
 
         return (response, 200)
+
+
+class LocationByCityAPI(Resource):
+
+    def post(self, oid):
+        response = []
+        city = db.session.query(City).filter_by(oid=oid).one_or_none()
+        if city:
+            for location in city.locations:
+                response.append(
+                    {
+                        'id': location.oid,
+                        'name': location.name,
+                        'description': location.description,
+                        'price': location.price.amount,
+                    }
+                )
+
+            return (response, 200)
+
+        return ({'success':False,
+                 'message':'Specified country not found'}, 404)
 
 
 class CityAPI(Resource):
@@ -604,7 +636,8 @@ class CityListAPI(Resource):
             Addition succeeded
 
                 {
-                    "success": true
+                    "success": true,
+                    "id": 21,
                 }
 
             Addition failed
@@ -617,12 +650,18 @@ class CityListAPI(Resource):
 
         req = request.get_json(force=True, silent=True)
         if req:
-            city = City(name=req['name'], country_id=int(req['country_id']),)
+            thumbnail_id = req['thumbnail_id'] if 'thumbnail_id' in req else None
+
+            city = City(
+                name=req['name'],
+                country_id=int(req['country_id']),
+                thumbnail_id=thumbnail_id
+            )
 
             db.session.add(city)
             db.session.commit()
 
-            return ({'success': True}, 200)
+            return ({'success': True, 'id': city.oid}, 200)
 
         return ({'success':False, 'message':'Not JSON'}, 400)
 
@@ -888,6 +927,7 @@ class CitiesByCountryAPI(Resource):
 
             If there isn't any city found, then JSON file has an empty array.
         """
+
         response = []
         country = db.session.query(Country).filter_by(oid=oid).one_or_none()
         if country:
@@ -904,6 +944,55 @@ class CitiesByCountryAPI(Resource):
         return ({'success':False,
                  'message':'Specified country not found'}, 404)
 
+
+class LocationsByCityAPI(Resource):
+
+    def get(self, oid):
+        """Fetch all locations.
+
+        Returns:
+            JSON file containing id, name, description, price, city and
+            country identifiers of all selected locations. For example:
+
+                [
+                    {
+                        "id": 17,
+                        "name": "Jovan Jovanovic Zmaj",
+                        "description": "Gimnazija",
+                        "price": 0
+                    },
+                    {
+                        "id": 17,
+                        "name": "Jovan Jovanovic Zmaj",
+                        "description": "Gimnazija",
+                        "price": 0
+                    },
+                    ...
+                ]
+
+            If database is not populated, then JSON file has an empty array.
+        """
+
+        city = db.session.query(City).filter_by(oid=oid).one_or_none()
+
+        if city:
+            response = []
+            for location in city.locations:
+                response.append(
+                    {
+                        'id':location.oid,
+                        'name':location.name,
+                        'description':location.description,
+                        'price':location.price[0].amount
+                    }
+                )
+
+            return (response, 200)
+
+        return ({'success':False,
+                 'message':'Specified city not found'}, 404)
+
+
 class FilesAPI(Resource):
     def post(self):
         UPLOAD_FOLDER = '../static'
@@ -918,14 +1007,27 @@ class FilesAPI(Resource):
             image_ids.append(image.oid)
         return (image_ids)
 
+class ImageAPI(Resource):
+
+    def get(self, oid):
+        image = db.session.query(Image).filter_by(oid=oid).one_or_none()
+        if image:
+            UPLOAD_FOLDER = '../static'
+            return send_from_directory(UPLOAD_FOLDER, image.file_name)
+
+        return ({'success':False,
+                 'message':'Specified image not found'}, 404)
+
 
 api.add_resource(TourListAPI, '/tours')
 api.add_resource(TourAPI, '/tours/<int:oid>')
 api.add_resource(LocationListAPI, '/locations')
 api.add_resource(LocationAPI, '/locations/<int:oid>')
+api.add_resource(LocationsByCityAPI, '/city/<int:oid>/locations')
 api.add_resource(CityListAPI, '/cities')
 api.add_resource(CityAPI, '/cities/<int:oid>')
 api.add_resource(CitiesByCountryAPI, '/country/<int:oid>/cities')
 api.add_resource(CountryListAPI, '/countries')
 api.add_resource(CountryAPI, '/countries/<int:oid>')
 api.add_resource(FilesAPI, '/upload')
+api.add_resource(ImageAPI, '/images/<int:oid>')

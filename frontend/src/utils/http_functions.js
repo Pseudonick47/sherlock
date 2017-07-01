@@ -65,6 +65,10 @@ export function get_cities_by_country(country_id) {
     return axios.get('api/country/' + country_id + '/cities');
 }
 
+export function get_locations_by_city(city_id) {
+    return axios.get('api/city/' + city_id + '/locations');
+}
+
 export function post_location(name, description, city_id, country_id, price) {
     return axios.post('api/locations', {
         name, description, city_id, country_id, price,

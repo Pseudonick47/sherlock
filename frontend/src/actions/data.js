@@ -13,7 +13,10 @@ import {
     FETCH_CITIES_BY_COUNTRY_FAILED,
     RECEIVE_CITIES_BY_COUNTRY,
     INSERT_LOCATION_SUCCEEDED,
-    INSERT_LOCATION_FAILED, 
+    INSERT_LOCATION_FAILED,
+    RECEIVE_LOCATIONS_BY_CITY,
+    FETCH_LOCATIONS_BY_CITY_REQUEST,
+    FETCH_LOCATIONS_BY_CITY_FAILED,
     FILE_UPLOAD_SUCCESS
 } from '../constants/index';
 import { parseJSON } from '../utils/misc';
@@ -21,7 +24,8 @@ import {
     data_about_user, 
     get_countries, 
     get_cities, 
-    get_cities_by_country, 
+    get_cities_by_country,
+    get_locations_by_city,
     post_city, 
     post_location,
     upload_file 
@@ -91,32 +95,28 @@ export function fetchCountries() {
     };
 }
 
-export function insertCitySucceeded() {
+export function insertCitySucceeded(id) {
     return {
         type: INSERT_CITY_SUCCEEDED,
+        payload: id,
     };
 }
 
 export function insertCityFailed(message) {
     return {
         type: INSERT_CITY_FAILED,
-        payload: {
-            message: message,
-        }
+        payload: message,
     };
 }
 
 export function insertCity(name, country_id) {
     return (dispatch) => {
-        alert(name);
-        alert(country_id);
         post_city(name, country_id)
             .then(response => {
-                if (response.status === 200) {
-                    dispatch(insertCitySucceeded());
-                } else if (response.status === 409){
-                    dispatch(insertCityFailed('City with that name already exists.'));
-                }
+                dispatch(insertCitySucceeded(response.data.id));
+            })
+            .catch(error => {
+                dispatch(insertCityFailed(error))
             });
     };
 }
@@ -185,19 +185,49 @@ export function fetchCitiesByCountry(country_id) {
     };
 }
 
-export function insertLocationSucceeded() {
+export function receiveLocationsByCity(data) {
+    return {
+        type: RECEIVE_LOCATIONS_BY_CITY,
+        payload: data,
+    };
+}
+
+export function fetchLocationsByCityFailed() {
+    return {
+        type: FETCH_LOCATIONS_BY_CITY_FAILED,
+    };
+}
+
+export function fetchLocationsByCityRequest() {
+    return {
+        type: FETCH_CITIES_BY_COUNTRY_REQUEST,
+    };
+}
+
+export function fetchLocationsByCity(city_id) {
+    return (dispatch) => {
+        dispatch(fetchLocationsByCityRequest());
+        get_locations_by_city(city_id)
+            .then(response => {
+                dispatch(receiveLocationsByCity(response.data));
+            })
+            .catch(error => {
+                dispatch(fetchLocationsByCityFailed());
+            });
+    };
+}
+
+export function insertLocationSucceeded(id) {
     return {
         type: INSERT_LOCATION_SUCCEEDED,
+        payload: id,
     };
 }
 
 export function insertLocationFailed(message) {
     return {
-        
         type: INSERT_LOCATION_FAILED,
-        payload: {
-            message: message,
-        }
+        payload: message,
     };
 }
 
@@ -205,11 +235,11 @@ export function insertLocation(name, description, city_id, country_id, price) {
     return (dispatch) => {
         post_location(name, description, city_id, country_id, price)
             .then(response => {
-                if (response.status === 200) {
-                    dispatch(insertLocationSucceeded());
-                } else if (response.status === 409){
-                    dispatch(insertLocationFailed('Location with that name already exists.'));
-                }
+                dispatch(insertLocationSucceeded(response.data.id));
+
+            })
+            .catch(error => {
+                dispatch(insertLocationFailed('Location with that name already exists.'));
             });
     };
 }

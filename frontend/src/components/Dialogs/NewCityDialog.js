@@ -6,18 +6,19 @@ import { connect } from 'react-redux';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
-import AutoComplete from 'material-ui/AutoComplete';
 import TextField from 'material-ui/TextField';
+
+import FileUpload from '../FileUpload';
 
 import * as actionCreators from '../../actions/data'
 
+import './styles.scss'
+
 function mapStateToProps(state) {
     return {
-        countries: state.data.countries,
-        isFetching: state.data.isFetching,
-        error: state.data.error,
-        insert_error: state.data.insert_error,
+        insertError: state.data.insertError,
         message: state.data.message,
+        id: state.data.cityId,
     };
 }
 
@@ -28,92 +29,82 @@ function mapDispatchToProps(dispatch) {
 @connect(mapStateToProps, mapDispatchToProps)
 export default class NewCityDialog extends React.Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
+
         this.state = {
-            open: true,
-            city_name: '',
-            city_name_error: '',
-            country_name: '',
-            country_name_error: '',
-            country_names: [],
+            open: false,
+            uploadDialogOpen: false,
+            name: '',
+            nameError: '',
+            imageUrl: 'https://images.vexels.com/media/users/3/128414/isolated/lists/4532b23a286c2d6637b4ba65398360fd-philadelphia-city-skyline-silhouette.png',
         };
     };
 
     componentWillMount() {
-        this.fetchData();
+        this.setState({open: true});
     };
 
     componentWillReceiveProps(nextProps) {
-        if(this.props.countries != nextProps.countries) {
-            var c = [];
-            nextProps.countries.forEach(function(e) {
-                c.push(e.name);
+        if (this.props.id != nextProps.id) {
+            this.props.submit({
+                name: this.state.name,
+                id: nextProps.id,
             });
-            this.setState({country_names: c});
         }
-    };
+    }
+
+    componentWillUnmount() {
+        this.setState({open: false});
+    }
 
     handleCancel = () => {
-        this.setState({open: false});
+        this.props.cancel();
     };
 
     handleSubmit = () => {
-        const {city_name, country_name} = this.state;
-        const index = this.state.country_names.indexOf(country_name);
+        const {name} = this.state;
 
-        if (city_name.length === 0) {
-            console.log("name required");
+        if (name.length === 0) {
             this.setState({
-                city_name_error: 'Name is required!',
-                city_name: null,
+                nameError: 'Name is required!',
+                name: null,
             });
-        } else if (country_name === 0) {
-            this.setState({
-                country_name_error: 'Country is required!',
-                country_name: null,
-            });
-        } else if (index == -1) {
-            this.setState({
-                country_name_error: 'Country does\'t exist, please try again!',
-                country_name: null,
-            });
-        } else {
-            const country = this.props.countries[index];
-            this.props.insertCity(city_name, country.id);
-            if (this.props.insert_error) {
-                this.setState({city_name_error: this.props.message});
-            } else {
-                this.setState({open: false});
+        } 
+        else {
+            const {country} = this.props;
+
+            this.props.insertCity(name, country.id);
+
+            if (this.props.insertError) {
+                this.setState({nameError: this.props.message});
             }
         }
     };
 
-    fetchData() {
-        this.props.fetchCountries();
-    };
-
-    nameChanged(event, value) {
-        if (this.state.city_name_error != '') {
+    nameChanged = (event, value) => {
+        if (this.state.nameError != '') {
             this.setState({
-                city_name: value,
-                city_name_error: ''
+                name: value,
+                nameError: ''
             });
-        } else {
-            this.state.city_name = value;
+        } 
+        else {
+            this.setState({
+                name: value,
+            });
         }
     }
 
-    countryChanged(value) {
-        if (this.state.country_error != '') {
-            this.setState({
-                country_name: value,
-                country_name_error: ''
-            });
-        } else {
-            this.state.country_name = value;
-        }
+    setImage = (imageIds) => {
+        var imageUrl = 'http://localhost:5000/api/images/'.concat(imageIds[0].toString())
+
+        this.setState({
+            uploadDialogOpen: false,
+            imageUrl: imageUrl
+        });
     }
+
 
     render() {
         const actions = [
@@ -130,42 +121,49 @@ export default class NewCityDialog extends React.Component {
         />,
         ];
 
-        const {isFetching, error} = this.props;
-
         return (
             <div>
-                <Dialog
-                    title="Add New City"
-                    actions={actions}
-                    modal
-                    open={this.state.open}
-                >
-                    <TextField
-                        hintText="City name"
-                        errorText={this.state.city_name_error}
-                        onChange={(event, value) => this.nameChanged(event, value)}
-                        fullWidth
+            <Dialog
+                title="Add New City"
+                actions={actions}
+                modal
+                open={this.state.open}
+            >
+                <div className="container">
+                    <img src={this.state.imageUrl} className="image" />
+                    <div className="middle">
+                        <RaisedButton 
+                            label="Upload" 
+                            onTouchTap={() => this.setState({uploadDialogOpen: true})}
+                        />
+                    </div>
+                </div>
+                <TextField
+                    hintText="City name"
+                    errorText={this.state.nameError}
+                    onChange={this.nameChanged}
+                    fullWidth
+                />
+
+            </Dialog>
+            <Dialog
+                actions={[
+                    <FlatButton 
+                        label="Cancel"
+                        onTouchTap={() => this.setState({uploadDialogOpen: false})}
                     />
-                    <AutoComplete
-                        hintText={isFetching ? "Loading countries.." : "Country"}
-                        errorText={error ? "Oops, something went wrong!" : this.state.country_name_error}
-                        disabled={error}
-                        dataSource={this.state.country_names}
-                        onUpdateInput={(value) => this.countryChanged(value)}
-                        fullWidth
-                    />
-                </Dialog>
+                ]}
+                open={this.state.uploadDialogOpen}
+            >
+                <FileUpload callback={this.setImage} />
+            </Dialog>
             </div>
         );
     };
 }
 
 NewCityDialog.propTypes = {
-    fetchCountries: React.PropTypes.func,
     insertCity: React.PropTypes.func,
-    countries: React.PropTypes.array,
-    isFetching: React.PropTypes.bool,
-    error: React.PropTypes.bool,
-    insert_error: React.PropTypes.bool,
+    insertError: React.PropTypes.bool,
     message: React.PropTypes.string,
 };

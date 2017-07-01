@@ -1,7 +1,7 @@
 /* eslint new-cap: 0 */
 
 import React from 'react';
-import { Route } from 'react-router';
+import { Route, IndexRoute } from 'react-router';
 
 /* containers */
 import { App } from './containers/App';
@@ -17,6 +17,8 @@ import ProfileView from './components/ProfileView';
 import FileUpload from './components/FileUpload';
 import NewCityDialog from './components/Dialogs/NewCityDialog';
 import NewLocationDialog from './components/Dialogs/NewLocationDialog';
+import AddLocations from './components/Dialogs/AddLocations';
+import AddTour from './components/AddTour';
 
 import { DetermineAuth } from './components/DetermineAuth';
 import { requireAuthentication } from './components/AuthenticatedComponent';
@@ -34,6 +36,8 @@ export default (
         <Route path="countries" component={requireNoAuthentication(CountriesView)} />
         <Route path="new_city" component={requireNoAuthentication(NewCityDialog)} />
         <Route path="new_location" component={requireNoAuthentication(NewLocationDialog)} />
+        <Route path="add_location" component={requireNoAuthentication(AddLocations)} />
+        <Route path="add_tour" component={requireNoAuthentication(AddTour)} />
         <Route path="profile" component={requireAuthentication(ProfileView)} />                
         <Route path="*" component={DetermineAuth(NotFound)} />
     </Route>

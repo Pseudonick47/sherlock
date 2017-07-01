@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from random import randint
 from config import BaseConfig
@@ -23,6 +23,7 @@ def arst():
         rand = randint(2, 50)
         ret.append({'id':str(rand), 'description':'Some very long desc about tour no ' + str(rand), 'name':'Name of ' + str(rand), 'guide_fee': str(rand * rand - rand), 'locations':[]})
     return jsonify(ret)
+
 
 app.register_blueprint(api_auth_mod, url_prefix='/api')
 app.register_blueprint(api_data_mod, url_prefix='/api')

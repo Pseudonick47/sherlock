@@ -10,6 +10,7 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import NumberInput from 'material-ui-number-input';
 import Divider from 'material-ui/Divider';
+import Paper from 'material-ui/Paper';
 
 export default class AddTour extends React.Component {
 
@@ -19,6 +20,7 @@ export default class AddTour extends React.Component {
             finished: false,
             stepIndex: 0,
             locations: [],
+            locationDisplay: [],
         };
     };
 
@@ -61,7 +63,7 @@ export default class AddTour extends React.Component {
                         hintText="Description"
                         fullWidth
                         multiLine
-                        rows={3}
+                        rows={4}
                         rowsMax={10}
                     />
                     <NumberInput 
@@ -92,10 +94,10 @@ export default class AddTour extends React.Component {
 
     render() {
         const {finished, stepIndex} = this.state;
-        const contentStyle = {margin: '0 16px'};
+        const contentStyle = {margin: '0 16px', padding: 10};
 
         return (
-            <div style={{width: '100%', maxWidth: 700, margin: 'auto'}}>
+            <Paper>
                 <Stepper activeStep={stepIndex}>
                     <Step>
                         <StepLabel>Tour information</StepLabel>
@@ -143,7 +145,7 @@ export default class AddTour extends React.Component {
                         </div>
                     )}
                 </div>
-            </div>
+            </Paper>
         );
     }
 }
