@@ -13,7 +13,7 @@ class User(db.Model):
     biography = db.Column(db.String(255))
     role = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, email, password, first_name='', surname='',dateOfBirth='',biography='',role='tourist'):
+    def __init__(self, email, password, first_name='', surname='',role='',dateOfBirth='',biography=''):
         self.email = email 
         self.active = True
         self.password = User.hashed_password(password)

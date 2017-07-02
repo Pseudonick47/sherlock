@@ -21,7 +21,8 @@ def create_user():
         email=incoming["email"],
         password=incoming["password"],
 		first_name=incoming["first_name"],
-		surname=incoming["surname"]
+		surname=incoming["surname"],
+		role=incoming["role"]
     )
     db.session.add(user)
 
