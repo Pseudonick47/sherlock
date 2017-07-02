@@ -1,15 +1,27 @@
 from app import db
 from passlib.hash import argon2
+from models.data import Payment, SpecificTour
 
 class User(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
+    __tablename__ = 'user'
+    id = db.Column('id', db.Integer(), primary_key=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
+    name = db.Column(db.String(255), nullable=False)
+    surname = db.Column(db.String(255), nullable=False)
+    dateOfBirth = db.Column(db.String(255), nullable=False)
+    biography = db.Column(db.String(255))
+    role = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, name='',surname='',dateOfBirth='',biography='',role='tourist'):
         self.email = email
         self.active = True
         self.password = User.hashed_password(password)
+        self.name = name
+        self.surname = surname
+        self.dateOfBirth = dateOfBirth
+        self.biography = biography
+        self.role = role
 
     @staticmethod
     def hashed_password(password):
@@ -23,3 +35,16 @@ class User(db.Model):
             return user
         else:
             return None
+
+
+tourists_and_payments = db.Table(
+	'tourists_and_payments',
+	db.Column('tourist_id', db.Integer, db.ForeignKey('user.id')),
+	db.Column('payment_id', db.Integer, db.ForeignKey('payments.id'))
+)
+
+guides_and_tours = db.Table(
+	'guides_and_tours',
+	db.Column('guide_id', db.Integer, db.ForeignKey('user.id')),
+	db.Column('spec_tour_id', db.Integer, db.ForeignKey('specificTours.id'))
+)

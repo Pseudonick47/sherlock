@@ -8,8 +8,9 @@ app.config.from_object(BaseConfig)
 db = SQLAlchemy(app)
 
 from models.users import User
-from models.data import City, Continent, Country, Location, Tour, Price, Comment
+from models.data import City, Continent, Country, Location, Tour, Price, Comment, SpecificTour, Payment, Image
 
+db.drop_all()
 db.create_all()
 db.session.commit()
 
