@@ -10,6 +10,7 @@ import {
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     TOURS_SUCCESS,
+    TOUR_SUCCESS,
     PROFILE_SUCCESS,
 } from '../constants/index';
 
@@ -24,6 +25,12 @@ const initialState = {
     registerStatusText: null,
     isLoading: true,
     toures: [],
+    name: null,
+    description: null,
+    locations: [],
+    photos: [],
+    rating: null,
+    commentIds: [],
 };
 
 export default createReducer(initialState, {
@@ -75,10 +82,19 @@ export default createReducer(initialState, {
             userName: null,
             registerStatusText: `Register Error: ${payload.status} ${payload.statusText}`,
         }),
+    [TOUR_SUCCESS]: (state, payload) =>
+        Object.assign({}, state, {
+            name: payload.name,
+            description: payload.description,
+            locations: payload.locations,
+            photos: payload.photos,
+            rating: payload.rating,
+            commentIds: payload.commentIds,
+        }),
     [TOURS_SUCCESS]: (state, payload) =>
         Object.assign({}, state, {
-            tours: payload,   
-            isLoading:false,
+            tours: payload,
+            isLoading: false,
         }),
     [PROFILE_SUCCESS]: (state, payload) =>
 	Object.assign({}, state, {

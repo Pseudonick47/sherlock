@@ -10,12 +10,8 @@ export default class Comments extends Component {
     render() {
         var commentList = [];
 
-        // for (var i = this.props.data.length - 1; i >= 0; i--) {
-        //     commentList.push(<Comment data={this.props.data[i]} />);
-        // }
-
-        for (var i = 0; i < 5; i++) { 
-            commentList.push(<Comment />)
+        for (var i in this.props.ids) {
+            commentList.push(<Comment id={this.props.ids[i]} />);
         }
 
         return (

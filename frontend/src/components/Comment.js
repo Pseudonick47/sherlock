@@ -14,6 +14,14 @@ import * as actionCreators from '../actions/auth';
 
 export default class Comment extends Component {
 
+    componentWillMount() {
+        (commentId) => {this.props.getComment()};
+    }
+
+    clickLike = (e) => { };
+    clickDislike = (e) => { };
+    clickDelete = (e) => { };
+
     render() {
         const styles = {
             chip: {
@@ -25,27 +33,27 @@ export default class Comment extends Component {
                 width: "100%",
             },
             p: {
-                margin: "10px",
+                margin: 10,
             },
         };
 
         return (
             <Paper style={styles.wrapper}>
-                <Chip
-                    style={styles.chip}
-                >
-                    <Avatar src="https://scontent.fbeg1-1.fna.fbcdn.net/v/t1.0-9/11173388_1045240915489523_2355894768946753656_n.jpg?oh=d3fb2c90e13a135986f2cc7b1d9c39c3&oe=59CDD98F" />
-                    <a href="#">Ime usera</a>
+                <Chip style={styles.chip}>
+                    <Avatar src={this.props.userPhoto} />
+                    <a href={"profile/" + this.props.userId}>{this.props.userName}</a>
                 </Chip>
-                {/*<p>{this.props.data.text}</p>*/}
-                <p style={styles.p}>Neki lorem ipsum dolor sit amet...</p>
-                <IconButton tooltip="Like">
+                <p style={styles.p}>{this.props.comment}</p>
+
+                <IconButton tooltip="Like" onClick={this.clickLike}>
                     <ArrowUp />
                 </IconButton>
-                <IconButton tooltip="Disike">
+                
+                <IconButton tooltip="Disike" onClick={this.clickDislike}>
                     <ArrowDown />
                 </IconButton>
-                <IconButton tooltip="Delete">
+                
+                <IconButton tooltip="Delete" onClick={this.clickDelete}>
                     <Close />
                 </IconButton>
             </Paper>

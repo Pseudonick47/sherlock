@@ -136,6 +136,25 @@ tours_on_locations = db.Table(
     db.Column('location_id', db.Integer, db.ForeignKey('locations.id'))
 )
 
+comments_on_tour = db.Table(
+    'comments_on_tour',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('comment_id', db.Integer, db.ForeignKey('comments.id')),
+    db.Column('tour_id', db.Integer, db.ForeignKey('toures.id')),
+
+)
+
+
+class Comment(db.Model):
+    """SQLAlchemy table representing comments.
+
+    """
+    __tablename__ = 'comments'
+    oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    text = db.Column('text', db.Unicode)
+
+
+
 
 class Tour(db.Model):
     """SQLAlchemy table representing tour.
@@ -156,6 +175,7 @@ class Tour(db.Model):
     guide_fee = db.Column(db.Float, nullable=False)
     locations = db.relationship('Location', secondary=tours_on_locations,
                                 backref='tours')
+    comments = db.relationship('Comment', secondary=comments_on_tour, backref='tours')
 
     def __init__(self, name, guide_fee, description=''):
         self.name = name
@@ -174,3 +194,6 @@ class Image(db.Model):
     
     def __init__(self, file_name):
         self.file_name = file_name
+
+
+

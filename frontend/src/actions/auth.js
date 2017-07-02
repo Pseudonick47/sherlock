@@ -9,11 +9,12 @@ import {
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     TOURS_SUCCESS,
+    TOUR_SUCCESS,
     PROFILE_SUCCESS,
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';
-import { get_token, create_user, get_tours } from '../utils/http_functions';
+import { get_token, create_user, get_tours, get_tour } from '../utils/http_functions';
 
 
 export function loginUserSuccess(token) {
@@ -171,5 +172,30 @@ export function searchTours(searchTerm) {
                 }
             })
             .catch(error => {});
+    };
+}
+
+export function getTourSuccess(data) {
+    localStorage.setItem('data', data);
+    return {
+        type: TOUR_SUCCESS,
+        payload: data,
+    };
+}
+
+export function getTour(id) {
+    alert("auth.js " + id);
+    return function (dispatch) {
+        return get_tour(id)
+            .then(parseJSON)
+            .then(response => {
+                try {
+                    alert(response.name);
+                    dispatch(getTourSuccess(response));
+                } catch (e) {
+                    alert(e);
+                }
+            })
+            .catch(error => { });
     };
 }

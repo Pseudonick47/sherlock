@@ -14,14 +14,34 @@ import Lightbox from 'react-images';
 import RaisedButton from 'material-ui/RaisedButton';
 
 
+function mapStateToProps(state) {
+    return {
+        name: state.auth.name,
+        description: state.auth.description,
+        locations: state.auth.locations,
+        photos: state.auth.photos,
+        rating: state.auth.rating,
+        commentIds: state.auth.commentIds,
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(actionCreators, dispatch);
+}
+@connect(mapStateToProps, mapDispatchToProps)
 export default class SingleTour extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            id: this.props.routeParams.id,
             isLigthboxOpen: false,
             currentPhoto: 1,
         };
+    }
+
+    componentWillMount() {
+        this.props.getTour(this.props.routeParams.id,);
     }
 
     openLightbox = (index, event) => {
@@ -34,92 +54,45 @@ export default class SingleTour extends React.Component {
 
     render() {
         
-        alert(this.props.routeParams.id);
-        const PHOTO_SET = [
-            {
-                src: 'http://tilda.center/static/images/album-tilda/01a.jpg',
-                width: 1680,
-                height: 1050,
-                alt: 'image 1',
-            },
-            {
-                src: 'http://tilda.center/static/images/album-tilda/02a.jpg',
-                width: 1680,
-                height: 1050,
-                alt: 'image 1',
-            },
-            {
-                src: 'http://tilda.center/static/images/album-tilda/04a.jpg',
-                width: 1680,
-                height: 1050,
-                alt: 'image 2',
-            },
-            {
-                src: 'http://tilda.center/static/images/album-tilda/05a.jpg',
-                width: 1680,
-                height: 1050,
-                alt: 'image 2',
-            },
-            {
-                src: 'http://tilda.center/static/images/album-tilda/06a.jpg',
-                width: 1680,
-                height: 1050,
-                alt: 'image 2',
-            },
-            {
-                src: 'http://tilda.center/static/images/album-tilda/07a.jpg',
-                width: 1680,
-                height: 1050,
-                alt: 'image 2',
-            },
-            {
-                src: 'http://tilda.center/static/images/album-tilda/08a.jpg',
-                width: 1680,
-                height: 1050,
-                alt: 'image 2',
-            },
-        ];
-
+        alert(this.props.commentIds);
+      
         const style = {
             margin: 12,
         };
+
+        var locationList = [];        
+        for (var i in this.props.locations) { 
+            locationList.push(<a href={"/location/" + this.props.locations[i].id}>{this.props.locations[i].name}, </a>);
+        }
         
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-md-12">
-                        <h1>Ime</h1>
+                        <h1>{this.props.name}</h1>
                         <Divider />
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-md-7">
                         <h2>Description:</h2>
-                        <p>Corrupti rerum eligendi impedit odit. Quia suscipit soluta qui velit quis. Quasi sit ipsa quisquam. Neque mollitia totam dolores suscipit incidunt ipsum minus. Aut architecto animi quod est voluptas cumque nisi quis.
-        Ad perspiciatis aut aut. Facilis rem eos corporis asperiores et soluta quia. Ut quas eum molestias ratione molestiae inventore cupiditate unde. Ipsum rerum laudantium quisquam ex non neque quis. Numquam et nemo officia deleniti.
-        Ratione officiis fugiat odio hic. Nihil vel nihil deserunt repellat. Harum blanditiis tempora qui. Enim non dolores mollitia quisquam.
-        Omnis dolore explicabo at consectetur molestiae sapiente. Blanditiis recusandae odio delectus eligendi corrupti iusto ex dicta. Modi consequatur est rerum enim possimus sequi. Deserunt consequatur adipisci nisi modi ut saepe consequuntur quibusdam. Et eveniet vel totam facilis debitis necessitatibus minima.</p>
+                        <p>{this.props.description}</p>
                         <Divider />
                         <h3>Locations:</h3>
-                        <ul>
-                            <li>Lok 1</li>
-                            <li>Lok 1</li>
-                            <li>Lok 1</li>
-                            <li>Lok 1</li>
-                        </ul>
+                        {locationList}
                         <Divider />
                         <RaisedButton label="Rate" style={style} />
                         <RaisedButton label="Book" primary={true} style={style} />
                         <RaisedButton label="Comment" secondary={true} style={style} />   
                         <Divider />
                         <h3>Comments</h3>
-                        <Comments />
+                        <Comments ids={this.props.commentIds} />
 
                     </div>
                     <div className="col-md-4 col-md-offset-1">
-                        <Gallery photos={PHOTO_SET}onClickPhoto={this.openLightbox} />
+                        <Gallery photos={this.props.photos}onClickPhoto={this.openLightbox} />
                         <Lightbox
-                            images={PHOTO_SET}
+                            images={this.props.photos}
                             isOpen={this.state.isLigthboxOpen}
                             onClose={this.closeLightbox}
                             onClickNext={this.nextPhoto}
