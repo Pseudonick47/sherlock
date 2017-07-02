@@ -53,9 +53,7 @@ export default class SingleTour extends React.Component {
     prevPhoto = () => this.setState({ currentPhoto: this.state.currentPhoto - 1 });
 
     render() {
-        
-        alert(this.props.commentIds);
-      
+              
         const style = {
             margin: 12,
         };

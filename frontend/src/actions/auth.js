@@ -11,10 +11,11 @@ import {
     TOURS_SUCCESS,
     TOUR_SUCCESS,
     PROFILE_SUCCESS,
+    COMMENT_SUCCESS,
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';
-import { get_token, create_user, get_tours, get_tour } from '../utils/http_functions';
+import { get_token, create_user, get_tours, get_tour, get_comment } from '../utils/http_functions';
 
 
 export function loginUserSuccess(token) {
@@ -184,14 +185,35 @@ export function getTourSuccess(data) {
 }
 
 export function getTour(id) {
-    alert("auth.js " + id);
     return function (dispatch) {
         return get_tour(id)
             .then(parseJSON)
             .then(response => {
                 try {
-                    alert(response.name);
                     dispatch(getTourSuccess(response));
+                } catch (e) {
+                    alert(e);
+                }
+            })
+            .catch(error => { });
+    };
+}
+
+export function getCommentSuccess(data) {
+    localStorage.setItem('data', data);
+    return {
+        type: COMMENT_SUCCESS,
+        payload: data,
+    };
+}
+
+export function getComment(id) {
+    return function (dispatch) {
+        return get_comment(id)
+            .then(parseJSON)
+            .then(response => {
+                try {
+                    dispatch(getCommentSuccess(response));
                 } catch (e) {
                     alert(e);
                 }

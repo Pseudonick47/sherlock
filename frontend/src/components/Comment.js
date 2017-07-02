@@ -6,16 +6,34 @@ import RaisedButton from 'material-ui/RaisedButton';
 import ArrowUp from 'material-ui/svg-icons/action/thumb-up';
 import ArrowDown from 'material-ui/svg-icons/action/thumb-down';
 import Close from 'material-ui/svg-icons/navigation/close';
-
-
 import IconButton from 'material-ui/IconButton';
 
 import * as actionCreators from '../actions/auth';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
+function mapStateToProps(state) {
+    return {
+        userPhoto: state.auth.userPhoto,
+        userName: state.auth.userName,
+        userId: state.auth.userId,
+        comment: state.auth.comment,
+        likes: state.auth.likes,
+        dislikes: state.auth.dislikes,
+        current: state.auth.current,
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(actionCreators, dispatch);
+}
+@connect(mapStateToProps, mapDispatchToProps)
 export default class Comment extends Component {
-
+    constructor(props) {
+        super(props);
+    }
     componentWillMount() {
-        (commentId) => {this.props.getComment()};
+        this.props.getComment(this.props.id);
     }
 
     clickLike = (e) => { };

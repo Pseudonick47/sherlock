@@ -138,7 +138,6 @@ tours_on_locations = db.Table(
 
 comments_on_tour = db.Table(
     'comments_on_tour',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('comment_id', db.Integer, db.ForeignKey('comments.id')),
     db.Column('tour_id', db.Integer, db.ForeignKey('toures.id')),
 
@@ -152,6 +151,8 @@ class Comment(db.Model):
     __tablename__ = 'comments'
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     text = db.Column('text', db.Unicode)
+    user_id = db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+
 
 
 

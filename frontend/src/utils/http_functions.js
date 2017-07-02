@@ -52,8 +52,11 @@ export function get_tours() {
 }
 
 export function get_tour(id) {
-    alert("axios " + id);
     return axios.get('/api/tours/' + id);
+}
+
+export function get_comment(id) {
+    return axios.get('/api/comment/' + id);
 }
 
 export function upload_file(files) {

@@ -12,6 +12,7 @@ import {
     TOURS_SUCCESS,
     TOUR_SUCCESS,
     PROFILE_SUCCESS,
+    COMMENT_SUCCESS,
 } from '../constants/index';
 
 const initialState = {
@@ -31,6 +32,12 @@ const initialState = {
     photos: [],
     rating: null,
     commentIds: [],
+    userPhoto: "",
+    userId: null,
+    comment: null,
+    likes: null,
+    dislikes: null,
+    current: null,
 };
 
 export default createReducer(initialState, {
@@ -101,5 +108,16 @@ export default createReducer(initialState, {
 	    userName: jwtDecode(payload.token).email,
 	    isLoading:false,
 	    statusText: "Your profile",
-	}),
+        }),
+    [COMMENT_SUCCESS]: (state, payload) =>
+        Object.assign({}, state, {
+            userPhoto: payload.userPhoto,
+            userId: payload.userId,
+            userName: payload.userName,
+            comment: payload.comment,
+            likes: payload.likes,
+            current: payload.current,
+            dislikes: payload.dislikes,
+        }),
+    
 });
