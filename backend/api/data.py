@@ -14,7 +14,8 @@ import os
 from datetime import datetime
 
 from app import db
-from models.data import City, Country, Location, Price, Tour, Image
+from models.data import City, Country, Location, Price, Tour, Image, Comment
+from models.users import User
 
 mod = Blueprint('api/data', __name__)
 api = Api(mod)
@@ -112,7 +113,18 @@ class TourAPI(Resource):
                 'name':tour.name,
                 'description':tour.description,
                 'guide_fee':tour.guide_fee,
-                'locations':[location.oid for location in tour.locations]
+                'locations':[
+                    {'id': location.oid, 'name': location.name} for location in tour.locations],
+                'photos': [
+                    {
+                        'src': 'http://tilda.center/static/images/album-tilda/01a.jpg',
+                        'width': 1680,
+                        'height': 1050,
+                        'alt': 'image 1'
+                    } 
+                ],
+                'rating': 3,
+                'commentIds': [1]
             }
 
             return (response, 200)
@@ -878,6 +890,50 @@ class FilesAPI(Resource):
         return (image_ids)
 
 
+class CommentAPI(Resource):
+    """Services that allow user to get, post or delete comment
+       with the given key.
+    """
+
+    def get(self, oid):
+        """Fetch comment corresponding to the given identifier.
+
+        Returns:
+            JSON file containing id, name, description, guide_fee and location
+            identifiers of selected tour. For example:
+
+                {
+                    "id": 17,
+                    "name": "Walk Through History",
+                    "description": "Visit some of the finest castles and
+                                    mansions in all of Europe.",
+                    "guide_fee": 10,
+                    "locations": [...]
+                }
+
+            If a requested tour is not found, then JSON file has an empty
+            object.
+        """
+
+        response = {}
+        comment = db.session.query(Comment).filter_by(oid=oid,).one_or_none()
+        if comment:
+            user = db.session.query(User).filter_by(id=comment.user_id).one()
+            response = {
+                'comment': comment.text,
+                'userId': user.id,
+                'userName': user.email,
+                'userPhoto': " ",
+                'likes': 0,
+                'dislikes': 0,
+                'current': 0
+            }
+
+            return (response, 200)
+
+        return (response, 404)
+
+
 api.add_resource(TourListAPI, '/tours')
 api.add_resource(TourAPI, '/tours/<int:oid>')
 api.add_resource(LocationListAPI, '/locations')
@@ -887,3 +943,4 @@ api.add_resource(CityAPI, '/cities/<int:oid>')
 api.add_resource(CountryListAPI, '/countries')
 api.add_resource(CountryAPI, '/countries/<int:oid>')
 api.add_resource(FilesAPI, '/upload')
+api.add_resource(CommentAPI, '/comment/<int:oid>')

@@ -48,7 +48,15 @@ export function get_countries() {
 }
 
 export function get_tours() {
-    return axios.get('api/tooo');
+    return axios.get('api/tours');
+}
+
+export function get_tour(id) {
+    return axios.get('/api/tours/' + id);
+}
+
+export function get_comment(id) {
+    return axios.get('/api/comment/' + id);
 }
 
 export function upload_file(files) {

@@ -9,11 +9,13 @@ import {
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     TOURS_SUCCESS,
+    TOUR_SUCCESS,
     PROFILE_SUCCESS,
+    COMMENT_SUCCESS,
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';
-import { get_token, create_user, get_tours } from '../utils/http_functions';
+import { get_token, create_user, get_tours, get_tour, get_comment } from '../utils/http_functions';
 
 
 export function loginUserSuccess(token) {
@@ -171,5 +173,51 @@ export function searchTours(searchTerm) {
                 }
             })
             .catch(error => {});
+    };
+}
+
+export function getTourSuccess(data) {
+    localStorage.setItem('data', data);
+    return {
+        type: TOUR_SUCCESS,
+        payload: data,
+    };
+}
+
+export function getTour(id) {
+    return function (dispatch) {
+        return get_tour(id)
+            .then(parseJSON)
+            .then(response => {
+                try {
+                    dispatch(getTourSuccess(response));
+                } catch (e) {
+                    alert(e);
+                }
+            })
+            .catch(error => { });
+    };
+}
+
+export function getCommentSuccess(data) {
+    localStorage.setItem('data', data);
+    return {
+        type: COMMENT_SUCCESS,
+        payload: data,
+    };
+}
+
+export function getComment(id) {
+    return function (dispatch) {
+        return get_comment(id)
+            .then(parseJSON)
+            .then(response => {
+                try {
+                    dispatch(getCommentSuccess(response));
+                } catch (e) {
+                    alert(e);
+                }
+            })
+            .catch(error => { });
     };
 }
