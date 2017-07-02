@@ -7,17 +7,17 @@ class User(db.Model):
     id = db.Column('id', db.Integer(), primary_key=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
-    name = db.Column(db.String(255), nullable=False)
+    first_name = db.Column(db.String(255), nullable=False)
     surname = db.Column(db.String(255), nullable=False)
     dateOfBirth = db.Column(db.String(255), nullable=False)
     biography = db.Column(db.String(255))
     role = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, email, password, name='',surname='',dateOfBirth='',biography='',role='tourist'):
-        self.email = email
+    def __init__(self, email, password, first_name='', surname='',dateOfBirth='',biography='',role='tourist'):
+        self.email = email 
         self.active = True
         self.password = User.hashed_password(password)
-        self.name = name
+        self.first_name = first_name
         self.surname = surname
         self.dateOfBirth = dateOfBirth
         self.biography = biography

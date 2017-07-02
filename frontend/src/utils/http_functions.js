@@ -21,17 +21,19 @@ export function get_github_access() {
     );
 }
 
-export function create_user(email, password) {
+export function create_user(email, password, first_name, surname) {
     return axios.post('api/create_user', {
         email,
         password,
+		first_name,
+		surname
     });
 }
 
 export function get_token(email, password) {
     return axios.post('api/get_token', {
         email,
-        password,
+        password
     });
 }
 

@@ -16,6 +16,7 @@ import {
 } from '../constants/index';
 
 const initialState = {
+	first_name: null,
     token: null,
     userName: null,
     isAuthenticated: false,
@@ -52,6 +53,7 @@ export default createReducer(initialState, {
             isAuthenticated: true,
             token: payload.token,
             userName: jwtDecode(payload.token).email,
+			first_name: jwtDecode(payload.token).first_name,
             statusText: 'You have been successfully logged in.',
         }),
     [LOGIN_USER_FAILURE]: (state, payload) =>
@@ -60,6 +62,7 @@ export default createReducer(initialState, {
             isAuthenticated: false,
             token: null,
             userName: null,
+			first_name: null,
             statusText: `Authentication Error: ${payload.status} ${payload.statusText}`,
         }),
     [LOGOUT_USER]: (state) =>
@@ -67,6 +70,7 @@ export default createReducer(initialState, {
             isAuthenticated: false,
             token: null,
             userName: null,
+			first_name: null,
             statusText: 'You have been successfully logged out.',
         }),
     [REGISTER_USER_SUCCESS]: (state, payload) =>
@@ -76,6 +80,7 @@ export default createReducer(initialState, {
             isRegistering: false,
             token: payload.token,
             userName: jwtDecode(payload.token).email,
+			first_name: jwtDecode(payload.token).first_name,
             registerStatusText: 'You have been successfully logged in.',
         }),
     [REGISTER_USER_REQUEST]: (state) =>
@@ -87,6 +92,7 @@ export default createReducer(initialState, {
             isAuthenticated: false,
             token: null,
             userName: null,
+			first_name: null,
             registerStatusText: `Register Error: ${payload.status} ${payload.statusText}`,
         }),
     [TOUR_SUCCESS]: (state, payload) =>
@@ -106,6 +112,7 @@ export default createReducer(initialState, {
     [PROFILE_SUCCESS]: (state, payload) =>
 	Object.assign({}, state, {
 	    userName: jwtDecode(payload.token).email,
+		first_name: jwtDecode(payload.token).first_name,
 	    isLoading:false,
 	    statusText: "Your profile",
         }),
@@ -114,6 +121,7 @@ export default createReducer(initialState, {
             userPhoto: payload.userPhoto,
             userId: payload.userId,
             userName: payload.userName,
+			first_name: payload.first_name,
             comment: payload.comment,
             likes: payload.likes,
             current: payload.current,
