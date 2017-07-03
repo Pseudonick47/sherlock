@@ -11,7 +11,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import Divider from 'material-ui/Divider';
-import {List, ListItem} from 'material-ui/List';
+import {Table, TableBody, TableRowColumn} from 'material-ui/Table';
 import {Card, CardHeader, CardText} from 'material-ui/Card';
 
 import FileUpload from '../FileUpload';
@@ -20,6 +20,7 @@ import * as actionCreators from '../../actions/data'
 
 import NewCityDialog from './NewCityDialog';
 import NewLocationDialog from './NewLocationDialog';
+import Locations from '../Locations';
 
 function mapStateToProps(state) {
     return {
@@ -46,16 +47,22 @@ export default class AddLocations extends React.Component {
         super();
 
         this.state = {
+            open: false,
             country: null,
             countryNames: [],
             city: null,
             cityNames: [],
             newCityName: null,
             locations: [],
-            locationsDisplay: [],
+            // locationsDisplay: [],
             newCityOpen: false,
             newLocationOpen: false,
+            selectedLocations: [],
         }
+    }
+
+    componentWillMount() {
+        this.setState({open: true});
     }
 
     componentDidMount() {
@@ -78,24 +85,16 @@ export default class AddLocations extends React.Component {
             this.setState({cityNames: c});
         }
         if(this.props.locationsByCity != nextProps.locationsByCity) {
-            var c = [];
-            var l = [];
+            var locations = [];
             nextProps.locationsByCity.forEach((location) => {
-                l.push(location);
-                c.push(
-                    <ListItem>
-                        <Card>
-                            <CardHeader title={location.name} />
-                            <CardText>{location.description}</CardText>
-                        </Card>
-                    </ListItem>
-                );
+                locations.push(location);
             });
-            this.setState({
-                locations: l,
-                locationsDisplay: c,
-            });
+            this.setState({locations: locations,});
         }
+    }
+
+    componentWillUnmount() {
+        this.setState({open: false});
     }
 
 
@@ -146,24 +145,18 @@ export default class AddLocations extends React.Component {
 
     onNewLocationSubmit = (location) => {
         var locations = this.state.locations;
-        var locationsDisplay = this.state.locationsDisplay;
 
         locations.push(location);
-        locationsDisplay.push(
-            <ListItem>
-                <Card>
-                    <CardHeader title={location.name} />
-                    <CardText>{location.description}</CardText>
-                </Card>
-            </ListItem>
-        );
 
         this.setState({
             newLocationOpen: false,
             locations: locations,
-            locationsDisplay: locationsDisplay,
         });
     }
+
+    onCancel = () => this.props.cancel();
+
+    onSubmit = () => this.props.submit(this.state.selectedLocations);
 
     render() {
         const { 
@@ -178,10 +171,28 @@ export default class AddLocations extends React.Component {
             newLocationOpen
         } = this.state;
 
-        return (
-            <div className="col-md-12">
+        const actions = [
+            <FlatButton
+                label="Cancel"
+                secondary
+                onTouchTap={this.onCancel}
+            />,
+            <FlatButton
+                label="Submit"
+                primary
+                keyboardFocused
+                onTouchTap={this.onSubmit}
+            />
+        ]
 
-            <Paper >
+        return (
+            <Dialog
+                actions={actions}
+                modal
+                open={this.state.open}
+                style={{height: "100%"}}
+            >
+            <div style={{overflow: "auto"}}> 
                 <h1 style={{padding: 40, marginTop: 20}}>What would you like them to visit?</h1>
                 <p style={{padding: 20,}}>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
@@ -214,19 +225,21 @@ export default class AddLocations extends React.Component {
                     disabled={this.state.country ? false : true}
                 />
                 <Divider />
-                <List>
-                    {this.state.locationsDisplay}
-                </List>
+                {this.state.locations.length ? "" : 
+                    <h4 style={{padding: "5 20 0 20"}}>Please select country and city..</h4>
+                }
+                <Locations 
+                    data={this.state.locations} 
+                    selectionChanged={(selectedLocations) => this.setState({selectedLocations: selectedLocations})}
+                />
                 <Divider />
                 <FlatButton 
                     label="Add new location"
-                    style={{margin: "5 0 10 20",}}
+                    style={{margin: "15 0 10 20"}}
                     onTouchTap={() => this.setState({newLocationOpen: true})}
                     disabled={this.state.city ? false : true}
                 />
-                
-            </Paper>
-                            
+            </div>
             {newCityOpen ? 
                 <NewCityDialog 
                     cancel={this.onNewCityCancel} 
@@ -242,12 +255,14 @@ export default class AddLocations extends React.Component {
                     city={this.state.city} 
                 />
             : ""}
-            </div>
+            </Dialog>
         );
     }
 }
 
 AddLocations.propTypes = {
+    cancel: React.PropTypes.func,
+    submit: React.PropTypes.func,
     fetchCountries: React.PropTypes.func,
     fetchCitiesByCountry: React.PropTypes.func,
     fetchLocationsByCity: React.PropTypes.func,

@@ -72,11 +72,10 @@ export function post_location(name, description, city_id, country_id, price) {
     });
 }
 
-export function upload_file(file) {
-    var data = new FormData();
-    alert('axios  ' + file[0]);
-    data.append('file', file[0]);
-    return axios.get('api/tours');
+export function post_tour(name, description, guide_fee, locations, thumbnail, images) {
+    return axios.post('api/tours', {
+        name, description, guide_fee, locations, thumbnail, images
+    })
 }
 
 export function upload_file(files) {

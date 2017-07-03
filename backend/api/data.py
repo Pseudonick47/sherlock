@@ -12,6 +12,7 @@ from flask import Blueprint, request, send_from_directory
 from flask_restful import Api, Resource
 import os
 from datetime import datetime
+from PIL import Image as PILImage
 
 from app import db
 from models.data import City, Country, Location, Price, Tour, Image
@@ -163,8 +164,9 @@ class TourListAPI(Resource):
                 "name": "",
                 "description": "",
                 "guide_fee": 10.25,
-                "thumbnail_id": 2,
-                "locations": [2, 51, 16, 43]
+                "thumbnail": 2,
+                "locations": [2, 51, 16, 43],
+                "images": [ 34, 5, 63]
             }
 
         Returns:
@@ -185,22 +187,27 @@ class TourListAPI(Resource):
         """
 
         req = request.get_json(force=True, silent=True)
+        print(req)
         if req:
             tour = Tour(
                 name=req['name'],
                 guide_fee=req['guide_fee'],
                 description=req['description'],
-                thumbnail_id=req['thumbnail_id']
+                thumbnail_id=req['thumbnail']
             )
 
             for location in req['locations']:
                 loc = db.session.query(Location).filter_by(oid=location,).one()
                 loc.tours.append(tour)
 
+            for image_id in req['images']:
+                image = db.session.query(Image).filter_by(oid=image_id).one()
+                tour.images.append(image)
+
             db.session.add(tour)
             db.session.commit()
 
-            return ({'success': True}, 200)
+            return ({'success': True, 'id': tour.oid}, 200)
 
         return ({'success':False, 'message':'Not JSON'}, 400)
 
@@ -1001,13 +1008,28 @@ class FilesAPI(Resource):
         for fi in request.files:
             extension = request.files[fi].filename.split('.')[-1]
             filename = datetime.now().strftime("%d_%m_%Y_%H_%M_%S_%f" + '.' + extension)
-            request.files[fi].save(os.path.join(UPLOAD_FOLDER, filename))
-            image = Image(filename)
-            db.session.add(image)
-            db.session.commit()
-            image_ids.append(image.oid)
+            path = os.path.join(UPLOAD_FOLDER, filename)
+            request.files[fi].save(path)
+
+            with PILImage.open(path) as img:
+                width, height = img.size
+
+                image = Image(filename, width, height)
+
+                db.session.add(image)
+                db.session.commit()
+
+                image_ids.append({
+                    'id': image.oid,
+                    'src': 'http://localhost:5000/static/' + filename,
+                    'width': width,
+                    'height': height,
+                    'alt': 'image',
+                })
+
         return (image_ids)
 
+#TODO(aleksandar=varga): Delete this.
 class ImageAPI(Resource):
 
     def get(self, oid):

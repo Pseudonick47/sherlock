@@ -17,7 +17,12 @@ import {
     RECEIVE_LOCATIONS_BY_CITY,
     FETCH_LOCATIONS_BY_CITY_REQUEST,
     FETCH_LOCATIONS_BY_CITY_FAILED,
-    FILE_UPLOAD_SUCCESS
+    FILE_UPLOAD_SUCCESS,
+    INSERT_TOUR_SUCCEEDED,
+    INSERT_TOUR_FAILED,
+    RECEIVE_TOURS,
+    FETCH_TOURS_REQUEST,
+    FETCH_TOURS_FAILED
 } from '../constants/index';
 import { parseJSON } from '../utils/misc';
 import { 
@@ -28,7 +33,8 @@ import {
     get_locations_by_city,
     post_city, 
     post_location,
-    upload_file 
+    upload_file,
+    post_tour,
 } from '../utils/http_functions';
 import { logoutAndRedirect } from './auth';
 
@@ -244,24 +250,29 @@ export function insertLocation(name, description, city_id, country_id, price) {
     };
 }
 
-export function fileUploadSuccess(response) {
+export function insertTourSucceeded(id) {
     return {
-        type: FILE_UPLOAD_SUCCESS,
-        payload: {
-            response,
-        },
+        type: INSERT_TOUR_SUCCEEDED,
+        payload: id,
     };
 }
 
-export function fileUpload(fileList, callback) { 
+export function insertTourFailed(message) {
+    return {
+        type: INSERT_TOUR_FAILED,
+        payload: message,
+    };
+}
+
+export function insertTour(name, description, guide_fee, locations, thumbnail, photos) {
     return (dispatch) => {
-        upload_file(fileList)    
-            .then(parseJSON)
-            // .then(alert(response))
-            // .then((response) => alert(response))
-            .then(callback)
+        post_tour(name, description, guide_fee, locations, thumbnail, photos)
+            .then(response => {
+                dispatch(insertTourSucceeded(response.data.id));
+
+            })
             .catch(error => {
-                alert('nesto poslo po zlu')
+                dispatch(insertTourFailed('Tour with that title already exists.'));
             });
     };
 }

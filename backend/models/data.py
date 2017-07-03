@@ -208,6 +208,10 @@ class Image(db.Model):
     __tablename__ = 'images'
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     file_name = db.Column(db.Unicode, nullable=False, unique=True)
+    width = db.Column(db.Integer)
+    height = db.Column(db.Integer)
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, width, height):
         self.file_name = file_name
+        self.width = width
+        self.height = height

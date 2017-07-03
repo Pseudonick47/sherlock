@@ -1,14 +1,15 @@
-.container {
+.containerImage {
     position: relative;
-    margin: 10;
-    width: 128px;
+    margin: 0 auto;
+    width: 50%;
     height: auto;
 }
 
 .image {
   opacity: 1;
   display: block;
-  width: 128px;
+  margin: 0 auto;
+  width: 50%;
   height: auto;
   transition: .5s ease;
   backface-visibility: hidden;
@@ -24,10 +25,10 @@
   -ms-transform: translate(-50%, -50%)
 }
 
-.container:hover .image {
+.containerImage:hover .image {
   opacity: 0.3;
 }
 
-.container:hover .middle {
+.containerImage:hover .middle {
   opacity: 1;
 }

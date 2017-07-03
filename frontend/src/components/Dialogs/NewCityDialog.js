@@ -96,29 +96,27 @@ export default class NewCityDialog extends React.Component {
         }
     }
 
-    setImage = (imageIds) => {
-        var imageUrl = 'http://localhost:5000/api/images/'.concat(imageIds[0].toString())
-
+    setImage = (images) => {
         this.setState({
             uploadDialogOpen: false,
-            imageUrl: imageUrl
+            imageUrl: images[0].src,
         });
     }
 
 
     render() {
         const actions = [
-        <FlatButton
-            label="Cancel"
-            secondary
-            onTouchTap={this.handleCancel}
-        />,
-        <FlatButton
-            label="Submit"
-            primary
-            keyboardFocused
-            onTouchTap={this.handleSubmit}
-        />,
+            <FlatButton
+                label="Cancel"
+                secondary
+                onTouchTap={this.handleCancel}
+            />,
+            <FlatButton
+                label="Submit"
+                primary
+                keyboardFocused
+                onTouchTap={this.handleSubmit}
+            />,
         ];
 
         return (
@@ -129,7 +127,7 @@ export default class NewCityDialog extends React.Component {
                 modal
                 open={this.state.open}
             >
-                <div className="container">
+                <div className="containerImage">
                     <img src={this.state.imageUrl} className="image" />
                     <div className="middle">
                         <RaisedButton 
@@ -166,4 +164,5 @@ NewCityDialog.propTypes = {
     insertCity: React.PropTypes.func,
     insertError: React.PropTypes.bool,
     message: React.PropTypes.string,
+    id: React.PropTypes.number,
 };

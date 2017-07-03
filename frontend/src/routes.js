@@ -38,9 +38,6 @@ export default (
         <Route path="home" component={requireNoAuthentication(HomeContainer)} />
         <Route path="analytics" component={requireAuthentication(Analytics)} />
         <Route path="countries" component={requireNoAuthentication(CountriesView)} />
-        <Route path="new_city" component={requireNoAuthentication(NewCityDialog)} />
-        <Route path="new_location" component={requireNoAuthentication(NewLocationDialog)} />
-        <Route path="add_location" component={requireNoAuthentication(AddLocations)} />
         <Route path="add_tour" component={requireNoAuthentication(AddTour)} />
         <Route path="profile" component={requireAuthentication(ProfileView)} />                
         <Route path="*" component={DetermineAuth(NotFound)} />

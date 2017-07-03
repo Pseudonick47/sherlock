@@ -17,7 +17,12 @@ import {
     RECEIVE_LOCATIONS_BY_CITY,
     FETCH_LOCATIONS_BY_CITY_REQUEST,
     FETCH_LOCATIONS_BY_CITY_FAILED,
-    FILE_UPLOAD_SUCCESS
+    FILE_UPLOAD_SUCCESS,
+    INSERT_TOUR_SUCCEEDED,
+    INSERT_TOUR_FAILED,
+    RECEIVE_TOURS,
+    FETCH_TOURS_REQUEST,
+    FETCH_TOURS_FAILED,
 } from '../constants';
 
 import { createReducer } from '../utils/misc';
@@ -39,6 +44,10 @@ const initialState = {
     locationsByCity: [],
     locationsByCityError: false,
     fetchingLocationsByCity: false,
+    tourId: null,
+    tours: [],
+    toursError: false,
+    fetchingTours: false,
     insertError: false,
     isUploaded: false,
     imageIds: [],
@@ -130,6 +139,30 @@ export default createReducer(initialState, {
         Object.assign({}, state, {
             fetchingLocationsByCity: false,
             locationsByCityError: true,
+        }),
+    [INSERT_TOUR_SUCCEEDED]: (state, payload) =>
+        Object.assign({}, state, {
+            insertError: false,
+            tourId: payload
+        }),
+    [INSERT_TOUR_FAILED]: (state, payload) =>
+        Object.assign({}, state, {
+            insertError: true,
+            message: payload,
+        }),
+    [RECEIVE_TOURS]: (state, payload) =>
+        Object.assign({}, state, {
+            tours: payload,
+            fetchingTours: false,
+        }),
+    [FETCH_TOURS_REQUEST]: (state) =>
+        Object.assign({}, state, {
+            fetchingTours: true,
+        }),
+    [FETCH_TOURS_FAILED]: (state) =>
+        Object.assign({}, state, {
+            fetchingTours: false,
+            toursError: true,
         }),
     [FILE_UPLOAD_SUCCESS]: (state, payload) =>
         Object.assign({}, state, {

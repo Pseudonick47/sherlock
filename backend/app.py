@@ -18,3 +18,7 @@ from api.data import mod as api_data_mod
 
 app.register_blueprint(api_auth_mod, url_prefix='/api')
 app.register_blueprint(api_data_mod, url_prefix='/api')
+
+@app.route('/static/<file_name>', methods=['GET'])
+def get_static_file(file_name):
+    return send_from_directory('../static', file_name)
