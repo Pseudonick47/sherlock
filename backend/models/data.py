@@ -15,7 +15,8 @@
 
 import enum
 
-from app import db
+from app import db 
+#from models.users import User
 
 
 
@@ -165,6 +166,31 @@ class Location(db.Model):
         self.country_id = country_id
         self.thumbnail_id = thumbnail_id
 
+comments_on_tour = db.Table(
+    'comments_on_tour',
+    db.Column('comment_id', db.Integer, db.ForeignKey('comments.id')),
+    db.Column('tour_id', db.Integer, db.ForeignKey('toures.id')),
+
+)
+
+images_of_user = db.Table(
+    'images_of_user',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('image_id', db.Integer, db.ForeignKey('images.id')),
+)
+
+class Comment(db.Model):
+    """SQLAlchemy table representing comments.
+
+    """
+    __tablename__ = 'comments'
+    oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    text = db.Column('text', db.Unicode)
+    user_id = db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+
+
+
+
 
 class Tour(db.Model):
     """SQLAlchemy table representing tour.
@@ -189,6 +215,7 @@ class Tour(db.Model):
     locations = db.relationship('Location', secondary=tours_on_locations,
                                 backref='tours')
     images = db.relationship('Image', secondary=images_of_tours)
+    comments = db.relationship('Comment', secondary=comments_on_tour, backref='tours')
 
     def __init__(self, name, guide_fee, description='', thumbnail_id=None):
         self.name = name
@@ -215,3 +242,38 @@ class Image(db.Model):
         self.file_name = file_name
         self.width = width
         self.height = height
+
+    def __init__(self, file_name):
+        self.file_name = file_name
+
+
+class Payment(db.Model):
+    """SQLAlchemy table representing payments for specific tours.
+    """
+
+    __tablename__ = "payments"
+    oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    amount = db.Column(db.Float, nullable=False)
+    specific_tour_id = db.Column(
+        db.Integer(), db.ForeignKey('specificTours.id'))
+
+    def __init__(self, amount):
+        self.amount = amount
+
+
+class SpecificTour(db.Model):
+    """SQLAlchemy table representing specific tours.
+
+    """
+
+    __tablename__ = 'specificTours'
+    oid = db.Column('id', db.Integer, primary_key=True)
+    startDate = db.Column(db.Date, nullable=False)
+    endDate = db.Column(db.Date, nullable=False)
+    tour_id = db.Column(db.ForeignKey('toures.id'))
+    payments = db.relationship('Payment', backref='specificTours')
+
+    def __init__(self, startDate, endDate, tour_id):
+        self.startDate = startDate
+        self.endDate = endDate
+        self.tour_id = tour_id

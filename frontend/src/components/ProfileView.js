@@ -40,11 +40,10 @@ export default class ProfileView extends React.Component {
         super(props);
         this.state = {
             email: this.props.userName,
-	    profile_name: '',
-	    profile_surname: '',
-	    bio: '',
+	        profile_name: this.props.first_name,
+	        profile_surname: '',
+	        bio: '',
             birthday: '',
-         //   disabled: false,
         };
     }
 

@@ -21,17 +21,20 @@ export function get_github_access() {
     );
 }
 
-export function create_user(email, password) {
+export function create_user(email, password, first_name, surname, role) {
     return axios.post('api/create_user', {
         email,
         password,
+		first_name,
+		surname,
+		role
     });
 }
 
 export function get_token(email, password) {
     return axios.post('api/get_token', {
         email,
-        password,
+        password
     });
 }
 
@@ -76,6 +79,14 @@ export function post_tour(name, description, guide_fee, locations, thumbnail, im
     return axios.post('api/tours', {
         name, description, guide_fee, locations, thumbnail, images
     })
+}
+
+export function get_tour(id) {
+    return axios.get('/api/tours/' + id);
+}
+
+export function get_comment(id) {
+    return axios.get('/api/comment/' + id);
 }
 
 export function upload_file(files) {

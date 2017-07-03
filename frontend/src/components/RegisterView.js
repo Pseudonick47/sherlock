@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import RadioButton from 'material-ui/Checkbox';
 import Paper from 'material-ui/Paper';
 
 import * as actionCreators from '../actions/auth';
@@ -40,7 +41,11 @@ export default class RegisterView extends React.Component {
         this.state = {
             email: '',
             password: '',
+			first_name: '',
+			surname: '',
+			role: '',
             email_error_text: null,
+			role_error_text: null,
             password_error_text: null,
             redirectTo: redirectRoute,
             disabled: true,
@@ -50,6 +55,7 @@ export default class RegisterView extends React.Component {
     isDisabled() {
         let email_is_valid = false;
         let password_is_valid = false;
+		let role_is_valid = false;
 
         if (this.state.email === '') {
             this.setState({
@@ -64,6 +70,22 @@ export default class RegisterView extends React.Component {
         } else {
             this.setState({
                 email_error_text: 'Sorry, this is not a valid email',
+            });
+        }
+
+		if (this.state.role === '') {
+            this.setState({
+                role_error_text: null,
+            });
+        } else if (this.state.role==="tourist" || this.state.role==="guide") {
+            role_is_valid = true;
+            this.setState({
+                role_error_text: null,
+            });
+
+        } else {
+            this.setState({
+                role_error_text: 'Sorry, this is invalid role',
             });
         }
 
@@ -83,7 +105,7 @@ export default class RegisterView extends React.Component {
 
         }
 
-        if (email_is_valid && password_is_valid) {
+        if (email_is_valid && password_is_valid && role_is_valid) {
             this.setState({
                 disabled: false,
             });
@@ -110,7 +132,7 @@ export default class RegisterView extends React.Component {
 
     login(e) {
         e.preventDefault();
-        this.props.registerUser(this.state.email, this.state.password, this.state.redirectTo);
+        this.props.registerUser(this.state.email, this.state.password, this.state.first_name, this.state.surname, this.state.role, this.state.redirectTo);
     }
 
     render() {
@@ -128,7 +150,7 @@ export default class RegisterView extends React.Component {
 
                         <div className="col-md-12">
                             <TextField
-                              hintText="Email"
+                              hintText="example@domain.com"
                               floatingLabelText="Email"
                               type="email"
                               errorText={this.state.email_error_text}
@@ -142,6 +164,32 @@ export default class RegisterView extends React.Component {
                               type="password"
                               errorText={this.state.password_error_text}
                               onChange={(e) => this.changeValue(e, 'password')}
+                            />
+                        </div>
+						<div className="col-md-12">
+                            <TextField
+                              hintText="Name"
+                              floatingLabelText="Name"
+                              type="first_name"
+                              onChange={(e) => this.changeValue(e, 'first_name')}
+                            />
+                        </div>
+						<div className="col-md-12">
+                            <TextField
+                              hintText="Surname"
+                              floatingLabelText="Surname"
+                              type="surname"
+                              onChange={(e) => this.changeValue(e, 'surname')}
+                            />
+                        </div>
+
+						<div className="col-md-12">
+                            <TextField
+                                hintText="tourist/guide"
+                                floatingLabelText="Role"
+                                type="role"
+								errorText={this.state.role_error_text}
+                                onChange={(e) => this.changeValue(e, 'role')}
                             />
                         </div>
 

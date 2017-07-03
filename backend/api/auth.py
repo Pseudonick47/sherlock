@@ -19,7 +19,10 @@ def create_user():
     incoming = request.get_json()
     user = User(
         email=incoming["email"],
-        password=incoming["password"]
+        password=incoming["password"],
+		first_name=incoming["first_name"],
+		surname=incoming["surname"],
+		role=incoming["role"]
     )
     db.session.add(user)
 
