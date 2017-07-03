@@ -81,6 +81,10 @@ export function post_tour(name, description, guide_fee, locations, thumbnail, im
     })
 }
 
+export function get_tours() {
+    return axios.get('/api/tours');
+}
+
 export function get_tour(id) {
     return axios.get('/api/tours/' + id);
 }
@@ -92,7 +96,7 @@ export function get_comment(id) {
 export function upload_file(files) {
     var data = new FormData();
     for (var f in files) {
-        data.append('file' + f, files[f]);        
+        data.append('file' + f, files[f]);
     }
     const options = {
         headers: {
