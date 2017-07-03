@@ -8,8 +8,6 @@ def insert_countries():
 
     with open('../data/countries', mode='r', encoding='UTF-8') as f:
         for line in f.readlines():
-
-            print(line)
             continent, name = line.strip().split('|')
             country = Country(name, continent)
             db.session.add(country)

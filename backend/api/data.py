@@ -112,23 +112,32 @@ class TourAPI(Resource):
         response = {}
         tour = db.session.query(Tour).filter_by(oid=oid,).one_or_none()
         if tour:
+            thumbnail = db.session.query(Image).filter_by(oid=tour.thumbnail_id).one()
+
             response = {
                 'id':tour.oid,
                 'name':tour.name,
                 'description':tour.description,
                 'guide_fee':tour.guide_fee,
-                'thumbnail': tour.thumbnail_id,
-                'locations':[
-                    {'id': location.oid, 'name': location.name} 
+                'thumbnail': {
+                    'id': thumbnail.oid,
+                    'src': 'http://localhost:5000/static/' + thumbnail.file_name,
+                    'width': thumbnail.width,
+                    'height': thumbnail.height,
+                    'alt': 'thumbnail'
+                },
+                'locations': [
+                    {'id': location.oid, 'name': location.name} \
                     for location in tour.locations
                 ],
                 'photos': [
                     {
-                        'src': 'http://tilda.center/static/images/album-tilda/01a.jpg',
-                        'width': 1680,
-                        'height': 1050,
-                        'alt': 'image 1'
-                    } 
+                        'id': image.oid,
+                        'src': 'http://localhost:5000/static/' + image.file_name,
+                        'width': image.width,
+                        'height': image.height,
+                        'alt': 'image'
+                    } for image in tour.images
                 ],
                 'rating': 3,
                 'commentIds': [1]
@@ -260,14 +269,35 @@ class TourListAPI(Resource):
 
         response = []
         for tour in db.session.query(Tour).all():
+            thumbnail = db.session.query(Image).filter_by(oid=tour.thumbnail_id).one()
             response.append(
                 {
                     'id':tour.oid,
                     'name':tour.name,
                     'description':tour.description,
                     'guide_fee':tour.guide_fee,
-                    'thumbnail': tour.thumbnail_id,
-                    'locations':[location.oid for location in tour.locations]
+                    'thumbnail': {
+                        'id': thumbnail.oid,
+                        'src': 'http://localhost:5000/static/' + thumbnail.file_name,
+                        'width': thumbnail.width,
+                        'height': thumbnail.height,
+                        'alt': 'thumbnail'
+                    },
+                    'locations': [
+                        {'id': location.oid, 'name': location.name} \
+                        for location in tour.locations
+                    ],
+                    'photos': [
+                        {
+                            'id': image.oid,
+                            'src': 'http://localhost:5000/static/' + image.file_name,
+                            'width': image.width,
+                            'height': image.height,
+                            'alt': 'image'
+                        } for image in tour.images
+                    ],
+                    'rating': 3,
+                    'commentIds': [1]
                 }
             )
 
