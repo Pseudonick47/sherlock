@@ -53,16 +53,16 @@ export default class SingleTour extends React.Component {
     prevPhoto = () => this.setState({ currentPhoto: this.state.currentPhoto - 1 });
 
     render() {
-              
+
         const style = {
             margin: 12,
         };
 
-        var locationList = [];        
-        for (var i in this.props.locations) { 
-            locationList.push(<a href={"/location/" + this.props.locations[i].id}>{this.props.locations[i].name}, </a>);
+        var locationList = [];
+        for (var i in this.props.locations) {
+          locationList.push(<li><a href={"/location/" + this.props.locations[i].id}>{this.props.locations[i].name} </a></li>);
         }
-        
+
         return (
             <div className="container">
                 <div className="row">
@@ -77,11 +77,13 @@ export default class SingleTour extends React.Component {
                         <p>{this.props.description}</p>
                         <Divider />
                         <h3>Locations:</h3>
-                        {locationList}
+                        <ul>
+                          {locationList}
+                        </ul>
                         <Divider />
                         <RaisedButton label="Rate" style={style} />
                         <RaisedButton label="Book" primary={true} style={style} />
-                        <RaisedButton label="Comment" secondary={true} style={style} />   
+                        <RaisedButton label="Comment" secondary={true} style={style} />
                         <Divider />
                         <h3>Comments</h3>
                         <Comments ids={this.props.commentIds} />
@@ -98,7 +100,7 @@ export default class SingleTour extends React.Component {
                             currentImage={this.state.currentPhoto}
                         />
                     </div>
-                        
+
                 </div >
             </div >
         );

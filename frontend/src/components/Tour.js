@@ -4,7 +4,7 @@ import Paper from 'material-ui/Paper';
 import * as actionCreators from '../actions/auth';
 
 export default class Tour extends Component {
-   
+
     render() {
         const style = {
            padding: 20,
@@ -19,7 +19,11 @@ export default class Tour extends Component {
 
         var locations = [];
         for (var loc in this.props.data.locations) {
-            locations.push(<a>{this.props.data.locations[loc]+", "}</a>);
+          locations.push(
+            <li><a href={"/location/" + this.props.data.locations[loc].id}>
+              {this.props.data.locations[loc].name}
+          </a></li>
+          );
         }
 
         return (
@@ -34,7 +38,7 @@ export default class Tour extends Component {
                 <div style={{ height: 30, position: "absolute", bottom: 30, }} >
                     <h3>{this.props.data.guide_fee} $</h3>
                 </div>
-            </Paper>     
+            </Paper>
         );
     }
 }
