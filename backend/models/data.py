@@ -19,6 +19,33 @@ from app import db
 #from models.users import User
 
 
+
+images_of_locations = db.Table(
+    'images_of_locations',
+    db.Column('location_id', db.Integer, db.ForeignKey('locations.id')),
+    db.Column('image_id', db.Integer, db.ForeignKey('images.id'))
+)
+
+images_of_tours = db.Table(
+    'images_of_tours',
+    db.Column('tour_id', db.Integer, db.ForeignKey('tours.id')),
+    db.Column('image_id', db.Integer, db.ForeignKey('images.id'))
+)
+
+images_of_cities = db.Table(
+    'images_of_cities',
+    db.Column('city_id', db.Integer, db.ForeignKey('cities.id')),
+    db.Column('image_id', db.Integer, db.ForeignKey('images.id'))
+)
+
+
+tours_on_locations = db.Table(
+    'tours_on_locations',
+    db.Column('tour_id', db.Integer, db.ForeignKey('tours.id')),
+    db.Column('location_id', db.Integer, db.ForeignKey('locations.id'))
+)
+
+
 class Continent(enum.Enum):
     """Enumeration of continents."""
 
@@ -30,7 +57,7 @@ class Continent(enum.Enum):
     NorthAmerica = 6
     SouthAmerica = 7
 
-#TODO(all): Discuss posibility to add continent regions.
+#TODO(all): Discuss possibility to add continent regions.
 
 
 class Country(db.Model):
@@ -62,7 +89,8 @@ class City(db.Model):
         oid (int): Unique identifier.
         name (str): City name.
         country_id (int): Country identifier in which the city is located.
-        country: Reference to a country in which the city is located.
+        thumbnail_id (int): Thumbnail image identifier.
+        images (list): References to images that belong to the city.
     """
 
     __tablename__ = 'cities'
@@ -70,10 +98,13 @@ class City(db.Model):
     name = db.Column(db.Unicode, nullable=False)
     country_id = db.Column(db.Integer, db.ForeignKey('countries.id'),
                            nullable=False)
+    thumbnail_id = db.Column(db.ForeignKey('images.id'), nullable=True)
+    images = db.relationship('Image', secondary=images_of_cities)
 
-    def __init__(self, name, country_id):
+    def __init__(self, name, country_id, thumbnail_id=None):
         self.name = name
         self.country_id = country_id
+        self.thumbnail_id = thumbnail_id
 
 
 class Price(db.Model):
@@ -112,6 +143,8 @@ class Location(db.Model):
         city (City): Reference to a city to which the location belongs to.
         country_id (int): Country identifier to which the location belongs to.
         country (Country): Reference to a city to which the location belongs to.
+        thumbnail_id (int): Thumbnail image identifier.
+        images (list): References to images that belong to the location.
     """
 
     __tablename__ = 'locations'
@@ -120,22 +153,18 @@ class Location(db.Model):
     description = db.Column(db.Unicode)
     city_id = db.Column(db.ForeignKey('cities.id'))
     country_id = db.Column(db.ForeignKey('countries.id'))
+    thumbnail_id = db.Column(db.ForeignKey('images.id'))
     price = db.relationship('Price', backref='location', lazy='dynamic')
     city = db.relationship('City', backref='locations')
     country = db.relationship('Country', backref='locations')
+    images = db.relationship('Image', secondary=images_of_locations)
 
-    def __init__(self, name, description, city_id=None, country_id=None):
+    def __init__(self, name, description, city_id=None, country_id=None, thumbnail_id=None):
         self.name = name
         self.description = description
         self.city_id = city_id
         self.country_id = country_id
-
-
-tours_on_locations = db.Table(
-    'tours_on_locations',
-    db.Column('tour_id', db.Integer, db.ForeignKey('toures.id')),
-    db.Column('location_id', db.Integer, db.ForeignKey('locations.id'))
-)
+        self.thumbnail_id = thumbnail_id
 
 comments_on_tour = db.Table(
     'comments_on_tour',
@@ -171,34 +200,48 @@ class Tour(db.Model):
         name (str): Tour name.
         description (str): Tour description.
         guide_fee (float): Fee that guide demands for organizing tours.
+        thumbnail_id (int): Thumbnail image identifier.
         locations (list): References to locations that will be visited by the
                           participants of the tour.
+        images (list): References to images that belong to the tour.
     """
 
-    __tablename__ = 'toures'
+    __tablename__ = 'tours'
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode, nullable=False)
     description = db.Column(db.Unicode)
     guide_fee = db.Column(db.Float, nullable=False)
+    thumbnail_id = db.Column(db.ForeignKey('images.id'))
     locations = db.relationship('Location', secondary=tours_on_locations,
                                 backref='tours')
+    images = db.relationship('Image', secondary=images_of_tours)
     comments = db.relationship('Comment', secondary=comments_on_tour, backref='tours')
 
-    def __init__(self, name, guide_fee, description=''):
+    def __init__(self, name, guide_fee, description='', thumbnail_id=None):
         self.name = name
         self.guide_fee = guide_fee
         self.description = description
+        self.thumbnail_id = thumbnail_id
 
 
 class Image(db.Model):
     """SQLAlchemy table representing images.
 
+    Attributes:
+        oid (int): Unique identifier.
+        file_name (str): Name of the file as it is stored on the server.
     """
 
     __tablename__ = 'images'
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     file_name = db.Column(db.Unicode, nullable=False, unique=True)
-    main_image = db.Column('profile_image', db.Boolean)
+    width = db.Column(db.Integer)
+    height = db.Column(db.Integer)
+
+    def __init__(self, file_name, width, height):
+        self.file_name = file_name
+        self.width = width
+        self.height = height
 
     def __init__(self, file_name):
         self.file_name = file_name

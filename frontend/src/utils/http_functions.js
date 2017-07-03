@@ -50,8 +50,35 @@ export function get_countries() {
     return axios.get('api/countries');
 }
 
-export function get_tours() {
-    return axios.get('api/tours');
+
+export function get_cities() {
+    return axios.get('api/cities');
+}
+
+export function post_city(name, country_id) {
+    return axios.post('api/cities', {
+        name, country_id,
+    });
+}
+
+export function get_cities_by_country(country_id) {
+    return axios.get('api/country/' + country_id + '/cities');
+}
+
+export function get_locations_by_city(city_id) {
+    return axios.get('api/city/' + city_id + '/locations');
+}
+
+export function post_location(name, description, city_id, country_id, price) {
+    return axios.post('api/locations', {
+        name, description, city_id, country_id, price,
+    });
+}
+
+export function post_tour(name, description, guide_fee, locations, thumbnail, images) {
+    return axios.post('api/tours', {
+        name, description, guide_fee, locations, thumbnail, images
+    })
 }
 
 export function get_tour(id) {

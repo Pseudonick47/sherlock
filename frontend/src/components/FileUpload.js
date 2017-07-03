@@ -36,6 +36,8 @@ export default class FileUpload extends React.Component {
     }
 
     onDrop(acceptedFiles, rejectedFiles) {
+        var filesToBeSent = [];
+        filesToBeSent.push(acceptedFiles[0]);
         var filesToBeSent = this.state.filesToBeSent;
         for (var f in acceptedFiles) {
             filesToBeSent.push(acceptedFiles[f]);            
@@ -50,7 +52,6 @@ export default class FileUpload extends React.Component {
     }    
     
     render() {
-
         const dropStyle = {
             display: "flex",
             alignItems: "center",
@@ -62,10 +63,6 @@ export default class FileUpload extends React.Component {
             border: "2px dashed #2323cf",
             borderRadius: 20,
         };
-
-        const style = {
-
-        }
 
         return (
             <div className="App">

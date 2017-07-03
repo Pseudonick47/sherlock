@@ -58,22 +58,3 @@ def is_token_valid():
         return jsonify(token_is_valid=True)
     else:
         return jsonify(token_is_valid=False), 403
-
-@mod.route("/countries", methods=['GET'])
-def get_countries():
-    return jsonify(
-        [
-            {
-                "name": "Serbia"
-            },
-            {
-                'name': 'France'
-            },
-            {
-                "name": "Germany"
-            },
-            {
-                'name': 'Italy'
-            }
-        ]
-    ), 200
