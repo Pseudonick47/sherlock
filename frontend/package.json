@@ -117,6 +117,7 @@
     "yargs": "^6.5.0"
   },
   "dependencies": {
+    "material-ui-number-input": "^5.0.19",
     "material-ui-search-bar": "^0.2.1",
     "react-dropzone": "^3.13.3",
     "react-images": "^0.5.4",

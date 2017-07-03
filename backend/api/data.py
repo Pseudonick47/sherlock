@@ -101,7 +101,7 @@ class TourAPI(Resource):
                     "description": "Visit some of the finest castles and
                                     mansions in all of Europe.",
                     "guide_fee": 10,
-                    "thumbnail_id": 2,
+                    "thumbnail": 2,
                     "locations": [...]
                 }
 
@@ -117,9 +117,11 @@ class TourAPI(Resource):
                 'name':tour.name,
                 'description':tour.description,
                 'guide_fee':tour.guide_fee,
-                'thumbnail_id': tour.thumbnail_id,
+                'thumbnail': tour.thumbnail_id,
                 'locations':[
-                    {'id': location.oid, 'name': location.name} for location in tour.locations],
+                    {'id': location.oid, 'name': location.name} 
+                    for location in tour.locations
+                ],
                 'photos': [
                     {
                         'src': 'http://tilda.center/static/images/album-tilda/01a.jpg',
@@ -237,7 +239,7 @@ class TourListAPI(Resource):
                         "description": "Visit some of the finest castles and
                                         mansions in all of Europe.",
                         "guide_fee": 10,
-                        "thumbnail_id": 2,
+                        "thumbnail": 2,
                         "locations": [...]
                     },
                     {
@@ -247,7 +249,7 @@ class TourListAPI(Resource):
                                         wicked people in Sydney's most
                                         spectacular night clubs.",
                         "guide_fee": 14,
-                        "thumbnail_id": 403,
+                        "thumbnail": 403,
                         "locations": [...]
                     },
                     ...
@@ -264,7 +266,7 @@ class TourListAPI(Resource):
                     'name':tour.name,
                     'description':tour.description,
                     'guide_fee':tour.guide_fee,
-                    'thumbnail_id': tour.thumbnail_id,
+                    'thumbnail': tour.thumbnail_id,
                     'locations':[location.oid for location in tour.locations]
                 }
             )

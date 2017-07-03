@@ -7,9 +7,6 @@
 from urllib.request import urlopen
 from html.parser import HTMLParser
 
-import enum
-import psycopg2
-
 
 CONTINENTS = {
     'AF': 1,
@@ -51,13 +48,7 @@ def extract_countries(html):
     countries = []
     for country in my_parser.html_data:
         try:
-            countries.append(
-                [
-                    CONTINENTS[country[0]],
-                    country[8][:country[8].index(',')]
-                    if ',' in country[8] else country[8]
-                ]
-            )
+            countries.append(str(CONTINENTS[country[0]]) + ','+ country[8] + '\n')
         except Exception:
             pass
 
@@ -69,32 +60,18 @@ def main():
 
         Disclaimer:
             There are few changes that need to be made to the database.
-            North Korea and South Korea are both descrabed as Korea due to 
+            North Korea and South Korea are both described as Korea due to 
             shortening of names.
     """
 
     #fetch data
     response = urlopen('https://en.wikipedia.org/wiki/List_of_sovereign_states_\
                         and_dependent_territories_by_continent_(data_file)')
-    html = response.read()
+    html = str(response.read())
 
-#TODO: set dbname, user and password
-    conn = psycopg2.connect('dbname=db user=u password=p')
-    curr = conn.cursor()
+    with open('data/countries', mode='w', encoding='UTF-8') as f:
+        f.writelines(extract_countries(html))
 
-    for country in extract_countries(str(html)):
-        curr.execute('INSERT INTO countries (continent, name) VALUES (%s, %s);',
-                     [country[0], country[1]])
-
-    conn.commit()
-
-    curr.execute('SELECT * FROM countries;')
-    countries = curr.fetchall()
-    for country in countries:
-        print(country)
-
-    curr.close()
-    conn.close()
 
 if __name__ == '__main__':
     main()

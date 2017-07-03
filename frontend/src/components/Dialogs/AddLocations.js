@@ -51,6 +51,7 @@ export default class AddLocations extends React.Component {
             country: null,
             countryNames: [],
             city: null,
+            cities: [],
             cityNames: [],
             newCityName: null,
             locations: [],
@@ -82,7 +83,7 @@ export default class AddLocations extends React.Component {
             nextProps.citiesByCountry.forEach((city) => {
                 c.push(city.name);
             });
-            this.setState({cityNames: c});
+            this.setState({cityNames: c, cities: nextProps.citiesByCountry});
         }
         if(this.props.locationsByCity != nextProps.locationsByCity) {
             var locations = [];
@@ -117,7 +118,7 @@ export default class AddLocations extends React.Component {
     }
 
     onCityRequest = (value, index) => {
-        const city = this.props.citiesByCountry[index];
+        const city = this.state.cities[index];
         this.setState({city: city});
         this.fetchLocations(city.id);
     }
@@ -129,10 +130,16 @@ export default class AddLocations extends React.Component {
     }
 
     onNewCitySubmit = (city) => {
-        var cityNames = [city.name,];
+        var cityNames = this.state.cityNames;
+        cityNames.push(city.name);
+
+        var cities = this.state.cities;
+        cities.push(city);
+
         this.setState({
             newCityOpen: false,
             city: city,
+            cities: cities,
             cityNames: cityNames,
         });
     }
@@ -217,6 +224,7 @@ export default class AddLocations extends React.Component {
                     dataSource={this.state.cityNames}
                     style={{width: "60%", margin: "5 0 20 20",}}
                     onNewRequest={this.onCityRequest}
+                    defaultValue={this.state.city ? this.state.city.name : ""}
                 />
                 <FlatButton 
                     label="Add new city"

@@ -169,7 +169,7 @@ class Location(db.Model):
 comments_on_tour = db.Table(
     'comments_on_tour',
     db.Column('comment_id', db.Integer, db.ForeignKey('comments.id')),
-    db.Column('tour_id', db.Integer, db.ForeignKey('toures.id')),
+    db.Column('tour_id', db.Integer, db.ForeignKey('tours.id')),
 
 )
 
@@ -187,9 +187,6 @@ class Comment(db.Model):
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     text = db.Column('text', db.Unicode)
     user_id = db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
-
-
-
 
 
 class Tour(db.Model):
@@ -243,9 +240,6 @@ class Image(db.Model):
         self.width = width
         self.height = height
 
-    def __init__(self, file_name):
-        self.file_name = file_name
-
 
 class Payment(db.Model):
     """SQLAlchemy table representing payments for specific tours.
@@ -270,7 +264,7 @@ class SpecificTour(db.Model):
     oid = db.Column('id', db.Integer, primary_key=True)
     startDate = db.Column(db.Date, nullable=False)
     endDate = db.Column(db.Date, nullable=False)
-    tour_id = db.Column(db.ForeignKey('toures.id'))
+    tour_id = db.Column(db.ForeignKey('tours.id'))
     payments = db.relationship('Payment', backref='specificTours')
 
     def __init__(self, startDate, endDate, tour_id):

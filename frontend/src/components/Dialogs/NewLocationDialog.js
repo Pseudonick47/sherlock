@@ -141,7 +141,7 @@ export default class NewLocationDialog extends React.Component {
                     modal
                     open={this.state.open}
                 >
-                    <div className="container">
+                    <div className="containerImage">
                         <img src={this.state.imageUrl} className="image" />
                         <div className="middle">
                             <RaisedButton 
