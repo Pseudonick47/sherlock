@@ -1,6 +1,6 @@
 from app import db
 from passlib.hash import argon2
-from models.data import Payment, SpecificTour
+from models.data import Payment, SpecificTour, images_of_user
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -12,9 +12,10 @@ class User(db.Model):
     dateOfBirth = db.Column(db.String(255), nullable=False)
     biography = db.Column(db.String(255))
     role = db.Column(db.String(255), nullable=False)
+    image = db.relationship('Image', secondary=images_of_user)
 
-    def __init__(self, email, password, first_name='', surname='',role='',dateOfBirth='',biography=''):
-        self.email = email 
+    def __init__(self, email, password, first_name='', surname='',role='',dateOfBirth='',biography='', image=None):
+        self.email = email
         self.active = True
         self.password = User.hashed_password(password)
         self.first_name = first_name
@@ -22,6 +23,7 @@ class User(db.Model):
         self.dateOfBirth = dateOfBirth
         self.biography = biography
         self.role = role
+#        self.image = image
 
     @staticmethod
     def hashed_password(password):

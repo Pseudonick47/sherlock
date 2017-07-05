@@ -44,7 +44,8 @@ def get_token():
     incoming = request.get_json()
     user = User.get_user_with_email_and_password(incoming["email"], incoming["password"])
     if user:
-        return jsonify(token=generate_token(user))
+        ret_val = {'token': generate_token(user), 'user': {'email': user.email, 'first_name': user.first_name, 'surname': user.surname, 'role': user.role}}
+        return jsonify(ret_val)
 
     return jsonify(error=True), 403
 

@@ -91,6 +91,9 @@ export class Header extends Component {
                                 </MenuItem>
                             </div>
                     }
+                    <MenuItem onClick={() => this.dispatchNewRoute('/tours')}>
+                      Search Tours
+                    </MenuItem>
                 </LeftNav>
                 <AppBar
                   title="React-Redux-Flask"

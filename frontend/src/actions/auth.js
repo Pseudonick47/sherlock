@@ -18,12 +18,16 @@ import { parseJSON } from '../utils/misc';
 import { get_token, create_user, get_tours, get_tour, get_comment } from '../utils/http_functions';
 
 
-export function loginUserSuccess(token) {
-    localStorage.setItem('token', token);
+export function loginUserSuccess(response) {
+    localStorage.setItem('token', response['token']);
+    localStorage.setItem('user', response['user']);
+    var token = response['token'];
+    var user = response['user'];
     return {
         type: LOGIN_USER_SUCCESS,
         payload: {
-            token,
+          token,
+          user,
         },
     };
 }
@@ -73,7 +77,7 @@ export function loginUser(email, password) {
             .then(parseJSON)
             .then(response => {
                 try {
-                    dispatch(loginUserSuccess(response.token));
+                    dispatch(loginUserSuccess(response));
                     browserHistory.push('/main');
                 } catch (e) {
                     alert(e);

@@ -31,6 +31,7 @@ const initialState = {
     description: null,
     locations: [],
     photos: [],
+    user: null,
     rating: null,
     commentIds: [],
     userPhoto: "",
@@ -50,6 +51,7 @@ export default createReducer(initialState, {
     [LOGIN_USER_SUCCESS]: (state, payload) =>
         Object.assign({}, state, {
             isAuthenticating: false,
+            user: payload.user,
             isAuthenticated: true,
             token: payload.token,
             userName: jwtDecode(payload.token).email,
@@ -127,5 +129,5 @@ export default createReducer(initialState, {
             current: payload.current,
             dislikes: payload.dislikes,
         }),
-    
+
 });

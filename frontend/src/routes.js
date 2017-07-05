@@ -29,7 +29,7 @@ export default (
     <Route path="/" component={App}>
         <Route path="main" component={requireAuthentication(ProtectedView)} />
         <Route path="login" component={requireNoAuthentication(LoginView)} />
-        <Route path="tours" component={requireNoAuthentication(SearchTours)} />
+        <Route path="tours" component={SearchTours} />
         <Route path="tour" component="div">
             <Route path=":id" component={requireNoAuthentication(SingleTour)} />
         </Route>
@@ -39,7 +39,7 @@ export default (
         <Route path="analytics" component={requireAuthentication(Analytics)} />
         <Route path="countries" component={requireNoAuthentication(CountriesView)} />
         <Route path="add_tour" component={requireNoAuthentication(AddTour)} />
-        <Route path="profile" component={requireAuthentication(ProfileView)} />                
+        <Route path="profile" component={requireAuthentication(ProfileView)} />
         <Route path="*" component={DetermineAuth(NotFound)} />
     </Route>
 );

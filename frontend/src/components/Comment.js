@@ -66,11 +66,11 @@ export default class Comment extends Component {
                 <IconButton tooltip="Like" onClick={this.clickLike}>
                     <ArrowUp />
                 </IconButton>
-                
+
                 <IconButton tooltip="Disike" onClick={this.clickDislike}>
                     <ArrowDown />
                 </IconButton>
-                
+
                 <IconButton tooltip="Delete" onClick={this.clickDelete}>
                     <Close />
                 </IconButton>
