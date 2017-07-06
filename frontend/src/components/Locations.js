@@ -25,10 +25,25 @@ export default class Locations extends React.Component {
         }
     }
 
+    componentWillMount() {
+        var locations = [];
+        this.props.data.forEach((location) => {
+            locations.push(
+                <Location 
+                    data={location} 
+                    select={this.onLocationSelected}
+                    deselect={this.onLocationDeselected}
+                    showButton={true}
+                />
+            );
+        });
+
+        this.setState({locations: locations});
+    }
+
     componentWillReceiveProps(nextProps) {
         if (this.props != nextProps) {
             var locations = [];
-
             nextProps.data.forEach((location) => {
                 locations.push(
                     <Location 
@@ -36,6 +51,7 @@ export default class Locations extends React.Component {
                         select={this.onLocationSelected}
                         deselect={this.onLocationDeselected}
                         showButton={true}
+                        actionType={this.props.actionType}
                     />
                 );
             });

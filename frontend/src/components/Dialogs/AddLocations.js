@@ -50,9 +50,11 @@ export default class AddLocations extends React.Component {
             open: false,
             country: null,
             countryNames: [],
+            countryError: '',
             city: null,
             cities: [],
             cityNames: [],
+            cityError: '',
             newCityName: null,
             locations: [],
             // locationsDisplay: [],
@@ -112,15 +114,40 @@ export default class AddLocations extends React.Component {
     }
 
     onCountryRequest = (value, index) => {
-        const country = this.props.countries[index];
-        this.setState({country: country});
-        this.fetchCities(country.id);
+        if (index == -1) {
+            index = this.state.countryNames.indexOf(value);
+        }
+        if (index != -1) {
+            const country = this.props.countries[index];
+            this.setState({
+                country: country, 
+                cities: [], 
+                locations: [],
+                countryError: '',    
+            });
+            this.fetchCities(country.id);
+        } 
+        else {
+            this.setState({countryError: 'Country doesn\'t exist!'})
+        }
     }
 
     onCityRequest = (value, index) => {
-        const city = this.state.cities[index];
-        this.setState({city: city});
-        this.fetchLocations(city.id);
+        if (index == -1) {
+            index = this.state.cityNames.indexOf(value);
+        }
+            if (index != -1) {
+            const city = this.state.cities[index];
+            this.setState({
+                city: city, 
+                cityError: '',
+                locations: [],
+            });
+            this.fetchLocations(city.id);
+        }
+        else {
+            this.setState({cityError: 'City doesn\'t exist!'})
+        }
     }
 
     onNewCityCancel = () => {
@@ -212,21 +239,27 @@ export default class AddLocations extends React.Component {
                 </p>
                 <AutoComplete 
                     hintText={fetchingCountries ? "Loading countries.." : "Countries"}
-                    errorText={countriesError ? "Oops, something went wrong! Please try reloading the page." : ""}
+                    errorText={
+                        countriesError ? "Oops, something went wrong! Please try reloading the page." :
+                        this.state.countryError
+                    }
                     dataSource={this.state.countryNames}
                     style={{width: "80%", margin: "20 0 5 20",}}
                     onNewRequest={this.onCountryRequest}
                 />
                 <AutoComplete 
                     hintText={fetchingCities ? "Loading cities.." : "Cities"}
-                    errorText={citiesError ? "Oops, something went wrong! Please try reloading the page." : ""}
+                    errorText={
+                        citiesError ? "Oops, something went wrong! Please try reloading the page." : 
+                        this.state.cityError
+                    }
                     disabled={this.state.cityNames.length ? false : true}
                     dataSource={this.state.cityNames}
                     style={{width: "60%", margin: "5 0 20 20",}}
                     onNewRequest={this.onCityRequest}
                     defaultValue={this.state.city ? this.state.city.name : ""}
                 />
-                <FlatButton 
+                <RaisedButton 
                     label="Add new city"
                     style={{float: "right", margin: "5 20 20 0",}}
                     onTouchTap={() => this.setState({newCityOpen: true})}
@@ -239,9 +272,10 @@ export default class AddLocations extends React.Component {
                 <Locations 
                     data={this.state.locations} 
                     selectionChanged={(selectedLocations) => this.setState({selectedLocations: selectedLocations})}
+                    actionType="add"
                 />
                 <Divider />
-                <FlatButton 
+                <RaisedButton 
                     label="Add new location"
                     style={{margin: "15 0 10 20"}}
                     onTouchTap={() => this.setState({newLocationOpen: true})}

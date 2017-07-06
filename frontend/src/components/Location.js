@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import ContentRemove from 'material-ui/svg-icons/content/remove';
 import ActionDone from 'material-ui/svg-icons/action/done';
 
 import * as actionCreators from '../actions/auth';
@@ -50,7 +51,10 @@ export default class Location extends Component {
                         style={{margin: 10, right: 0, position: "absolute", bottom: 0}}
                     >
 
-                        {this.state.selected ? <ActionDone /> : <ContentAdd /> }
+                        {this.state.selected ? <ActionDone /> : 
+                         this.props.actionType === 'add' ? <ContentAdd /> :
+                         this.props.actionType === 'remove' ? <ContentRemove /> : ""
+                        }
                     </FloatingActionButton>
                 : "" }
             </Paper>

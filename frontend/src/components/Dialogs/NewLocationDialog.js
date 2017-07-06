@@ -35,7 +35,7 @@ export default class NewLocationDialog extends React.Component {
             open: false,
             name: '',
             nameError: '',
-            location_description: '',
+            description: '',
             price: 0.0,
             imageUrl: 'https://cdn2.iconfinder.com/data/icons/lightly-icons/30/location-map-480.png',
             uploadDialogOpen: false,

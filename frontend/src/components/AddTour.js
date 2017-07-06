@@ -55,13 +55,14 @@ export default class AddTour extends React.Component {
             thumbnail: null,
             uploadDialogOpen: false,
             thumbnailDialogOpen: false,
+            waitForRequest: false,
             fee: 0,
         };
     };
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.tourId != nextProps.tourId) {
-            browserHistory.push('/tour/'.concat(nextProps.tourId.toString()));
+        if (this.props.id != nextProps.id) {
+            browserHistory.push('/tour/'.concat(nextProps.id.toString()));
         }
     }
 
@@ -78,7 +79,7 @@ export default class AddTour extends React.Component {
                 this.setState({titleError: 'Tour title is required!'});
             }
         }
-        /*else if (stepIndex === 1) {
+        else if (stepIndex === 1) {
             if (locations.length == 0) {
                 this.setState({locationsError: <font color="red">At least one location should be added!</font>});
             } else {
@@ -87,7 +88,7 @@ export default class AddTour extends React.Component {
                     finished: false,
                 });
             }
-        }*/
+        }
         else if (stepIndex === 3) {
             this.setState({finished: true});
         }
@@ -166,7 +167,7 @@ export default class AddTour extends React.Component {
     onCancel = () => this.setState({finished: false});
 
     onSubmit = () => {
-        this.setState({finished: false});
+        this.setState({waitForRequest: true});
 
         const {title, description, locations, photos, thumbnail, fee} = this.state;
 
@@ -210,7 +211,7 @@ export default class AddTour extends React.Component {
                     <h2 style={{textAlign: "center", padding: 30}}>Let's travel somewhere! Where should we go?</h2>
                     <div className="containerImage">
                         <img 
-                            src={this.state.thumbnail ? this.state.thumbnail.src : "http://st2.depositphotos.com/2951317/6909/v/950/depositphotos_69095081-stock-illustration-travel-outline-icons-set.jpg"} 
+                            src={this.state.thumbnail ? this.state.thumbnail.src : "http://localhost:5000/static/tour.jpg"}
                             className="image" />
                         <div className="middle">
                             <RaisedButton 
@@ -271,14 +272,18 @@ export default class AddTour extends React.Component {
                     }
                     <Locations 
                         data={this.state.locations} 
-                        select={function(){}} 
-                        deselect={function(){}}
+                        selectionChanged={function() {}}
+                        actionType="remove"
                     />
                     <Divider />
-                    <FlatButton
-                        style={{margin: "10 0 15 20"}}
+                    <RaisedButton
+                        style={{margin: "10 10 15 20"}}
                         label="Add locations"
                         onTouchTap={() => this.setState({addLocationsDialogOpen: true})}
+                    />
+                    <RaisedButton
+                        style={{margin: "10 10 15 20"}}
+                        label="Remove locations"
                     />
                     {this.state.addLocationsDialogOpen ?
                         <AddLocations
@@ -306,7 +311,7 @@ export default class AddTour extends React.Component {
                         currentImage={this.state.currentPhoto}
                     />
                     <Divider />
-                    <FlatButton
+                    <RaisedButton
                         style={{margin: "10 0 15 20"}}
                         label="Upload photos"
                         onTouchTap={() => this.setState({uploadDialogOpen: true})}
@@ -381,14 +386,17 @@ export default class AddTour extends React.Component {
                                     label="Cancel"
                                     onTouchTap={this.onCancel}
                                     secondary
+                                    disabled={this.state.waitForRequest}
                                 />,
                                 <FlatButton
                                     label="Submit"
                                     onTouchTap={this.onSubmit}
                                     primary
+                                    disabled={this.state.waitForRequest}
                                 />
                             ]}
                             open
+                            modal
                         >
                             <p style={{padding: 5}}>Have you check all the information about your tour? If everything is alright click submit button.</p>
                         </Dialog>
@@ -397,7 +405,7 @@ export default class AddTour extends React.Component {
                             <div>{this.getStepContent(stepIndex)}</div>
                             <Divider />
                             <div style={{marginTop: 12}}>
-                                <FlatButton
+                                <RaisedButton
                                     label="Back"
                                     disabled={stepIndex === 0}
                                     onTouchTap={this.handlePrev}
@@ -405,7 +413,7 @@ export default class AddTour extends React.Component {
                                 />
                                 <RaisedButton
                                     label={stepIndex === 3 ? 'Finish' : 'Next'}
-                                    primary={true}
+                                    primary
                                     onTouchTap={this.handleNext}
                                 />
                             </div>
