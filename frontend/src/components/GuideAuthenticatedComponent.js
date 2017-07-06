@@ -25,12 +25,13 @@ export function requireGuideAuthentication(Component) {
         }
 
         checkAuth(props = this.props) {
-            alert('pizda materina');
-            if (props.isAuthenticated) {
-                alert("nema nista "+JSON.stringify(user));
+            if (props.isAuthenticated && props.user.role == 'guide') {
                 this.setState({
                     is_guide: props.user.role == 'guide',
                 });
+            } 
+            else {
+                browserHistory.push("/home");
             }
         }
 
@@ -39,7 +40,7 @@ export function requireGuideAuthentication(Component) {
                 <div>
                     {this.props.isAuthenticated && this.state.is_guide
                         ? <Component {...this.props} />
-                        : <h1>nisi gajd</h1>
+                        : ""
                     }
                 </div>
             );

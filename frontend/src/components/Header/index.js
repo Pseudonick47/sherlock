@@ -8,13 +8,20 @@ import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
 import Divider from 'material-ui/Divider';
 
-import * as actionCreators from '../../actions/auth';
+import * as authActions from '../../actions/auth';
+import * as componentActions from '../../actions/components';
+
+
+const actionCreators = Object.assign({}, authActions, componentActions);
+
 
 function mapStateToProps(state) {
     return {
         token: state.auth.token,
         userName: state.auth.userName,
         isAuthenticated: state.auth.isAuthenticated,
+        user: state.auth.user,
+        leftNavDisplayed: state.components.leftNavDisplayed,
     };
 }
 
@@ -34,38 +41,24 @@ export class Header extends Component {
 
     dispatchNewRoute(route) {
         browserHistory.push(route);
-        this.setState({
-            open: false,
-        });
+        this.props.leftNavToggle(false);
 
     }
-
-
-    handleClickOutside() {
-        this.setState({
-            open: false,
-        });
-    }
-
 
     logout(e) {
         e.preventDefault();
         this.props.logoutAndRedirect();
-        this.setState({
-            open: false,
-        });
+        this.props.leftNavToggle(false);
     }
 
     openNav() {
-        this.setState({
-            open: true,
-        });
+        this.props.leftNavToggle(true);
     }
 
     render() {
         return (
             <header>
-                <LeftNav open={this.state.open}>
+                <LeftNav open={this.props.leftNavDisplayed}>
                     {
                         !this.props.isAuthenticated ?
                             <div>
@@ -76,10 +69,23 @@ export class Header extends Component {
                                     Register
                                 </MenuItem>
                             </div>
-                            :
+                            : ""
+                    }
+                    {
+                        <div>
+                            <MenuItem onClick={() => this.dispatchNewRoute('/tour/3')}>
+                                Tour 3
+                            </MenuItem>
+                            <MenuItem onClick={() => this.dispatchNewRoute('/tours')}>
+                                Search Tours
+                            </MenuItem>
+                        </div>
+                    }
+                    {
+                            this.props.isAuthenticated ? this.props.user.role == "guide" ?
                             <div>
-                                <MenuItem onClick={() => this.dispatchNewRoute('/analytics')}>
-                                    Analytics
+                                <MenuItem onClick={() => this.dispatchNewRoute('/new_tour')}>
+                                    New Tour
                                 </MenuItem>
                                 <Divider />
 	                              <MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
@@ -90,16 +96,22 @@ export class Header extends Component {
                                     Logout
                                 </MenuItem>
                             </div>
+                            :
+                            <div>
+                                <Divider />
+	                              <MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
+                                    ProfileView
+                                </MenuItem>
+				                        <Divider />
+                                <MenuItem onClick={(e) => this.logout(e)}>
+                                    Logout
+                                </MenuItem>
+                            </div>
+                            : ""
                     }
-                    <MenuItem onClick={() => this.dispatchNewRoute('/tour/3')}>
-                      Tour 3
-                    </MenuItem>
-                    <MenuItem onClick={() => this.dispatchNewRoute('/tours')}>
-                      Search Tours
-                    </MenuItem>
                 </LeftNav>
                 <AppBar
-                  title="React-Redux-Flask"
+                  title="Sherlock"
                   onLeftIconButtonTouchTap={() => this.openNav()}
                   iconElementRight={
                       <FlatButton label="Home" onClick={() => this.dispatchNewRoute('/')} />
@@ -114,4 +126,6 @@ export class Header extends Component {
 Header.propTypes = {
     logoutAndRedirect: React.PropTypes.func,
     isAuthenticated: React.PropTypes.bool,
+    leftNavDisplayed: React.PropTypes.bool,
+    leftNavToggle: React.PropTypes.func,
 };

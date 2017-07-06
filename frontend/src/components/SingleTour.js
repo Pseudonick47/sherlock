@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import Gallery from 'react-photo-gallery';
 import Lightbox from 'react-images';
 import RaisedButton from 'material-ui/RaisedButton';
+import SpecificTourDialog from './Dialogs/SpecificTourDialog';
 
 
 function mapStateToProps(state) {
@@ -38,6 +39,7 @@ export default class SingleTour extends React.Component {
             id: this.props.routeParams.id,
             isLigthboxOpen: false,
             currentPhoto: 1,
+            specificTourDialog: false,
         };
     }
 
@@ -52,6 +54,12 @@ export default class SingleTour extends React.Component {
     closeLightbox = () => this.setState({ isLigthboxOpen: false });
     nextPhoto = () => this.setState({ currentPhoto: this.state.currentPhoto + 1 });
     prevPhoto = () => this.setState({ currentPhoto: this.state.currentPhoto - 1 });
+
+    onSpecificTourCancel = () => this.setState({specificTourDialog: false});
+    onSpecificTourSubmit = (term) => {
+        console.log(term);
+        this.setState({specificTourDialog: false});
+    }
 
     render() {
 
@@ -80,9 +88,11 @@ export default class SingleTour extends React.Component {
                         <ul>
                           {locationList}
                         </ul>
+                        {this.props.user ? this.props.user.role == "guide" ? 
+                            <RaisedButton label="Add new term" primary={true} style={style} onTouchTap={() => this.setState({specificTourDialog: true})}/>
+                        : "" : "" }
                         <Divider />
                         <RaisedButton label="Rate" style={style} />
-                        <RaisedButton label="Book" primary={true} style={style} />
                         {(this.props.user && (this.props.user.role == 'guide')) ? <RaisedButton label="Guide this tour" primary={true} style={style} /> : null}
                         <RaisedButton label="Comment" secondary={true} style={style} />
                         <Divider />
@@ -101,8 +111,10 @@ export default class SingleTour extends React.Component {
                             currentImage={this.state.currentPhoto}
                         />
                     </div>
-
                 </div >
+                {this.state.specificTourDialog ?
+                    <SpecificTourDialog cancel={this.onSpecificTourCancel} submit={this.onSpecificTourSubmit} />
+                : ""}
             </div >
         );
 
