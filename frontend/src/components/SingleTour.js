@@ -3,10 +3,10 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 import * as actionCreators from '../actions/auth';
 import { validateEmail } from '../utils/misc';
 import Comments from './Comments'
-
 import Divider from 'material-ui/Divider';
 import PropTypes from 'prop-types';
 import Gallery from 'react-photo-gallery';
@@ -20,6 +20,7 @@ function mapStateToProps(state) {
         description: state.auth.description,
         locations: state.auth.locations,
         photos: state.auth.photos,
+        user: state.auth.user,
         rating: state.auth.rating,
         commentIds: state.auth.commentIds,
     };
@@ -57,10 +58,9 @@ export default class SingleTour extends React.Component {
         const style = {
             margin: 12,
         };
-
         var locationList = [];
-        for (var i in this.props.locations) {
-          locationList.push(<li><a href={"/location/" + this.props.locations[i].id}>{this.props.locations[i].name} </a></li>);
+        for (var loc in this.props.locations) {
+          locationList.push(<li><Link to={"/location/" + this.props.locations[loc].id}>{this.props.locations[loc].name}</Link></li>);
         }
 
         return (
@@ -83,6 +83,7 @@ export default class SingleTour extends React.Component {
                         <Divider />
                         <RaisedButton label="Rate" style={style} />
                         <RaisedButton label="Book" primary={true} style={style} />
+                        {(this.props.user && (this.props.user.role == 'guide')) ? <RaisedButton label="Guide this tour" primary={true} style={style} /> : null}
                         <RaisedButton label="Comment" secondary={true} style={style} />
                         <Divider />
                         <h3>Comments</h3>

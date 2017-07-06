@@ -31,7 +31,6 @@ const initialState = {
     description: null,
     locations: [],
     photos: [],
-    user: null,
     rating: null,
     commentIds: [],
     userPhoto: "",

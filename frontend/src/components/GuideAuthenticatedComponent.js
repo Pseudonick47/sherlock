@@ -27,7 +27,7 @@ export function requireGuideAuthentication(Component) {
         checkAuth(props = this.props) {
             alert('pizda materina');
             if (props.isAuthenticated) {
-                alert(JSON.stringify(user));
+                alert("nema nista "+JSON.stringify(user));
                 this.setState({
                     is_guide: props.user.role == 'guide',
                 });

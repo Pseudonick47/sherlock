@@ -11,6 +11,7 @@ import IconButton from 'material-ui/IconButton';
 import * as actionCreators from '../actions/auth';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 
 function mapStateToProps(state) {
     return {
@@ -54,12 +55,11 @@ export default class Comment extends Component {
                 margin: 10,
             },
         };
-
         return (
             <Paper style={styles.wrapper}>
                 <Chip style={styles.chip}>
-                    <Avatar src={this.props.userPhoto} />
-                    <a href={"profile/" + this.props.userId}>{this.props.userName}</a>
+                  <Avatar src={this.props.userPhoto} />
+                    <Link to={"profile/" + this.props.userId}>{this.props.userName}</Link>
                 </Chip>
                 <p style={styles.p}>{this.props.comment}</p>
 

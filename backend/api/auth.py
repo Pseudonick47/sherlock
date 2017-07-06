@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app import db
 from models.users import User
+from models.data import Image
 from utils.auth import generate_token, requires_auth, verify_token
 
 mod = Blueprint('api/auth', __name__)
@@ -17,6 +18,7 @@ def get_user():
 @mod.route("/create_user", methods=["POST"])
 def create_user():
     incoming = request.get_json()
+    print(incoming["role"])
     user = User(
         email=incoming["email"],
         password=incoming["password"],
@@ -44,7 +46,17 @@ def get_token():
     incoming = request.get_json()
     user = User.get_user_with_email_and_password(incoming["email"], incoming["password"])
     if user:
-        ret_val = {'token': generate_token(user), 'user': {'email': user.email, 'first_name': user.first_name, 'surname': user.surname, 'role': user.role}}
+        image = db.session.query(Image).filter_by(oid=user.image,).one_or_none()
+        ret_val = {
+                'token': generate_token(user),
+                'user': {
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'surname': user.surname,
+                    'role': user.role,
+                    'userPhoto': 'http://localhost:5000/static/' + image.file_name
+                }
+        }
         return jsonify(ret_val)
 
     return jsonify(error=True), 403

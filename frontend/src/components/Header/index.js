@@ -82,15 +82,18 @@ export class Header extends Component {
                                     Analytics
                                 </MenuItem>
                                 <Divider />
-				<MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
+	                              <MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
                                     ProfileView
                                 </MenuItem>
-				<Divider />
+				                        <Divider />
                                 <MenuItem onClick={(e) => this.logout(e)}>
                                     Logout
                                 </MenuItem>
                             </div>
                     }
+                    <MenuItem onClick={() => this.dispatchNewRoute('/tour/3')}>
+                      Tour 3
+                    </MenuItem>
                     <MenuItem onClick={() => this.dispatchNewRoute('/tours')}>
                       Search Tours
                     </MenuItem>

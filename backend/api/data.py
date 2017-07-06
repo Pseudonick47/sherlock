@@ -1115,11 +1115,12 @@ class CommentAPI(Resource):
         comment = db.session.query(Comment).filter_by(oid=oid,).one_or_none()
         if comment:
             user = db.session.query(User).filter_by(id=comment.user_id).one()
+            image = db.session.query(Image).filter_by(oid=user.image,).one_or_none()
             response = {
                 'comment': comment.text,
                 'userId': user.id,
                 'userName': user.email,
-                'userPhoto': " ",
+                'userPhoto': 'http://localhost:5000/static/' + image.file_name,
                 'likes': 0,
                 'dislikes': 0,
                 'current': 0

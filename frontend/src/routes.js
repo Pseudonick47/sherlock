@@ -9,7 +9,6 @@ import { HomeContainer } from './containers/HomeContainer';
 import LoginView from './components/LoginView';
 import RegisterView from './components/RegisterView';
 import ProtectedView from './components/ProtectedView';
-import Analytics from './components/Analytics';
 import NotFound from './components/NotFound';
 import CountriesView from './components/CountriesView';
 import SearchTours from './components/SearchTours';
@@ -27,19 +26,18 @@ import { requireNoAuthentication } from './components/notAuthenticatedComponent'
 
 export default (
     <Route path="/" component={App}>
-        <Route path="main" component={requireAuthentication(ProtectedView)} />
+        <Route path="main" component={ProtectedView} />
         <Route path="login" component={requireNoAuthentication(LoginView)} />
         <Route path="tours" component={SearchTours} />
         <Route path="tour" component="div">
-            <Route path=":id" component={requireNoAuthentication(SingleTour)} />
+            <Route path=":id" component={SingleTour} />
         </Route>
-        <Route path="upload" component={requireAuthentication(FileUpload)} />
+        <Route path="upload" component={FileUpload} />
         <Route path="register" component={requireNoAuthentication(RegisterView)} />
-        <Route path="home" component={requireNoAuthentication(HomeContainer)} />
-        <Route path="analytics" component={requireAuthentication(Analytics)} />
-        <Route path="countries" component={requireNoAuthentication(CountriesView)} />
+        <Route path="home" component={HomeContainer} />
+        <Route path="countries" component={CountriesView} />
         <Route path="add_tour" component={requireNoAuthentication(AddTour)} />
-        <Route path="profile" component={requireAuthentication(ProfileView)} />
+        <Route path="profile" component={ProfileView} />
         <Route path="*" component={DetermineAuth(NotFound)} />
     </Route>
 );

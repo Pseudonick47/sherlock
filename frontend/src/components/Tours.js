@@ -6,10 +6,10 @@ export default class Tours extends Component {
         super(props);
         const redirectRoute = '';
     }
-    
+
     render() {
         var tourList = [];
-    
+
         for (var i = this.props.data.length - 1; i >= 0; i--) {
             tourList.push(<Tour data={this.props.data[i]} />);
         }
@@ -29,7 +29,7 @@ export default class Tours extends Component {
 
         return (
             <div style={style}>
-                {tourList}       
+                {tourList}
             </div>
         );
     }

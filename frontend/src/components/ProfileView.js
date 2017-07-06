@@ -14,6 +14,7 @@ import { validateEmail } from '../utils/misc';
 function mapStateToProps(state) {
     return {
         isRegistering: state.auth.isRegistering,
+        user: state.auth.user,
         registerStatusText: state.auth.registerStatusText,
     };
 }
@@ -47,59 +48,6 @@ export default class ProfileView extends React.Component {
         };
     }
 
-   /* isDisabled() {
-        let email_is_valid = false;
-        let password_is_valid = false;
-
-        if (this.state.email === '') {
-            this.setState({
-                email_error_text: null,
-            });
-        } else if (validateEmail(this.state.email)) {
-            email_is_valid = true;
-            this.setState({
-                email_error_text: null,
-            });
-
-        } else {
-            this.setState({
-                email_error_text: 'Sorry, this is not a valid email',
-            });
-        }
-
-        if (this.state.password === '' || !this.state.password) {
-            this.setState({
-                password_error_text: null,
-            });
-        } else if (this.state.password.length >= 6) {
-            password_is_valid = true;
-            this.setState({
-                password_error_text: null,
-            });
-        } else {
-            this.setState({
-                password_error_text: 'Your password must be at least 6 characters',
-            });
-
-        }
-
-        if (email_is_valid && password_is_valid) {
-            this.setState({
-                disabled: false,
-            });
-        }
-
-    }*/
-
-   /* changeValue(e, type) {
-        const value = e.target.value;
-        const next_state = {};
-        next_state[type] = value;
-        this.setState(next_state, () => {
-            this.isDisabled();
-        });
-    }*/
-
     _handleKeyPress(e) {
         if (e.key === 'Edit') {
             if (!this.state.disabled) {
@@ -107,20 +55,20 @@ export default class ProfileView extends React.Component {
             }
         }
     }
-    
-    imageUploadCallback(imageIds) { 
+
+    imageUploadCallback(imageIds) {
         alert(imageIds[0]);
     }
 
     edit(e) {
-	var novo = window.prompt("Edit info","Name");
-	this.setState({profile_name:novo});
-	novo = window.prompt("Edit info","Surname");
-	this.setState({profile_surname:novo});
-	novo = window.prompt("Edit info","Birthday");
-	this.setState({birthday:novo});
-	novo = window.prompt("Edit info","Bio");
-	this.setState({bio:novo});
+        var novo = window.prompt("Edit info","Name");
+        this.setState({profile_name:novo});
+        novo = window.prompt("Edit info","Surname");
+        this.setState({profile_surname:novo});
+        novo = window.prompt("Edit info","Birthday");
+        this.setState({birthday:novo});
+        novo = window.prompt("Edit info","Bio");
+        this.setState({bio:novo});
     }
 
     render() {
@@ -129,32 +77,31 @@ export default class ProfileView extends React.Component {
                 <div className="text-left">
 		    <br></br>
 		    <br></br>
-                    <img src="/images.png" alt="Profile picture" height="300" width="300" />   	
+                    <img src={this.props.user.userPhoto} alt="Profile picture" height="300" width="300" />
 		</div>
-	    	
+
 		<div className="text-center">
 		    <br></br>
 		    <br></br>
 		    <div className="text-left">
-			<b> Email: </b> {this.state.email}
+			<b> Email: </b> {this.props.user.email}
 		    </div>
 		    <br></br>
 		    <div className="text-left">
-		        <b> Name: </b> {this.state.profile_name}
-			
+		        <b> Name: </b> {this.props.user.first_name}
 		    </div>
 		    <br></br>
 		    <div className="text-left">
-		        <b> Surname: </b> {this.state.profile_surname}
+		        <b> Surname: </b> {this.props.user.surname}
 
 		    </div>
 		    <br></br>
 		    <div className="text-left">
-		        <b> Birthday: </b> {this.state.birthday}
+		        <b> Birthday: </b> {this.props.user.birthday}
 		    </div>
 		    <br></br>
 		    <div className="text-left">
-		        <b> Bio: </b> {this.state.bio}
+		        <b> Bio: </b> {this.props.user.bio}
 		    </div>
 	        </div>
 		<RaisedButton
@@ -163,7 +110,7 @@ export default class ProfileView extends React.Component {
                     onClick={(e) => this.edit(e)}
                 />
         <FileUpload callback={this.imageUploadCallback} />
-	    </div>   
+	    </div>
         );
 
     }
