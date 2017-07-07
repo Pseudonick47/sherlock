@@ -1,5 +1,5 @@
 import {
-    FETCH_PROTECTED_DATA_REQUEST, 
+    FETCH_PROTECTED_DATA_REQUEST,
     RECEIVE_PROTECTED_DATA,
     FETCH_COUNTRIES_REQUEST,
     FETCH_COUNTRIES_FAILED,
@@ -25,13 +25,13 @@ import {
     FETCH_TOURS_FAILED
 } from '../constants/index';
 import { parseJSON } from '../utils/misc';
-import { 
-    data_about_user, 
-    get_countries, 
-    get_cities, 
+import {
+    data_about_user,
+    get_countries,
+    get_cities,
     get_cities_by_country,
     get_locations_by_city,
-    post_city, 
+    post_city,
     post_location,
     upload_file,
     post_tour,
@@ -286,9 +286,9 @@ export function fileUploadSuccess(response) {
     };
 }
 
-export function fileUpload(fileList, callback) { 
+export function fileUpload(fileList, callback) {
     return (dispatch) => {
-        upload_file(fileList)    
+        upload_file(fileList)
             .then(parseJSON)
             .then(callback)
             .catch(error => {
@@ -296,3 +296,4 @@ export function fileUpload(fileList, callback) {
             });
     };
 }
+

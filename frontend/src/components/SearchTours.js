@@ -8,7 +8,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import * as actionCreators from '../actions/auth';
 import { validateEmail } from '../utils/misc';
-import SearchBar from 'material-ui-search-bar' 
+import SearchBar from 'material-ui-search-bar'
 
 import Tours from './Tours';
 

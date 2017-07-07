@@ -15,13 +15,16 @@ import { Link } from 'react-router';
 
 function mapStateToProps(state) {
     return {
-        userPhoto: state.auth.userPhoto,
-        userName: state.auth.userName,
-        userId: state.auth.userId,
-        comment: state.auth.comment,
-        likes: state.auth.likes,
-        dislikes: state.auth.dislikes,
-        current: state.auth.current,
+        user: {
+            email: state.auth.email,
+            first_name: state.auth.first_name,
+            surname: state.auth.surname,
+            biography: state.auth.biography,
+            dateOfBirth: state.auth.dateOfBirth,
+            role: state.auth.role,
+            image: state.auth.image,
+            id: state.auth.id,
+        },
     };
 }
 
@@ -33,10 +36,6 @@ export default class Comment extends Component {
     constructor(props) {
         super(props);
     }
-    componentWillMount() {
-        this.props.getComment(this.props.id);
-    }
-
     clickLike = (e) => { };
     clickDislike = (e) => { };
     clickDelete = (e) => { };
@@ -58,10 +57,10 @@ export default class Comment extends Component {
         return (
             <Paper style={styles.wrapper}>
                 <Chip style={styles.chip}>
-                  <Avatar src={this.props.userPhoto} />
-                    <Link to={"profile/" + this.props.userId}>{this.props.userName}</Link>
+                    <Avatar src={this.props.comment.userPhoto} />
+                    <Link to={"profile/" + this.props.comment.userId}>{this.props.comment.userName}</Link>
                 </Chip>
-                <p style={styles.p}>{this.props.comment}</p>
+                <p style={styles.p}>{this.props.comment.comment}</p>
 
                 <IconButton tooltip="Like" onClick={this.clickLike}>
                     <ArrowUp />
@@ -75,6 +74,6 @@ export default class Comment extends Component {
                     <Close />
                 </IconButton>
             </Paper>
-        );
-    }
+            );
+}
 }

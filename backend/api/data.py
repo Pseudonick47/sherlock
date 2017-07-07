@@ -113,6 +113,9 @@ class TourAPI(Resource):
         tour = db.session.query(Tour).filter_by(oid=oid,).one_or_none()
         if tour:
             thumbnail = db.session.query(Image).filter_by(oid=tour.thumbnail_id).one()
+            comments = []
+            for comment in tour.comments:
+                comments.append(comment.oid)
 
             response = {
                 'id':tour.oid,
@@ -140,7 +143,7 @@ class TourAPI(Resource):
                     } for image in tour.images
                 ],
                 'rating': 3,
-                'commentIds': [1]
+                'commentIds': comments
             }
 
             return (response, 200)
@@ -1086,6 +1089,31 @@ class ImageAPI(Resource):
                  'message':'Specified image not found'}, 404)
 
 
+class CommentOnTourAPI(Resource):
+    def get(self, tour_id):
+
+        response = {'com':[]}
+        tour = db.session.query(Tour).filter_by(oid=tour_id,).one_or_none()
+        comments = tour.comments
+
+        if comments:
+            for comm in comments:
+                user = db.session.query(User).filter_by(id=comm.user_id).one()
+                image = db.session.query(Image).filter_by(oid=user.image,).one_or_none()
+                response['com'].append({
+                    'comment': comm.text,
+                    'userId': user.id,
+                    'userName': user.first_name,
+                    'userPhoto': 'http://localhost:5000/static/' + image.file_name,
+                    'likes': 0,
+                    'dislikes': 0,
+                    'current': 0
+                })
+
+            return (response, 200)
+
+        return (response, 404)
+
 class CommentAPI(Resource):
     """Services that allow user to get, post or delete comment
        with the given key.
@@ -1119,7 +1147,7 @@ class CommentAPI(Resource):
             response = {
                 'comment': comment.text,
                 'userId': user.id,
-                'userName': user.email,
+                'userName': user.first_name,
                 'userPhoto': 'http://localhost:5000/static/' + image.file_name,
                 'likes': 0,
                 'dislikes': 0,
@@ -1130,6 +1158,51 @@ class CommentAPI(Resource):
 
         return (response, 404)
 
+    def post(self):
+        """Add new comment.
+
+        Request should be formated as JSON file. For example:
+
+            {
+                "text": "Comment text",
+                "tour_id": 63,
+                "user_id": 23,
+            }
+
+        Returns:
+            JSON file. For example:
+
+            Addition succeeded
+
+                {
+                    "success": true
+                }
+
+            Addition failed
+
+                {
+                    "success": false,
+                    "message": "Not JSON"
+                }
+        """
+        print('hellooo from the other side')
+        req = request.get_json(force=True, silent=True)
+        print(req)
+        if req:
+            comment = Comment(
+                    text=req['text'],
+                    user_id=req['user_id']
+                    )
+            tour = db.session.query(Tour).filter_by(oid=req['tour_id']).one()
+            tour.comments.append(comment)
+            db.session.add(comment)
+
+            db.session.add(tour)
+            db.session.commit()
+
+            return ({'success': True, 'id': tour.oid}, 200)
+
+        return ({'success':False, 'message':'Not JSON'}, 400)
 
 api.add_resource(TourListAPI, '/tours')
 api.add_resource(TourAPI, '/tours/<int:oid>')
@@ -1143,4 +1216,5 @@ api.add_resource(CountryListAPI, '/countries')
 api.add_resource(CountryAPI, '/countries/<int:oid>')
 api.add_resource(FilesAPI, '/upload')
 api.add_resource(ImageAPI, '/images/<int:oid>')
-api.add_resource(CommentAPI, '/comment/<int:oid>')
+api.add_resource(CommentOnTourAPI, '/comment/<int:tour_id>')
+api.add_resource(CommentAPI, '/comment')

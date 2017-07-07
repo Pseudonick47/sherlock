@@ -54,7 +54,7 @@ export default class Tour extends Component {
                 <div style={{ height: 30, position: "absolute", bottom: 30, }} >
                     <h3>{this.props.data.guide_fee} $</h3>
                 </div>
-                {this.props.user.role == 'guide' ? <h2>'hotdog'</h2> : <h2>no hotdog</h2>}
+                {this.props.user ? (this.props.user.role == 'guide' ? <h2>'hotdog'</h2> : <h2>no hotdog</h2>) : null}
             </Paper>
         );
     }

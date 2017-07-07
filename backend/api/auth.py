@@ -47,17 +47,8 @@ def get_token():
     user = User.get_user_with_email_and_password(incoming["email"], incoming["password"])
     if user:
         image = db.session.query(Image).filter_by(oid=user.image,).one_or_none()
-        ret_val = {
-                'token': generate_token(user),
-                'user': {
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'surname': user.surname,
-                    'role': user.role,
-                    'userPhoto': 'http://localhost:5000/static/' + image.file_name
-                }
-        }
-        return jsonify(ret_val)
+        user.image = "http://localhost:5000/static/" + image.file_name
+        return jsonify({'token': generate_token(user)})
 
     return jsonify(error=True), 403
 

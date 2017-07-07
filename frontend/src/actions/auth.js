@@ -15,19 +15,17 @@ import {
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';
-import { get_token, create_user, get_tours, get_tour, get_comment } from '../utils/http_functions';
+import { get_token, create_user, get_tours, get_tour, get_comment, post_comment } from '../utils/http_functions';
 
 
 export function loginUserSuccess(response) {
     localStorage.setItem('token', response['token']);
     localStorage.setItem('user', response['user']);
     var token = response['token'];
-    var user = response['user'];
     return {
         type: LOGIN_USER_SUCCESS,
         payload: {
           token,
-          user,
         },
     };
 }
@@ -35,6 +33,7 @@ export function loginUserSuccess(response) {
 
 export function loginUserFailure(error) {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     return {
         type: LOGIN_USER_FAILURE,
         payload: {
@@ -52,6 +51,7 @@ export function loginUserRequest() {
 
 export function logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     return {
         type: LOGOUT_USER,
     };
@@ -118,6 +118,7 @@ export function registerUserSuccess(token) {
 
 export function registerUserFailure(error) {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     return {
         type: REGISTER_USER_FAILURE,
         payload: {
@@ -217,7 +218,7 @@ export function getComment(id) {
             .then(parseJSON)
             .then(response => {
                 try {
-                    dispatch(getCommentSuccess(response));
+                    dispatch(getCommentSuccess(response.com));
                 } catch (e) {
                     alert(e);
                 }
@@ -225,3 +226,15 @@ export function getComment(id) {
             .catch(error => { });
     };
 }
+
+export function postComment(text, tour_id, user_id) {
+    return (dispatch) => {
+        alert("action auth");
+        post_comment(text, tour_id, user_id)
+            .then(parseJSON)
+            .catch(error => {
+                alert('Error posting comment!')
+            });
+    };
+}
+

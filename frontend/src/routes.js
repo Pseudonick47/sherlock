@@ -23,7 +23,7 @@ import SingleTour from './components/SingleTour'
 import { DetermineAuth } from './components/DetermineAuth';
 import { requireAuthentication } from './components/AuthenticatedComponent';
 import { requireNoAuthentication } from './components/notAuthenticatedComponent';
-import { requireGuideAuthentication } from './components/GuideAuthenticatedComponent'; 
+import { requireGuideAuthentication } from './components/GuideAuthenticatedComponent';
 
 export default (
     <Route path="/" component={App}>
@@ -31,9 +31,7 @@ export default (
         <Route path="main" component={ProtectedView} />
         <Route path="login" component={requireNoAuthentication(LoginView)} />
         <Route path="tours" component={SearchTours} />
-        <Route path="tour" component="div">
-            <Route path=":id" component={SingleTour} />
-        </Route>
+        <Route path="tour/:id" component={SingleTour} />
         <Route path="upload" component={FileUpload} />
         <Route path="register" component={requireNoAuthentication(RegisterView)} />
         <Route path="home" component={HomeContainer} />

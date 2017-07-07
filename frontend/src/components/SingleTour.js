@@ -21,7 +21,16 @@ function mapStateToProps(state) {
         description: state.auth.description,
         locations: state.auth.locations,
         photos: state.auth.photos,
-        user: state.auth.user,
+      user: {
+        email: state.auth.email,
+        first_name: state.auth.first_name,
+        surname: state.auth.surname,
+        biography: state.auth.biography,
+        dateOfBirth: state.auth.dateOfBirth,
+        role: state.auth.role,
+        image: state.auth.image,
+        id: state.auth.id,
+        },
         rating: state.auth.rating,
         commentIds: state.auth.commentIds,
     };
@@ -62,7 +71,6 @@ export default class SingleTour extends React.Component {
     }
 
     render() {
-
         const style = {
             margin: 12,
         };
@@ -88,17 +96,19 @@ export default class SingleTour extends React.Component {
                         <ul>
                           {locationList}
                         </ul>
-                        {this.props.user ? this.props.user.role == "guide" ? 
-                            <RaisedButton label="Add new term" primary={true} style={style} onTouchTap={() => this.setState({specificTourDialog: true})}/>
-                        : "" : "" }
                         <Divider />
                         <RaisedButton label="Rate" style={style} />
-                        {(this.props.user && (this.props.user.role == 'guide')) ? <RaisedButton label="Guide this tour" primary={true} style={style} /> : null}
+                        {this.props.user ? this.props.user.role == "guide" ?
+                          <RaisedButton
+                            label="Add new term"
+                            primary={true} style={style}
+                            onTouchTap={() => this.setState({specificTourDialog: true})}
+                          />
+                        : null : null }
                         <RaisedButton label="Comment" secondary={true} style={style} />
                         <Divider />
                         <h3>Comments</h3>
-                        <Comments ids={this.props.commentIds} />
-
+                        <Comments id={this.state.id} />
                     </div>
                     <div className="col-md-4 col-md-offset-1">
                         <Gallery photos={this.props.photos}onClickPhoto={this.openLightbox} />
@@ -111,11 +121,11 @@ export default class SingleTour extends React.Component {
                             currentImage={this.state.currentPhoto}
                         />
                     </div>
-                </div >
+                </div>
                 {this.state.specificTourDialog ?
                     <SpecificTourDialog cancel={this.onSpecificTourCancel} submit={this.onSpecificTourSubmit} />
                 : ""}
-            </div >
+            </div>
         );
 
     }

@@ -13,17 +13,22 @@ import { validateEmail } from '../utils/misc';
 
 function mapStateToProps(state) {
     return {
-        isRegistering: state.auth.isRegistering,
-        user: state.auth.user,
-        registerStatusText: state.auth.registerStatusText,
+      user: {
+        email: state.auth.email,
+        first_name: state.auth.first_name,
+        surname: state.auth.surname,
+        biography: state.auth.biography,
+        dateOfBirth: state.auth.dateOfBirth,
+        role: state.auth.role,
+        image: state.auth.image,
+        id: state.auth.id,
+     }
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(actionCreators, dispatch);
 }
-
-
 
 const style = {
     marginTop: 50,
@@ -40,11 +45,7 @@ export default class ProfileView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: this.props.userName,
-	        profile_name: this.props.first_name,
-	        profile_surname: '',
-	        bio: '',
-            birthday: '',
+            disabled: false,
         };
     }
 
@@ -77,7 +78,7 @@ export default class ProfileView extends React.Component {
                 <div className="text-left">
 		    <br></br>
 		    <br></br>
-                    <img src={this.props.user.userPhoto} alt="Profile picture" height="300" width="300" />
+                    <img src={this.props.user.image} alt="Profile picture" height="300" width="300" />
 		</div>
 
 		<div className="text-center">
@@ -97,11 +98,14 @@ export default class ProfileView extends React.Component {
 		    </div>
 		    <br></br>
 		    <div className="text-left">
-		        <b> Birthday: </b> {this.props.user.birthday}
+		        <b> Birthday: </b> {this.props.user.dateOfBirth}
 		    </div>
 		    <br></br>
 		    <div className="text-left">
-		        <b> Bio: </b> {this.props.user.bio}
+		        <b> Bio: </b> {this.props.user.biography}
+		    </div>
+		    <div className="text-left">
+		        <b> Account type: </b> {this.props.user.role}
 		    </div>
 	        </div>
 		<RaisedButton

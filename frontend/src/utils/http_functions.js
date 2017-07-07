@@ -81,6 +81,12 @@ export function post_tour(name, description, guide_fee, locations, thumbnail, im
     })
 }
 
+export function post_comment(text, tour_id, user_id) {
+  return axios.post('/api/comment', {
+      text, user_id, tour_id
+    })
+}
+
 export function get_tours() {
     return axios.get('/api/tours');
 }
