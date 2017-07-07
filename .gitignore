@@ -102,3 +102,10 @@ ENV/
 
 # upload files
 static/
+!static/city.jpg
+!static/location.png
+!static/profile.jpg
+!static/tour.jpg
+
+# vscode
+.vscode/
