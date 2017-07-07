@@ -15,7 +15,7 @@ from datetime import datetime
 from PIL import Image as PILImage
 
 from app import db
-from models.data import City, Country, Location, Price, Tour, Image, Comment
+from models.data import City, Country, Location, Price, Tour, Image, Comment, SpecificTour
 from models.users import User
 
 mod = Blueprint('api/data', __name__)
@@ -302,6 +302,70 @@ class TourListAPI(Resource):
             )
 
         return (response, 200)
+
+
+class SpecificTourAPI(Resource):
+
+    def put(self, oid):
+        pass
+
+    def get(self, oid):
+        response = {}
+        specific_tour = db.session.query(SpecificTour).filter_by(oid=oid,).one_or_none()
+        if specific_tour:
+            response = {
+                'startDate': specific_tour.start_date,
+                'endDate': specific_tour.end_date,
+                'tourId': specific_tour.tour_id,
+            }
+
+            return (response, 200)
+
+        return (response, 404)
+
+    def delete(self, oid):
+        pass
+
+
+class SpecificTourListAPI(Resource):
+
+    def post(self):
+        req = request.get_json(force=True, silent=True)
+        if req:
+            print(req)
+            specific_tour = SpecificTour(
+                start_date=req['startDate'],
+                end_date=req['endDate'],
+                tour_id=req['tourId']
+            )
+            db.session.add(specific_tour)
+            db.session.commit()
+
+            return ({'success': True, 'id': specific_tour.oid}, 200)
+
+        return ({'success':False, 'message':'Not JSON'}, 400)
+
+class SpecificToursByTourAPI(Resource):
+
+    def get(self, oid):
+        tour = db.session.query(Tour).filter_by(oid=oid).one_or_none()
+        if tour:
+            response = []
+            for specific_tour in tour.specific_tours:
+                response.append({
+                    'startDate': str(specific_tour.start_date),
+                    'endDate': str(specific_tour.end_date),
+                    'tourId': specific_tour.tour_id,
+                })
+
+                db.session.add(specific_tour)
+
+            db.session.commit()
+
+            return (response, 200)
+
+        return ({'success':False,
+                 'message':'Specified tour not found'}, 404)
 
 
 class LocationAPI(Resource):
@@ -1132,7 +1196,9 @@ class CommentAPI(Resource):
 
 
 api.add_resource(TourListAPI, '/tours')
+api.add_resource(SpecificTourListAPI, '/tours/specific')
 api.add_resource(TourAPI, '/tours/<int:oid>')
+api.add_resource(SpecificToursByTourAPI, '/tour/<int:oid>/specific')
 api.add_resource(LocationListAPI, '/locations')
 api.add_resource(LocationAPI, '/locations/<int:oid>')
 api.add_resource(LocationsByCityAPI, '/city/<int:oid>/locations')

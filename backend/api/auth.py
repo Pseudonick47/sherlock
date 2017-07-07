@@ -22,9 +22,9 @@ def create_user():
     user = User(
         email=incoming["email"],
         password=incoming["password"],
-		first_name=incoming["first_name"],
-		surname=incoming["surname"],
-		role=incoming["role"]
+        first_name=incoming["first_name"],
+        surname=incoming["surname"],
+        role=incoming["role"]
     )
     db.session.add(user)
 

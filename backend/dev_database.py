@@ -1,5 +1,6 @@
 import sys
 from PIL import Image as PILImage
+from sqlalchemy.exc import IntegrityError
 
 from app import db
 from models.data import *
@@ -26,11 +27,14 @@ def insert_default_images():
     for i in images:
         with PILImage.open(folder + i) as img:
             width, height = img.size
+            
             image = Image(i, width, height)
+
             db.session.add(image)
-
-    db.session.commit()
-
+    try:
+        db.session.commit()
+    except IntegrityError:
+        pass
 
 def insert_countries():
     with open('../data/countries', mode='r', encoding='UTF-8') as f:
@@ -47,8 +51,10 @@ def main(drop_all=False):
         db.engine.execute('drop schema if exists public cascade')
         db.engine.execute('create schema public')
 
-    db.create_all()
+        db.create_all()
 
-    insert_countries()
-    insert_default_images()
-    insert_cities()
+        insert_countries()
+        insert_default_images()
+        insert_cities()
+    else:
+        db.create_all()

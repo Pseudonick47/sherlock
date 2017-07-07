@@ -49,5 +49,5 @@ tourists_and_payments = db.Table(
 guides_and_tours = db.Table(
 	'guides_and_tours',
 	db.Column('guide_id', db.Integer, db.ForeignKey('user.id')),
-	db.Column('spec_tour_id', db.Integer, db.ForeignKey('specificTours.id'))
+	db.Column('spec_tour_id', db.Integer, db.ForeignKey('specific_tours.id'))
 )

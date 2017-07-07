@@ -170,7 +170,7 @@ export default class AddTour extends React.Component {
         this.setState({waitForRequest: true});
 
         const {title, description, locations, photos, thumbnail, fee} = this.state;
-
+        console.log(thumbnail);
         var locationIds = [];
         locations.forEach((e) => locationIds.push(e.id));
         var photoIds = [];

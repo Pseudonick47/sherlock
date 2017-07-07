@@ -73,8 +73,8 @@ export class Header extends Component {
                     }
                     {
                         <div>
-                            <MenuItem onClick={() => this.dispatchNewRoute('/tour/3')}>
-                                Tour 3
+                            <MenuItem onClick={() => this.dispatchNewRoute('/tour/1')}>
+                                Tour 1
                             </MenuItem>
                             <MenuItem onClick={() => this.dispatchNewRoute('/tours')}>
                                 Search Tours

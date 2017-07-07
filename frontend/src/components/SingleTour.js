@@ -4,7 +4,8 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import * as actionCreators from '../actions/auth';
+import * as authActions from '../actions/auth';
+import * as dataActions from '../actions/data';
 import { validateEmail } from '../utils/misc';
 import Comments from './Comments'
 import Divider from 'material-ui/Divider';
@@ -13,7 +14,10 @@ import Gallery from 'react-photo-gallery';
 import Lightbox from 'react-images';
 import RaisedButton from 'material-ui/RaisedButton';
 import SpecificTourDialog from './Dialogs/SpecificTourDialog';
+import SpecificTour from './SpecificTour';
+import { List, ListItem } from 'material-ui/List';
 
+const actionCreators = Object.assign({}, authActions, dataActions);
 
 function mapStateToProps(state) {
     return {
@@ -24,6 +28,7 @@ function mapStateToProps(state) {
         user: state.auth.user,
         rating: state.auth.rating,
         commentIds: state.auth.commentIds,
+        specificTours: state.data.specificTours,
     };
 }
 
@@ -40,26 +45,71 @@ export default class SingleTour extends React.Component {
             isLigthboxOpen: false,
             currentPhoto: 1,
             specificTourDialog: false,
+            specificTours: [],
         };
     }
 
     componentWillMount() {
-        this.props.getTour(this.props.routeParams.id,);
+        const {getTour, fetchSpecificTours} = this.props;
+        const id = this.props.routeParams.id;
+        
+        getTour(id);
+        fetchSpecificTours(id);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.specificTours != nextProps.specificTours) {
+            var specificTours = this.state.specificTours;
+            nextProps.specificTours.forEach((tour) =>
+                specificTours.push(
+                    <SpecificTour
+                        startDate={tour.startDate}
+                        endDate={tour.endDate}
+                        select={function () { }}
+                        booked={false}
+                        showButton={this.props.user ? true : false}
+                    />
+                )
+            );
+
+            this.setState({specificTours: specificTours});
+        }
     }
 
     openLightbox = (index, event) => {
         event.preventDefault();
         this.setState({ isLigthboxOpen: true, currentPhoto: index });
     }
+
     closeLightbox = () => this.setState({ isLigthboxOpen: false });
+
     nextPhoto = () => this.setState({ currentPhoto: this.state.currentPhoto + 1 });
+
     prevPhoto = () => this.setState({ currentPhoto: this.state.currentPhoto - 1 });
 
-    onSpecificTourCancel = () => this.setState({specificTourDialog: false});
+    onSpecificTourCancel = () => this.setState({ specificTourDialog: false });
+    
     onSpecificTourSubmit = (term) => {
-        console.log(term);
-        this.setState({specificTourDialog: false});
+        const { specificTours } = this.state;
+
+        specificTours.push(
+            <SpecificTour
+                startDate={term.startDate.toLocaleString()}
+                endDate={term.endDate.toLocaleString()}
+                select={function () { }}
+                booked={false}
+                showButton={this.props.user ? true : false}
+            />
+        );
+
+        this.setState({ specificTourDialog: false });
+        this.props.insertSpecificTour({
+            startDate: term.startDate,
+            endDate: term.endDate,
+            tourId: this.state.id,
+        });
     }
+
 
     render() {
 
@@ -68,7 +118,7 @@ export default class SingleTour extends React.Component {
         };
         var locationList = [];
         for (var loc in this.props.locations) {
-          locationList.push(<li><Link to={"/location/" + this.props.locations[loc].id}>{this.props.locations[loc].name}</Link></li>);
+            locationList.push(<li><Link to={"/location/" + this.props.locations[loc].id}>{this.props.locations[loc].name}</Link></li>);
         }
 
         return (
@@ -86,11 +136,17 @@ export default class SingleTour extends React.Component {
                         <Divider />
                         <h3>Locations:</h3>
                         <ul>
-                          {locationList}
+                            {locationList}
                         </ul>
-                        {this.props.user ? this.props.user.role == "guide" ? 
-                            <RaisedButton label="Add new term" primary={true} style={style} onTouchTap={() => this.setState({specificTourDialog: true})}/>
-                        : "" : "" }
+                        {this.props.user ?
+                            <div>
+                                <Divider />
+                                {this.state.specificTours}
+                            </div>
+                            : ""}
+                        {this.props.user ? this.props.user.role == "guide" ?
+                            <RaisedButton label="Add new term" primary={true} style={style} onTouchTap={() => this.setState({ specificTourDialog: true })} />
+                            : "" : ""}
                         <Divider />
                         <RaisedButton label="Rate" style={style} />
                         {(this.props.user && (this.props.user.role == 'guide')) ? <RaisedButton label="Guide this tour" primary={true} style={style} /> : null}
@@ -101,7 +157,7 @@ export default class SingleTour extends React.Component {
 
                     </div>
                     <div className="col-md-4 col-md-offset-1">
-                        <Gallery photos={this.props.photos}onClickPhoto={this.openLightbox} />
+                        <Gallery photos={this.props.photos} onClickPhoto={this.openLightbox} />
                         <Lightbox
                             images={this.props.photos}
                             isOpen={this.state.isLigthboxOpen}
@@ -114,9 +170,21 @@ export default class SingleTour extends React.Component {
                 </div >
                 {this.state.specificTourDialog ?
                     <SpecificTourDialog cancel={this.onSpecificTourCancel} submit={this.onSpecificTourSubmit} />
-                : ""}
+                    : ""}
             </div >
         );
 
     }
+}
+
+SingleTour.PropTypes = {
+    insertSpecificTour: React.PropTypes.func,
+    fetchSpecificTours: React.PropTypes.func,
+    name: React.PropTypes.func,
+    description: React.PropTypes.string,
+    locations: React.PropTypes.array,
+    photos: React.PropTypes.array,
+    user: React.PropTypes.object,
+    rating: React.PropTypes.number,
+    commentIds: React.PropTypes.array,
 }

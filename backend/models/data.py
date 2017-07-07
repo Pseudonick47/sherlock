@@ -213,6 +213,7 @@ class Tour(db.Model):
                                 backref='tours')
     images = db.relationship('Image', secondary=images_of_tours)
     comments = db.relationship('Comment', secondary=comments_on_tour, backref='tours')
+    specific_tours = db.relationship('SpecificTour', backref='tour')
 
     def __init__(self, name, guide_fee, description='', thumbnail_id=None):
         self.name = name
@@ -249,7 +250,7 @@ class Payment(db.Model):
     oid = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     amount = db.Column(db.Float, nullable=False)
     specific_tour_id = db.Column(
-        db.Integer(), db.ForeignKey('specificTours.id'))
+        db.Integer(), db.ForeignKey('specific_tours.id'))
 
     def __init__(self, amount):
         self.amount = amount
@@ -260,14 +261,13 @@ class SpecificTour(db.Model):
 
     """
 
-    __tablename__ = 'specificTours'
+    __tablename__ = 'specific_tours'
     oid = db.Column('id', db.Integer, primary_key=True)
-    startDate = db.Column(db.Date, nullable=False)
-    endDate = db.Column(db.Date, nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
     tour_id = db.Column(db.ForeignKey('tours.id'))
-    payments = db.relationship('Payment', backref='specificTours')
 
-    def __init__(self, startDate, endDate, tour_id):
-        self.startDate = startDate
-        self.endDate = endDate
+    def __init__(self, start_date, end_date, tour_id):
+        self.start_date = start_date
+        self.end_date = end_date
         self.tour_id = tour_id
