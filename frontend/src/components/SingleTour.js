@@ -71,8 +71,9 @@ export default class SingleTour extends React.Component {
         this.setState({specificTourDialog: false});
     }
     rateTour = (newRating, oldRating, name) => {
-      alert(next);
       this.props.postTourRating(newRating, this.state.id, this.props.user.id);
+      this.props.getTour(this.props.routeParams.id,);
+      //should refetch rating data
     }
     render() {
         const style = {
@@ -105,8 +106,9 @@ export default class SingleTour extends React.Component {
                             <div style={{margin: "auto", fontSize:40, display: "inline-block",}}>
                                 <StarRatingComponent
                                     name="rating"
-                                    value={3}
+                                    value={this.props.rating}
                                     onStarClick={this.rateTour}
+                                    editing={this.props.user.first_name}
                                 />
                             </div>
                             {this.props.user ? this.props.user.role == "guide" ?

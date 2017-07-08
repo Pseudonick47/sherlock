@@ -50,6 +50,8 @@ export default class Comments extends Component {
   postComment = (e) => {
       e.preventDefault();
     this.props.postComment(this.state.newCommentText, this.state.tourId, this.props.user.id);
+      this.props.getComment(this.state.tourId);
+    this.setState({newCommentText: ""});
   }
   commentChanged = (e,text) => {
      this.setState({newCommentText: text});
@@ -89,6 +91,7 @@ export default class Comments extends Component {
                             multiLine={true}
                             rows={2}
                             onChange={this.commentChanged}
+                            value={this.state.newCommentText}
                     />
                     <RaisedButton onClick={this.postComment}>
                       Comment

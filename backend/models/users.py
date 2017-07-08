@@ -13,6 +13,7 @@ class User(db.Model):
     biography = db.Column(db.String(255))
     role = db.Column(db.String(255), nullable=False)
     image = db.Column(db.Integer(), nullable=True)
+    ratings = db.relationship('Rating', backref='users', lazy='dynamic')
 
     def __init__(self, email, password, first_name='', surname='',role='',dateOfBirth='',biography='', image=1):
         # 1 is default profile image!!! to do: make it actually be

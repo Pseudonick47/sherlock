@@ -15,7 +15,7 @@ import {
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';
-import { get_token, create_user, get_tours, get_tour, get_comment, post_comment, post_rating } from '../utils/http_functions';
+import { get_token, create_user, get_tours, get_tour, get_comment, post_comment, post_tour_rating } from '../utils/http_functions';
 
 
 export function loginUserSuccess(response) {

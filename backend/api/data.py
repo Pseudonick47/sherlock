@@ -15,7 +15,7 @@ from datetime import datetime
 from PIL import Image as PILImage
 
 from app import db
-from models.data import City, Country, Location, Price, Tour, Image, Comment
+from models.data import City, Country, Location, Price, Tour, Image, Comment, Rating
 from models.users import User
 
 mod = Blueprint('api/data', __name__)
@@ -114,6 +114,15 @@ class TourAPI(Resource):
         if tour:
             thumbnail = db.session.query(Image).filter_by(oid=tour.thumbnail_id).one()
             comments = []
+            ratings = db.session.query(Rating).filter_by(tour=tour.oid,).all()
+            rating = 0
+            if not ratings:
+                rating = 0
+            else:
+                for r in ratings:
+                    rating = rating + r.rating
+                rating = rating / len(ratings)
+
             for comment in tour.comments:
                 comments.append(comment.oid)
 
@@ -142,7 +151,7 @@ class TourAPI(Resource):
                         'alt': 'image'
                     } for image in tour.images
                 ],
-                'rating': 3,
+                'rating': rating,
                 'commentIds': comments
             }
 
@@ -1185,9 +1194,7 @@ class CommentAPI(Resource):
                     "message": "Not JSON"
                 }
         """
-        print('hellooo from the other side')
         req = request.get_json(force=True, silent=True)
-        print(req)
         if req:
             comment = Comment(
                     text=req['text'],
@@ -1201,6 +1208,30 @@ class CommentAPI(Resource):
             db.session.commit()
 
             return ({'success': True, 'id': tour.oid}, 200)
+
+        return ({'success':False, 'message':'Not JSON'}, 400)
+
+class RatingAPI(Resource):
+    def post(self):
+        req = request.get_json(force=True, silent=True)
+        if req:
+            req_user_id = req['user_id'],
+            req_tour_id = req['tour_id'],
+            req_rating = req['rating'],
+            rating = db.session.query(Rating).filter_by(user=req_user_id, tour=req_tour_id).one_or_none()
+            if rating:
+                rating.rating = req_rating
+            else:
+                rating = Rating(
+                    user_id = req['user_id'],
+                    tour_id = req['tour_id'],
+                    rating = req['rating'],
+                )
+
+                db.session.add(rating)
+            db.session.commit()
+
+            return ({'success': True}, 200)
 
         return ({'success':False, 'message':'Not JSON'}, 400)
 
@@ -1218,3 +1249,4 @@ api.add_resource(FilesAPI, '/upload')
 api.add_resource(ImageAPI, '/images/<int:oid>')
 api.add_resource(CommentOnTourAPI, '/comment/<int:tour_id>')
 api.add_resource(CommentAPI, '/comment')
+api.add_resource(RatingAPI, '/rating')
