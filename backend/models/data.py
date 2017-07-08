@@ -15,9 +15,8 @@
 
 import enum
 
-from app import db 
+from app import db
 #from models.users import User
-
 
 
 images_of_locations = db.Table(
@@ -214,6 +213,7 @@ class Tour(db.Model):
     images = db.relationship('Image', secondary=images_of_tours)
     comments = db.relationship('Comment', secondary=comments_on_tour, backref='tours')
     specific_tours = db.relationship('SpecificTour', backref='tour')
+    ratings = db.relationship('Rating', backref='tours')
 
     def __init__(self, name, guide_fee, description='', thumbnail_id=None):
         self.name = name
@@ -271,3 +271,15 @@ class SpecificTour(db.Model):
         self.start_date = start_date
         self.end_date = end_date
         self.tour_id = tour_id
+
+class Rating(db.Model):
+    __tablename__ = 'ratings'
+    user = db.Column(db.ForeignKey('user.id'), primary_key=True)
+    tour = db.Column(db.ForeignKey('tours.id'), primary_key=True)
+    rating = db.Column('rating', db.Integer)
+
+    def __init__(self, user_id, tour_id, rating):
+        self.user = user_id
+        self.tour = tour_id
+        self.rating = rating
+

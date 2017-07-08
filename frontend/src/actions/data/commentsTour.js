@@ -8,6 +8,7 @@ import { parseJSON } from '../../utils/misc';
 
 import { 
     get_comment,
+    post_comment,
 } from '../../utils/http_functions';
 
 
@@ -45,5 +46,15 @@ export function fetchComments(tourId) {
                 }
             })
             .catch(error => dispatch(fetchCommentsFailed('')));
+    };
+}
+
+export function postComment(text, tourId, userId) {
+    return (dispatch) => {
+        post_comment(text, tourId, userId)
+            .then(parseJSON)
+            .catch(error => {
+                alert('Error posting comment! Please try again.')
+            });
     };
 }

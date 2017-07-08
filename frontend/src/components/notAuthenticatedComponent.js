@@ -59,7 +59,6 @@ export function requireNoAuthentication(Component) {
                                 browserHistory.push('/main');
 
                             } else {
-                                alert("here");
                                 this.setState({
                                     loaded: true,
                                 });

@@ -10,28 +10,34 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Gallery from 'react-photo-gallery';
 import Lightbox from 'react-images';
 import PropTypes from 'prop-types';
+import StarRatingComponent from 'react-star-rating-component';
 
 import Comments from './Comments'
 import SpecificTour from './SpecificTour';
 import SpecificTourDialog from './Dialogs/SpecificTourDialog';
 
 import * as authActions from '../actions/auth';
-import * as tourActions from '../actions/data/tour';
+import * as commentsTourActions from '../actions/data/commentsTour';
+import * as ratingTourActions from '../actions/data/ratingTour';
 import * as specificToursActions from '../actions/data/specificTours';
+import * as tourActions from '../actions/data/tour';
 
-import { validateEmail } from '../utils/misc';
 
-const actionCreators = Object.assign({}, authActions, tourActions, specificToursActions);
+const actionCreators = Object.assign({}, 
+    authActions, 
+    commentsTourActions, 
+    ratingTourActions, 
+    specificToursActions, 
+    tourActions,
+);
 
-//TODO: Verovatno ne radi
+
 function mapStateToProps(state) {
     return {
-        commentIds: state.data.commentsByTour.data,
         tour: state.data.tour.data,
-        isFetchingComments: state.data.commentsByTour.isFetching,
+        isFetchingComments: state.data.commentsTour.isFetching,
         isFetchingSpecificTours: state.data.specificTours.isFetching,
         isFetchingTour: state.data.tour.isFetching,
-        //rating: state.auth.rating,
         specificTours: state.data.specificTours.data,
         user: state.auth.user,
     };
@@ -59,7 +65,7 @@ export default class SingleTour extends React.Component {
     }
 
     componentWillMount() {
-        const {fetchTour, fetchSpecificTours} = this.props;
+        const {fetchComments, fetchTour, fetchSpecificTours} = this.props;
         const id = this.props.routeParams.id;
         
         fetchTour(id);
@@ -141,14 +147,18 @@ export default class SingleTour extends React.Component {
         });
     }
 
+    rateTour = (newRating, oldRating, name) => {
+      this.props.postTourRating(newRating, this.state.id, this.props.user.id);
+      this.props.fetchTour(this.props.routeParams.id,);
+    }
 
     render() {
-
         const style = {
             margin: 12,
         };
         
-
+        console.log(this.props.tour);
+        console.log(this.props.isFetchingTour);
         return (
             <div className="container">
                 <div className="row">
@@ -174,15 +184,26 @@ export default class SingleTour extends React.Component {
                             <RaisedButton label="Add new term" primary={true} style={style} onTouchTap={() => this.setState({ specificTourDialog: true })} />
                             : "" : ""}
                         <Divider />
-                        <RaisedButton label="Rate" style={style} />
-                        {(this.props.user && (this.props.user.role == 'guide')) ? <RaisedButton label="Guide this tour" primary={true} style={style} /> : null}
-                        <RaisedButton label="Comment" secondary={true} style={style} />
+                        <div style={{margin: "auto", fontSize:40, display: "inline-block",}}>
+                            {!this.props.tour ? "Loading rating..." :
+                                <StarRatingComponent
+                                    name="rating"
+                                    value={this.props.tour.rating}
+                                    onStarClick={this.rateTour}
+                                    editing={this.props.user.name}
+                                />
+                            }
+                        </div>
                         <Divider />
                         <h3>Comments</h3>
-                        {this.props.isFetchingComments ? "Loading comments..." : <Comments ids={this.props.commentIds} />}
-
+                        {!this.props.tour ? "Loading comments..." : 
+                            <Comments 
+                                id={this.state.id}
+                                ids={this.props.tour.commentIds} 
+                            />
+                        }
                     </div>
-                    {this.props.isFetchingTour ? "" :
+                    {!this.props.tour ? "" :
                         <div className="col-md-4 col-md-offset-1">
                             <Gallery photos={this.state.images} onClickPhoto={this.openLightbox} />
                             <Lightbox
@@ -212,8 +233,7 @@ SingleTour.PropTypes = {
     isFetchingTour: React.PropTypes.bool,
     fetchSpecificTours: React.PropTypes.func,
     fetchTour: React.PropTypes.func,
-    user: React.PropTypes.object,
-    //rating: React.PropTypes.number,
-    commentIds: React.PropTypes.array,
     specificTours: React.PropTypes.array,
+    tour: React.PropTypes.object,
+    user: React.PropTypes.object,
 }

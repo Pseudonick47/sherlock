@@ -25,7 +25,6 @@ export function fetchTourRequest() {
 }
 
 export function receiveTour(data) {
-    //localStorage.setItem('data', data);
     return {
         type: TOUR_RECEIVED,
         payload: data,

@@ -3,7 +3,7 @@ import { routerReducer } from 'react-router-redux';
 
 import cities from './cities';
 import citiesByCountry from './citiesByCountry';
-import commentsByTour from './commentsByTour';
+import commentsTour from './commentsTour';
 import countries from './countries';
 import locations from './locations';
 import specificTours from './specificTours';
@@ -16,7 +16,7 @@ const dataReducer = combineReducers({
     /* your reducers */
     cities,
     citiesByCountry,
-    commentsByTour,
+    commentsTour,
     countries,
     locations,
     specificTours,

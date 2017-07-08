@@ -20,6 +20,7 @@ import {
 
 export function loginUserFailure(error) {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     return {
         type: USER_LOGIN_FAILED,
         payload: {
@@ -37,7 +38,6 @@ export function loginUserRequest() {
 
 export function loginUserSuccess(token) {
     localStorage.setItem('token', token);
-
     return {
         type: USER_LOGIN_SUCCEEDED,
         payload: token,
@@ -98,6 +98,7 @@ export function redirectToRoute(route) {
 
 export function registerUserFailure(error) {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     return {
         type: USER_REGISTER_FAILED,
         payload: {

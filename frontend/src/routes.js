@@ -21,7 +21,6 @@ import { requireAuthentication } from './components/AuthenticatedComponent';
 import { requireGuideAuthentication } from './components/GuideAuthenticatedComponent'; 
 import { requireNoAuthentication } from './components/notAuthenticatedComponent';
 
-
 export default (
     <Route path="/" component={App}>
         <Route path="home" component={determineAuth(SearchTours)} />
@@ -34,7 +33,11 @@ export default (
             <Route path=":id" component={determineAuth(SingleTour)} />
         </Route>
         <Route path="tours" component={determineAuth(SearchTours)} />
-        <Route path="upload" component={FileUpload} />
+        <Route path="upload" component={determineAuth(FileUpload)} />
         <Route path="*" component={determineAuth(NotFound)} />
     </Route>
 );
+
+/*
+
+*/

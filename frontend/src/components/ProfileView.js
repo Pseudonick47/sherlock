@@ -124,6 +124,9 @@ export default class ProfileView extends React.Component {
                     <div className="text-left">
                         <b> Bio: </b> {biography}
                     </div>
+                    <div className="text-left">
+                        <b> Account type: </b> {this.props.user.role}
+                    </div>
                 </div>
                 <RaisedButton
                     style={{  marginTop:50 ,marginLeft: 40 }}
