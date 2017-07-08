@@ -1,5 +1,4 @@
-node_modules/
-
+node_modules/ 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -102,3 +101,6 @@ ENV/
 
 # upload files
 static/
+
+# vim files
+.*.swp
