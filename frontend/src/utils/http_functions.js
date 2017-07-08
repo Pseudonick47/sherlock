@@ -87,6 +87,12 @@ export function post_comment(text, tour_id, user_id) {
     })
 }
 
+export function post_tour_rating(rating, tour_id, user_id) {
+  return axios.post('/api/rating', {
+      rating, user_id, tour_id
+    })
+}
+
 export function get_tours() {
     return axios.get('/api/tours');
 }

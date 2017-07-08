@@ -15,7 +15,7 @@ import {
 } from '../constants/index';
 
 import { parseJSON } from '../utils/misc';
-import { get_token, create_user, get_tours, get_tour, get_comment, post_comment } from '../utils/http_functions';
+import { get_token, create_user, get_tours, get_tour, get_comment, post_comment, post_rating } from '../utils/http_functions';
 
 
 export function loginUserSuccess(response) {
@@ -229,11 +229,20 @@ export function getComment(id) {
 
 export function postComment(text, tour_id, user_id) {
     return (dispatch) => {
-        alert("action auth");
         post_comment(text, tour_id, user_id)
             .then(parseJSON)
             .catch(error => {
-                alert('Error posting comment!')
+                alert('Error posting comment! Please try again.')
+            });
+    };
+}
+
+export function postTourRating(rating, tour_id, user_id) {
+    return (dispatch) => {
+        post_tour_rating(rating, tour_id, user_id)
+            .then(parseJSON)
+            .catch(error => {
+                alert('Error rating! Please try again.')
             });
     };
 }

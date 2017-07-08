@@ -13,6 +13,7 @@ import Gallery from 'react-photo-gallery';
 import Lightbox from 'react-images';
 import RaisedButton from 'material-ui/RaisedButton';
 import SpecificTourDialog from './Dialogs/SpecificTourDialog';
+import StarRatingComponent from 'react-star-rating-component';
 
 
 function mapStateToProps(state) {
@@ -69,7 +70,10 @@ export default class SingleTour extends React.Component {
         console.log(term);
         this.setState({specificTourDialog: false});
     }
-
+    rateTour = (newRating, oldRating, name) => {
+      alert(next);
+      this.props.postTourRating(newRating, this.state.id, this.props.user.id);
+    }
     render() {
         const style = {
             margin: 12,
@@ -97,15 +101,22 @@ export default class SingleTour extends React.Component {
                           {locationList}
                         </ul>
                         <Divider />
-                        <RaisedButton label="Rate" style={style} />
-                        {this.props.user ? this.props.user.role == "guide" ?
-                          <RaisedButton
-                            label="Add new term"
-                            primary={true} style={style}
-                            onTouchTap={() => this.setState({specificTourDialog: true})}
-                          />
-                        : null : null }
-                        <RaisedButton label="Comment" secondary={true} style={style} />
+                        <div>
+                            <div style={{margin: "auto", fontSize:40, display: "inline-block",}}>
+                                <StarRatingComponent
+                                    name="rating"
+                                    value={3}
+                                    onStarClick={this.rateTour}
+                                />
+                            </div>
+                            {this.props.user ? this.props.user.role == "guide" ?
+                              <RaisedButton
+                                label="Add new term"
+                                primary={true} style={style}
+                                onTouchTap={() => this.setState({specificTourDialog: true})}
+                              />
+                            : null : null }
+                        </div>
                         <Divider />
                         <h3>Comments</h3>
                         <Comments id={this.state.id} />

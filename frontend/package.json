@@ -122,6 +122,7 @@
     "react-dropzone": "^3.13.3",
     "react-images": "^0.5.4",
     "react-photo-gallery": "^5.6.1",
+    "react-star-rating-component": "^1.2.4",
     "react-upload-file": "^2.0.0-beta.6"
   }
 }
