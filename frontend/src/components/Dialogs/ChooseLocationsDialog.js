@@ -1,38 +1,41 @@
 import React from 'react';
 
-
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
 import AutoComplete from 'material-ui/AutoComplete';
-import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
-import Divider from 'material-ui/Divider';
-import {Table, TableBody, TableRowColumn} from 'material-ui/Table';
 import {Card, CardHeader, CardText} from 'material-ui/Card';
+import Dialog from 'material-ui/Dialog';
+import Divider from 'material-ui/Divider';
+import FlatButton from 'material-ui/FlatButton';
+import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
+import {Table, TableBody, TableRowColumn} from 'material-ui/Table';
+import TextField from 'material-ui/TextField';
 
 import FileUpload from '../FileUpload';
-
-import * as actionCreators from '../../actions/data'
-
+import Locations from '../Locations';
 import NewCityDialog from './NewCityDialog';
 import NewLocationDialog from './NewLocationDialog';
-import Locations from '../Locations';
+
+import * as citiesActions from '../../actions/data/citiesByCountry';
+import * as countriesActions from '../../actions/data/countries';
+import * as locationsActions from '../../actions/data/locations';
+
+const actionCreators = Object.assign({}, citiesActions, countriesActions, locationsActions);
+
 
 function mapStateToProps(state) {
     return {
-        countries: state.data.countries,
-        countriesError: state.data.countriesError,
-        fetchingCountries: state.data.fetchingCountries,
-        citiesByCountry: state.data.citiesByCountry,
-        citiesByCountryError: state.data.citiesByCountryError,
-        fetchingCitiesByCountry: state.data.fetchingCitiesByCountry,
-        locationsByCity: state.data.locationsByCity,
-        locationsByCityError: state.data.locationsByCityError,
-        fetchingLocationsByCity: state.data.fetchingLocationsByCity,
+        citiesByCountry: state.data.citiesByCountry.data,
+        citiesByCountryError: state.data.citiesByCountry.fetchErrorMessage,
+        countries: state.data.countries.data,
+        countriesError: state.data.countries.fetchErrorMessage,
+        fetchingCitiesByCountry: state.data.citiesByCountry.isFetching,
+        fetchingCountries: state.data.countries.isFetching,
+        fetchingLocations: state.data.locations.isFetching,
+        locations: state.data.locations.data,
+        locationsError: state.data.locations.fetchErrorMessage,
     };
 }
 
@@ -41,25 +44,24 @@ function mapDispatchToProps(dispatch) {
 }
 
 @connect(mapStateToProps, mapDispatchToProps)
-export default class AddLocations extends React.Component {
+export default class ChooseLocationsDialog extends React.Component {
 
     constructor() {
         super();
 
         this.state = {
-            open: false,
-            country: null,
-            countryNames: [],
-            countryError: '',
-            city: null,
             cities: [],
-            cityNames: [],
+            city: null,
             cityError: '',
-            newCityName: null,
+            cityNames: [],
+            country: null,
+            countryError: '',
+            countryNames: [],
             locations: [],
-            // locationsDisplay: [],
+            newCityName: null,
             newCityOpen: false,
             newLocationOpen: false,
+            open: false,
             selectedLocations: [],
         }
     }
@@ -87,9 +89,9 @@ export default class AddLocations extends React.Component {
             });
             this.setState({cityNames: c, cities: nextProps.citiesByCountry});
         }
-        if(this.props.locationsByCity != nextProps.locationsByCity) {
+        if(this.props.locations != nextProps.locations) {
             var locations = [];
-            nextProps.locationsByCity.forEach((location) => {
+            nextProps.locations.forEach((location) => {
                 locations.push(location);
             });
             this.setState({locations: locations,});
@@ -110,7 +112,7 @@ export default class AddLocations extends React.Component {
     }
 
     fetchLocations(id) {
-        this.props.fetchLocationsByCity(id);
+        this.props.fetchLocations(id);
     }
 
     onCountryRequest = (value, index) => {
@@ -302,16 +304,16 @@ export default class AddLocations extends React.Component {
     }
 }
 
-AddLocations.propTypes = {
+ChooseLocationsDialog.propTypes = {
     cancel: React.PropTypes.func,
-    submit: React.PropTypes.func,
-    fetchCountries: React.PropTypes.func,
-    fetchCitiesByCountry: React.PropTypes.func,
-    fetchLocationsByCity: React.PropTypes.func,
-    countries: React.PropTypes.array,
-    countriesError: React.PropTypes.bool,
-    fetchingCountries: React.PropTypes.bool,
     citiesByCountry: React.PropTypes.array,
     citiesByCountryError: React.PropTypes.bool,
-    fetchingCitiesByCountry: React.PropTypes.bool,
+    countries: React.PropTypes.array,
+    countriesError: React.PropTypes.bool,
+    fetchCitiesByCountry: React.PropTypes.func,
+    fetchCountries: React.PropTypes.func,
+    fetchLocations: React.PropTypes.func,
+    locations: React.PropTypes.array,
+    locationsError: React.PropTypes.bool,
+    submit: React.PropTypes.func,
 }

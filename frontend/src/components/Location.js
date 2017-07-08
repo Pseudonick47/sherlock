@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
-import Paper from 'material-ui/Paper';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
+import React from 'react';
+
+import ActionDone from 'material-ui/svg-icons/action/done';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
-import ActionDone from 'material-ui/svg-icons/action/done';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import Paper from 'material-ui/Paper';
 
 import * as actionCreators from '../actions/auth';
 
@@ -19,21 +20,28 @@ const style = {
     position: "relative",
 };
 
-export default class Location extends Component {
+export default class Location extends React.Component {
 
     constructor() {
         super();
-
-        this.state = {selected: false}
+        this.state = {
+            selected: false
+        }
     }
 
     onDeselect = () => {
-        this.setState({selected: false});
+        this.setState({
+            selected: false
+        });
+        
         this.props.deselect(this.props.data);
     }
 
     onSelect = () => {
-        this.setState({selected: true});
+        this.setState({
+            selected: true
+        });
+        
         this.props.select(this.props.data);
     }
 
@@ -60,4 +68,11 @@ export default class Location extends Component {
             </Paper>
         );
     }
+}
+
+Location.PropTypes = {
+    actionType: React.PropTypes.string,
+    data: React.PropTypes.object,
+    deselect: React.PropTypes.func,
+    select: React.PropTypes.func,
 }

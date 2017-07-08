@@ -10,15 +10,16 @@ import TextField from 'material-ui/TextField';
 
 import FileUpload from '../FileUpload';
 
-import * as actionCreators from '../../actions/data'
+import * as actionCreators from '../../actions/data/cities';
 
 import './styles.scss'
 
+
 function mapStateToProps(state) {
     return {
-        insertError: state.data.insertError,
-        message: state.data.message,
-        id: state.data.cityId,
+        id: state.data.cities.id,
+        insertError: state.data.cities.insertError,
+        insertErrorMessage: state.data.cities.insertErrorMessage,
     };
 }
 
@@ -33,11 +34,11 @@ export default class NewCityDialog extends React.Component {
         super();
 
         this.state = {
+            imageUrl: 'https://images.vexels.com/media/users/3/128414/isolated/lists/4532b23a286c2d6637b4ba65398360fd-philadelphia-city-skyline-silhouette.png',
+            name: '',
+            nameErrorMessage: '',
             open: false,
             uploadDialogOpen: false,
-            name: '',
-            nameError: '',
-            imageUrl: 'https://images.vexels.com/media/users/3/128414/isolated/lists/4532b23a286c2d6637b4ba65398360fd-philadelphia-city-skyline-silhouette.png',
         };
     };
 
@@ -67,7 +68,7 @@ export default class NewCityDialog extends React.Component {
 
         if (name.length === 0) {
             this.setState({
-                nameError: 'Name is required!',
+                nameErrorMessage: 'Name is required!',
                 name: null,
             });
         } 
@@ -77,7 +78,9 @@ export default class NewCityDialog extends React.Component {
             this.props.insertCity(name, country.id);
 
             if (this.props.insertError) {
-                this.setState({nameError: this.props.message});
+                this.setState({
+                    nameErrorMessage: this.props.insertErrorMessage
+                });
             }
         }
     };
@@ -86,7 +89,7 @@ export default class NewCityDialog extends React.Component {
         if (this.state.nameError != '') {
             this.setState({
                 name: value,
-                nameError: ''
+                nameErrorMessage: ''
             });
         } 
         else {
@@ -138,7 +141,7 @@ export default class NewCityDialog extends React.Component {
                 </div>
                 <TextField
                     hintText="City name"
-                    errorText={this.state.nameError}
+                    errorText={this.state.nameErrorMessage}
                     onChange={this.nameChanged}
                     fullWidth
                 />
@@ -161,8 +164,8 @@ export default class NewCityDialog extends React.Component {
 }
 
 NewCityDialog.propTypes = {
+    id: React.PropTypes.number,
     insertCity: React.PropTypes.func,
     insertError: React.PropTypes.bool,
-    message: React.PropTypes.string,
-    id: React.PropTypes.number,
+    insertErrorMessage: React.PropTypes.string,
 };

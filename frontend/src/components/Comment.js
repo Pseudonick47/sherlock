@@ -1,27 +1,30 @@
-import React, { Component } from 'react';
-import Paper from 'material-ui/Paper';
-import Avatar from 'material-ui/Avatar';
-import Chip from 'material-ui/Chip';
-import RaisedButton from 'material-ui/RaisedButton';
-import ArrowUp from 'material-ui/svg-icons/action/thumb-up';
-import ArrowDown from 'material-ui/svg-icons/action/thumb-down';
-import Close from 'material-ui/svg-icons/navigation/close';
-import IconButton from 'material-ui/IconButton';
-
-import * as actionCreators from '../actions/auth';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import React from 'react';
 import { Link } from 'react-router';
 
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
+import ArrowDown from 'material-ui/svg-icons/action/thumb-down';
+import ArrowUp from 'material-ui/svg-icons/action/thumb-up';
+import Avatar from 'material-ui/Avatar';
+import Chip from 'material-ui/Chip';
+import Close from 'material-ui/svg-icons/navigation/close';
+import IconButton from 'material-ui/IconButton';
+import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
+
+import * as actionCreators from '../actions/data/commentsByTour';
+
+//TODO: Verovatno ne radi, moram pogledati kako si slao
 function mapStateToProps(state) {
     return {
-        userPhoto: state.auth.userPhoto,
+        comment: state.auth.user.comment,
+        current: state.auth.user.current,
+        dislikes: state.auth.user.dislikes,
+        likes: state.auth.user.likes,
+        userId: state.auth.user.id,
+        userImage: state.auth.user.image,
         userName: state.auth.userName,
-        userId: state.auth.userId,
-        comment: state.auth.comment,
-        likes: state.auth.likes,
-        dislikes: state.auth.dislikes,
-        current: state.auth.current,
     };
 }
 
@@ -29,12 +32,14 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(actionCreators, dispatch);
 }
 @connect(mapStateToProps, mapDispatchToProps)
-export default class Comment extends Component {
+export default class Comment extends React.Component {
+
     constructor(props) {
         super(props);
     }
+
     componentWillMount() {
-        this.props.getComment(this.props.id);
+        this.props.fetchComment(this.props.id);
     }
 
     clickLike = (e) => { };
@@ -58,7 +63,7 @@ export default class Comment extends Component {
         return (
             <Paper style={styles.wrapper}>
                 <Chip style={styles.chip}>
-                  <Avatar src={this.props.userPhoto} />
+                  <Avatar src={this.props.userImage} />
                     <Link to={"profile/" + this.props.userId}>{this.props.userName}</Link>
                 </Chip>
                 <p style={styles.p}>{this.props.comment}</p>
@@ -78,3 +83,5 @@ export default class Comment extends Component {
         );
     }
 }
+
+//TODO: PropTypes

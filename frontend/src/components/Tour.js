@@ -1,10 +1,14 @@
-import React, { Component } from 'react';
-import Paper from 'material-ui/Paper';
-import * as actionCreators from '../actions/auth';
-import { connect } from 'react-redux';
+import React from 'react';
 import { browserHistory } from 'react-router';
-import { bindActionCreators } from 'redux';
 import { Link } from 'react-router';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+import Paper from 'material-ui/Paper';
+
+import * as actionCreators from '../actions/auth';
+
 
 function mapStateToProps(state) {
     return {
@@ -16,20 +20,22 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(actionCreators, dispatch);
 }
 
+const style = {
+    padding: 20,
+    margin: 10,
+    height: 300,
+    width: 300,  /* Or whatever */
+    marginRight: "auto",
+    marginBottom: 20,
+    overflow: 'hidden',
+    position: "relative",
+};
+
 @connect(mapStateToProps, mapDispatchToProps)
-export default class Tour extends Component {
+export default class Tour extends React.Component {
 
     render() {
-        const style = {
-           padding: 20,
-           margin: 10,
-           height: 300,
-           width: 300,  /* Or whatever */
-           marginRight: "auto",
-           marginBottom: 20,
-           overflow: 'hidden',
-           position: "relative",
-        };
+      
         function klik(tourId){
           browserHistory.push('/tour/3');
         }
@@ -54,8 +60,13 @@ export default class Tour extends Component {
                 <div style={{ height: 30, position: "absolute", bottom: 30, }} >
                     <h3>{this.props.data.guide_fee} $</h3>
                 </div>
-                {this.props.user.role == 'guide' ? <h2>'hotdog'</h2> : <h2>no hotdog</h2>}
+                {this.props.user && this.props.user.role == 'guide' ? <h2>'hotdog'</h2> : <h2>no hotdog</h2>}
             </Paper>
         );
     }
+}
+
+Tour.PropTypes = {
+    data: React.PropTypes.object,
+    user: React.PropTypes.object,
 }

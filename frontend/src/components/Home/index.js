@@ -1,6 +1,7 @@
 import React from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
 import { browserHistory } from 'react-router';
+
+import RaisedButton from 'material-ui/RaisedButton';
 
 export const Home = () =>
     <section>

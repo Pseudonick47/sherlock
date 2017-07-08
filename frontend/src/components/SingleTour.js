@@ -1,34 +1,39 @@
-/* eslint camelcase: 0, no-underscore-dangle: 0 */
-
 import React from 'react';
+import { Link } from 'react-router';
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
-import * as authActions from '../actions/auth';
-import * as dataActions from '../actions/data';
-import { validateEmail } from '../utils/misc';
-import Comments from './Comments'
+
 import Divider from 'material-ui/Divider';
-import PropTypes from 'prop-types';
+import RaisedButton from 'material-ui/RaisedButton';
+
 import Gallery from 'react-photo-gallery';
 import Lightbox from 'react-images';
-import RaisedButton from 'material-ui/RaisedButton';
-import SpecificTourDialog from './Dialogs/SpecificTourDialog';
+import PropTypes from 'prop-types';
+
+import Comments from './Comments'
 import SpecificTour from './SpecificTour';
-import { List, ListItem } from 'material-ui/List';
+import SpecificTourDialog from './Dialogs/SpecificTourDialog';
 
-const actionCreators = Object.assign({}, authActions, dataActions);
+import * as authActions from '../actions/auth';
+import * as tourActions from '../actions/data/tour';
+import * as specificToursActions from '../actions/data/specificTours';
 
+import { validateEmail } from '../utils/misc';
+
+const actionCreators = Object.assign({}, authActions, tourActions, specificToursActions);
+
+//TODO: Verovatno ne radi
 function mapStateToProps(state) {
     return {
-        name: state.auth.name,
-        description: state.auth.description,
-        locations: state.auth.locations,
-        photos: state.auth.photos,
+        commentIds: state.data.commentsByTour.data,
+        tour: state.data.tour.data,
+        isFetchingComments: state.data.commentsByTour.isFetching,
+        isFetchingSpecificTours: state.data.specificTours.isFetching,
+        isFetchingTour: state.data.tour.isFetching,
+        //rating: state.auth.rating,
+        specificTours: state.data.specificTours.data,
         user: state.auth.user,
-        rating: state.auth.rating,
-        commentIds: state.auth.commentIds,
-        specificTours: state.data.specificTours,
     };
 }
 
@@ -41,19 +46,23 @@ export default class SingleTour extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            id: this.props.routeParams.id,
-            isLigthboxOpen: false,
             currentPhoto: 1,
+            description: '',
+            id: this.props.routeParams.id,
+            images: [],
+            isLigthboxOpen: false,
+            locations: [],
+            name: '',
             specificTourDialog: false,
             specificTours: [],
         };
     }
 
     componentWillMount() {
-        const {getTour, fetchSpecificTours} = this.props;
+        const {fetchTour, fetchSpecificTours} = this.props;
         const id = this.props.routeParams.id;
         
-        getTour(id);
+        fetchTour(id);
         fetchSpecificTours(id);
     }
 
@@ -73,6 +82,28 @@ export default class SingleTour extends React.Component {
             );
 
             this.setState({specificTours: specificTours});
+        }
+
+        if(!nextProps.isFetchingTour) {
+            const { tour } = nextProps;
+
+            var locationList = [];
+            for (var loc in tour.locations) {
+                locationList.push(
+                    <li>
+                        <Link to={"/location/" + tour.locations[loc].id}>
+                            {tour.locations[loc].name}
+                        </Link>
+                    </li>
+                );
+            }
+
+            this.setState({
+                description: tour.description,
+                images: tour.images,
+                locations: locationList,
+                name: tour.name,
+            })
         }
     }
 
@@ -116,32 +147,27 @@ export default class SingleTour extends React.Component {
         const style = {
             margin: 12,
         };
-        var locationList = [];
-        for (var loc in this.props.locations) {
-            locationList.push(<li><Link to={"/location/" + this.props.locations[loc].id}>{this.props.locations[loc].name}</Link></li>);
-        }
+        
 
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-md-12">
-                        <h1>{this.props.name}</h1>
+                        <h1>{this.props.isFetchingTour ? "Loading tour data..." : this.state.name}</h1>
                         <Divider />
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-md-7">
                         <h2>Description:</h2>
-                        <p>{this.props.description}</p>
+                        <p>{this.state.description}</p>
                         <Divider />
                         <h3>Locations:</h3>
-                        <ul>
-                            {locationList}
-                        </ul>
+                        <ul>{this.state.locations}</ul>
                         {this.props.user ?
                             <div>
                                 <Divider />
-                                {this.state.specificTours}
+                                {this.props.isFetchingSpecificTours ? "Loading specific tours..." : this.state.specificTours}
                             </div>
                             : ""}
                         {this.props.user ? this.props.user.role == "guide" ?
@@ -153,20 +179,22 @@ export default class SingleTour extends React.Component {
                         <RaisedButton label="Comment" secondary={true} style={style} />
                         <Divider />
                         <h3>Comments</h3>
-                        <Comments ids={this.props.commentIds} />
+                        {this.props.isFetchingComments ? "Loading comments..." : <Comments ids={this.props.commentIds} />}
 
                     </div>
-                    <div className="col-md-4 col-md-offset-1">
-                        <Gallery photos={this.props.photos} onClickPhoto={this.openLightbox} />
-                        <Lightbox
-                            images={this.props.photos}
-                            isOpen={this.state.isLigthboxOpen}
-                            onClose={this.closeLightbox}
-                            onClickNext={this.nextPhoto}
-                            onClickPrev={this.prevPhoto}
-                            currentImage={this.state.currentPhoto}
-                        />
-                    </div>
+                    {this.props.isFetchingTour ? "" :
+                        <div className="col-md-4 col-md-offset-1">
+                            <Gallery photos={this.state.images} onClickPhoto={this.openLightbox} />
+                            <Lightbox
+                                images={this.state.images}
+                                isOpen={this.state.isLigthboxOpen}
+                                onClose={this.closeLightbox}
+                                onClickNext={this.nextPhoto}
+                                onClickPrev={this.prevPhoto}
+                                currentImage={this.state.currentPhoto}
+                            />
+                        </div>
+                    }
                 </div >
                 {this.state.specificTourDialog ?
                     <SpecificTourDialog cancel={this.onSpecificTourCancel} submit={this.onSpecificTourSubmit} />
@@ -179,12 +207,13 @@ export default class SingleTour extends React.Component {
 
 SingleTour.PropTypes = {
     insertSpecificTour: React.PropTypes.func,
+    isFetchingComments: React.PropTypes.bool,
+    isFetchingSpecificTours: React.PropTypes.bool,
+    isFetchingTour: React.PropTypes.bool,
     fetchSpecificTours: React.PropTypes.func,
-    name: React.PropTypes.func,
-    description: React.PropTypes.string,
-    locations: React.PropTypes.array,
-    photos: React.PropTypes.array,
+    fetchTour: React.PropTypes.func,
     user: React.PropTypes.object,
-    rating: React.PropTypes.number,
+    //rating: React.PropTypes.number,
     commentIds: React.PropTypes.array,
+    specificTours: React.PropTypes.array,
 }

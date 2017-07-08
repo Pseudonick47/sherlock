@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
+
 import Comment from './Comment';
 
-export default class Comments extends Component {
+
+export default class Comments extends React.Component {
     constructor(props) {
         super(props);
-        const redirectRoute = '';
     }
 
     render() {

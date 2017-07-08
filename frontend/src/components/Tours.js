@@ -1,7 +1,21 @@
-import React, { Component } from 'react';
+import React from 'react';
+
 import Tour from './Tour';
 
-export default class Tours extends Component {
+const style = {
+    paddingTop: 40,
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    alignContent: "flex-start",
+    width: 1000,
+    maxWidth: "100%",
+
+};
+
+export default class Tours extends React.Component {
     constructor(props) {
         super(props);
         const redirectRoute = '';
@@ -14,23 +28,14 @@ export default class Tours extends Component {
             tourList.push(<Tour data={this.props.data[i]} />);
         }
 
-        const style = {
-            paddingTop: 40,
-            display: "flex",
-            flexDirection: "row",
-            flexWrap: "wrap",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-            alignContent: "flex-start",
-            width: 1000,
-            maxWidth: "100%",
-
-        };
-
         return (
             <div style={style}>
                 {tourList}
             </div>
         );
     }
+}
+
+Tours.PropTypes = {
+    data: React.PropTypes.array,
 }

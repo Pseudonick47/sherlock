@@ -1,29 +1,28 @@
-/* eslint camelcase: 0, no-underscore-dangle: 0 */
-
 import React from 'react';
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
+
 import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+
 import FileUpload from './FileUpload';
+
 import * as actionCreators from '../actions/auth';
 
 import { validateEmail } from '../utils/misc';
 
+
 function mapStateToProps(state) {
     return {
-        isRegistering: state.auth.isRegistering,
         user: state.auth.user,
-        registerStatusText: state.auth.registerStatusText,
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(actionCreators, dispatch);
 }
-
-
 
 const style = {
     marginTop: 50,
@@ -40,12 +39,26 @@ export default class ProfileView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: this.props.userName,
-	        profile_name: this.props.first_name,
-	        profile_surname: '',
-	        bio: '',
+            biography: '',
             birthday: '',
+            email: '',
+            image: '',
+            name: '',
+            surname: '',
         };
+    }
+
+    componentWillMount() {
+        const { name, surname, email, biography, birthday, image } = this.props.user;
+
+        this.setState({
+            biography: biography,
+            birthday: birthday,
+            email: email,
+            image: image.src,
+            name: name,
+            surname: surname,
+        })
     }
 
     _handleKeyPress(e) {
@@ -72,47 +85,58 @@ export default class ProfileView extends React.Component {
     }
 
     render() {
+        const { 
+            biography,
+            birthday,
+            email,
+            image,
+            name,
+            surname, 
+        } = this.state;
+
         return (
             <div className="col-md-6 col-md-offset" onKeyPress={(e) => this._handleKeyPress(e)}>
                 <div className="text-left">
-		    <br></br>
-		    <br></br>
-                    <img src={this.props.user.userPhoto} alt="Profile picture" height="300" width="300" />
-		</div>
+                    <br></br>
+                    <br></br>
+                    <img src={image} alt="Profile picture" height="300" width="300" />
+                </div>
 
-		<div className="text-center">
-		    <br></br>
-		    <br></br>
-		    <div className="text-left">
-			<b> Email: </b> {this.props.user.email}
-		    </div>
-		    <br></br>
-		    <div className="text-left">
-		        <b> Name: </b> {this.props.user.first_name}
-		    </div>
-		    <br></br>
-		    <div className="text-left">
-		        <b> Surname: </b> {this.props.user.surname}
-
-		    </div>
-		    <br></br>
-		    <div className="text-left">
-		        <b> Birthday: </b> {this.props.user.birthday}
-		    </div>
-		    <br></br>
-		    <div className="text-left">
-		        <b> Bio: </b> {this.props.user.bio}
-		    </div>
-	        </div>
-		<RaisedButton
+                <div className="text-center">
+                    <br></br>
+                    <br></br>
+                    <div className="text-left">
+                        <b> Email: </b> {email}
+                    </div>
+                    <br></br>
+                    <div className="text-left">
+                        <b> Name: </b> {name}
+                    </div>
+                    <br></br>
+                    <div className="text-left">
+                        <b> Surname: </b> {surname}
+                    </div>
+                    <br></br>
+                    <div className="text-left">
+                        <b> Birthday: </b> {birthday}
+                    </div>
+                    <br></br>
+                    <div className="text-left">
+                        <b> Bio: </b> {biography}
+                    </div>
+                </div>
+                <RaisedButton
                     style={{  marginTop:50 ,marginLeft: 40 }}
                     label="✎"
                     onClick={(e) => this.edit(e)}
                 />
-        <FileUpload callback={this.imageUploadCallback} />
-	    </div>
+                <FileUpload callback={this.imageUploadCallback} />
+            </div>
         );
 
     }
 }
 
+ProfileView.PropTypes = {
+    user: React.PropTypes.object,
+}

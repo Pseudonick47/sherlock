@@ -38,18 +38,9 @@ export function get_token(email, password) {
     });
 }
 
-export function has_github_token(token) {
-    return axios.get('/api/has_github_token', tokenConfig(token));
-}
-
-export function data_about_user(token) {
-    return axios.get('/api/user', tokenConfig(token));
-}
-
 export function get_countries() {
     return axios.get('/api/countries');
 }
-
 
 export function get_cities() {
     return axios.get('/api/cities');

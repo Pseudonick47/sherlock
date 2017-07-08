@@ -130,7 +130,7 @@ class TourAPI(Resource):
                     {'id': location.oid, 'name': location.name} \
                     for location in tour.locations
                 ],
-                'photos': [
+                'images': [
                     {
                         'id': image.oid,
                         'src': 'http://localhost:5000/static/' + image.file_name,

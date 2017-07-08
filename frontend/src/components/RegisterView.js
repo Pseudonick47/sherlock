@@ -1,16 +1,17 @@
-/* eslint camelcase: 0, no-underscore-dangle: 0 */
-
 import React from 'react';
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-import RadioButton from 'material-ui/Checkbox';
+
 import Paper from 'material-ui/Paper';
+import RadioButton from 'material-ui/Checkbox';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 import * as actionCreators from '../actions/auth';
 
 import { validateEmail } from '../utils/misc';
+
 
 function mapStateToProps(state) {
     return {
@@ -39,30 +40,30 @@ export default class RegisterView extends React.Component {
         super(props);
         const redirectRoute = '/login';
         this.state = {
-            email: '',
-            password: '',
-			first_name: '',
-			surname: '',
-			role: '',
-            email_error_text: null,
-			role_error_text: null,
-            password_error_text: null,
-            redirectTo: redirectRoute,
             disabled: true,
+            email: '',
+            emailErrorText: null,
+            firstName: '',
+            password: '',
+            passwordErrorText: null,
+            redirectTo: redirectRoute,
+            role: '',
+            roleErrorText: null,
+            surname: '',
         };
     }
 
     isDisabled() {
-        let email_is_valid = false;
-        let password_is_valid = false;
-		let role_is_valid = false;
+        let isEmailValid = false;
+        let isPasswordValid = false;
+		let isRoleValid = false;
 
         if (this.state.email === '') {
             this.setState({
                 email_error_text: null,
             });
         } else if (validateEmail(this.state.email)) {
-            email_is_valid = true;
+            isEmailValid = true;
             this.setState({
                 email_error_text: null,
             });
@@ -78,7 +79,7 @@ export default class RegisterView extends React.Component {
                 role_error_text: null,
             });
         } else if (this.state.role==="tourist" || this.state.role==="guide") {
-            role_is_valid = true;
+            isRoleValid = true;
             this.setState({
                 role_error_text: null,
             });
@@ -94,7 +95,7 @@ export default class RegisterView extends React.Component {
                 password_error_text: null,
             });
         } else if (this.state.password.length >= 6) {
-            password_is_valid = true;
+            isPasswordValid = true;
             this.setState({
                 password_error_text: null,
             });
@@ -105,7 +106,7 @@ export default class RegisterView extends React.Component {
 
         }
 
-        if (email_is_valid && password_is_valid && role_is_valid) {
+        if (isEmailValid && isPasswordValid && isRoleValid) {
             this.setState({
                 disabled: false,
             });
@@ -115,9 +116,9 @@ export default class RegisterView extends React.Component {
 
     changeValue(e, type) {
         const value = e.target.value;
-        const next_state = {};
-        next_state[type] = value;
-        this.setState(next_state, () => {
+        const nextState = {};
+        nextState[type] = value;
+        this.setState(nextState, () => {
             this.isDisabled();
         });
     }
@@ -132,7 +133,7 @@ export default class RegisterView extends React.Component {
 
     login(e) {
         e.preventDefault();
-        this.props.registerUser(this.state.email, this.state.password, this.state.first_name, this.state.surname, this.state.role, this.state.redirectTo);
+        this.props.registerUser(this.state.email, this.state.password, this.state.firstName, this.state.surname, this.state.role, this.state.redirectTo);
     }
 
     render() {
@@ -153,7 +154,7 @@ export default class RegisterView extends React.Component {
                               hintText="example@domain.com"
                               floatingLabelText="Email"
                               type="email"
-                              errorText={this.state.email_error_text}
+                              errorText={this.state.emailErrorText}
                               onChange={(e) => this.changeValue(e, 'email')}
                             />
                         </div>
@@ -162,7 +163,7 @@ export default class RegisterView extends React.Component {
                               hintText="Password"
                               floatingLabelText="Password"
                               type="password"
-                              errorText={this.state.password_error_text}
+                              errorText={this.state.passwordErrorText}
                               onChange={(e) => this.changeValue(e, 'password')}
                             />
                         </div>
@@ -188,7 +189,7 @@ export default class RegisterView extends React.Component {
                                 hintText="tourist/guide"
                                 floatingLabelText="Role"
                                 type="role"
-								errorText={this.state.role_error_text}
+								errorText={this.state.roleErrorText}
                                 onChange={(e) => this.changeValue(e, 'role')}
                             />
                         </div>

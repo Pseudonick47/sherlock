@@ -1,5 +1,6 @@
 import { LEFT_NAV_OPEN, LEFT_NAV_CLOSE } from '../constants/index';
 
+
 export function leftNavOpen() {
     return {
         type: LEFT_NAV_OPEN,

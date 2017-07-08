@@ -1,15 +1,17 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { browserHistory } from 'react-router';
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
 import * as actionCreators from '../actions/auth';
+
 
 function mapStateToProps(state) {
     return {
-        token: state.auth.token,
-        userName: state.auth.userName,
-        user: state.auth.user,
+        fetchingUser: state.auth.isFetching,
         isAuthenticated: state.auth.isAuthenticated,
+        user: state.auth.user,
     };
 }
 
@@ -17,31 +19,65 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(actionCreators, dispatch);
 }
 
-
 export function requireGuideAuthentication(Component) {
     class GuideAuthenticatedComponent extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                load: false,
+            };
+        }
+        
         componentWillMount() {
             this.checkAuth();
         }
 
+        componentWillReceiveProps(nextProps) {
+            if (this.props.user != nextProps.user) {
+                this.checkAuth();
+            }
+        }
+
         checkAuth(props = this.props) {
-            if (props.isAuthenticated && props.user.role == 'guide') {
+            if (!props.isAuthenticated) {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    browserHistory.push('/home');
+                } else {
+                    fetch('/api/is_token_valid', {
+                        method: 'post',
+                        credentials: 'include',
+                        headers: {
+                            'Accept': 'application/json', // eslint-disable-line quote-props
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ token }),
+                    })
+                        .then(res => {
+                            if (res.status === 200) {
+                                this.props.loginUserSuccess(token);
+                                this.setState({
+                                    load: this.props.user.role == 'guide',
+                                });
+
+                            } else {
+                                browserHistory.push('/home');
+
+                            }
+                        });
+
+                }
+            } else {
                 this.setState({
-                    is_guide: props.user.role == 'guide',
+                    load: this.props.user.role == 'guide',
                 });
-            } 
-            else {
-                browserHistory.push("/home");
             }
         }
 
         render() {
             return (
                 <div>
-                    {this.props.isAuthenticated && this.state.is_guide
-                        ? <Component {...this.props} />
-                        : ""
-                    }
+                    {this.state.load ? <Component {...this.props} /> : ""}
                 </div>
             );
 
@@ -49,9 +85,10 @@ export function requireGuideAuthentication(Component) {
     }
 
     GuideAuthenticatedComponent.propTypes = {
-        loginUserSuccess: React.PropTypes.func,
         isAuthenticated: React.PropTypes.bool,
+        user: React.PropTypes.object,
     };
 
     return connect(mapStateToProps, mapDispatchToProps)(GuideAuthenticatedComponent);
 }
+

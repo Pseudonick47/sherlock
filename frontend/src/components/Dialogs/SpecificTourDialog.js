@@ -1,10 +1,10 @@
 import React from 'react';
 
+import DatePicker from 'material-ui/DatePicker';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import DatePicker from 'material-ui/DatePicker';
 
 
 export default class SpecificTourDialog extends React.Component {
@@ -13,12 +13,12 @@ export default class SpecificTourDialog extends React.Component {
         super();
 
         this.state = {
-            open: false,
+            endDate: null,
             endDateDisabled: true,
             minStartDate: new Date(),
             minEndDate: new Date(),
+            open: false,
             startDate: null,
-            endDate: null,
             submitDisabled: true,
         };
     };

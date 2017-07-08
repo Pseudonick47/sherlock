@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Location from './Location';
 
 
@@ -38,7 +39,9 @@ export default class Locations extends React.Component {
             );
         });
 
-        this.setState({locations: locations});
+        this.setState({
+            locations: locations,
+        });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -56,14 +59,19 @@ export default class Locations extends React.Component {
                 );
             });
 
-            this.setState({locations: locations});
+            this.setState({
+                locations: locations,
+            });
         }
     }
 
     onLocationSelected = (location) => {
         var locations = this.state.selectedLocations;
         locations.push(location);
-        this.setState({selectedLocations: locations});
+        
+        this.setState({
+            selectedLocations: locations,
+        });
     
         this.props.selectionChanged(locations);
     }
@@ -76,7 +84,9 @@ export default class Locations extends React.Component {
             locations.splice(index, 1);
         }
 
-        this.setState({selectedLocations: locations});
+        this.setState({
+            selectedLocations: locations,
+        });
 
         this.props.selectionChanged(locations);
     }
@@ -88,4 +98,10 @@ export default class Locations extends React.Component {
             </div>
         );
     }
+}
+
+Locations.PropTypes = {
+    actionType: React.PropTypes.string,
+    data: React.PropTypes.array,
+    selectionChanged: React.PropTypes.func,
 }
