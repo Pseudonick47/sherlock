@@ -25,7 +25,7 @@ export function fileUploadRequest() {
 
 export function fileUploadSuccess(ids) {
     return {
-        type: FILE_UPLOAD_SUCCESS,
+        type: FILE_UPLOAD_SUCCEEDED,
         payload: ids,
     };
 }

@@ -233,8 +233,8 @@ export default class ChooseLocationsDialog extends React.Component {
                 modal
                 open={this.state.open}
             >
-            <div style={{heigth: "100%"}}>
-                <h1 style={{}}>What would you like them to visit?</h1>
+            <div style={{overflow: "auto"}}>
+                <h1 style={{padding: 40, marginTop: 20}}>What would you like them to visit?</h1>
                 <AutoComplete
                     hintText={fetchingCountries ? "Loading countries.." : "Countries"}
                     errorText={

@@ -112,14 +112,10 @@ export default class NewLocationDialog extends React.Component {
         });
     }
 
-    setImage = (imageIds) => {
-        var imageUrl = 'http://localhost:5000/api/images/'.concat(imageIds[0].toString())
-
-        this.setState({
-            uploadDialogOpen: false,
-            imageUrl: imageUrl
-        });
-    }
+    setImage = (images) => this.setState({
+        uploadDialogOpen: false,
+        imageUrl: images[0].src,
+    });
 
     render() {
         const actions = [
