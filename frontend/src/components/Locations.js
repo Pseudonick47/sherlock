@@ -13,13 +13,15 @@ const style = {
     alignContent: "flex-start",
     width: 1000,
     maxWidth: "100%",
+    overflow: "scroll",
+    height: 150,
 };
 
 export default class Locations extends React.Component {
 
     constructor() {
         super();
-    
+
         this.state = {
             locations: [],
             selectedLocations: [],
@@ -30,8 +32,8 @@ export default class Locations extends React.Component {
         var locations = [];
         this.props.data.forEach((location) => {
             locations.push(
-                <Location 
-                    data={location} 
+                <Location
+                    data={location}
                     select={this.onLocationSelected}
                     deselect={this.onLocationDeselected}
                     showButton={true}
@@ -49,8 +51,8 @@ export default class Locations extends React.Component {
             var locations = [];
             nextProps.data.forEach((location) => {
                 locations.push(
-                    <Location 
-                        data={location} 
+                    <Location
+                        data={location}
                         select={this.onLocationSelected}
                         deselect={this.onLocationDeselected}
                         showButton={true}
@@ -68,17 +70,17 @@ export default class Locations extends React.Component {
     onLocationSelected = (location) => {
         var locations = this.state.selectedLocations;
         locations.push(location);
-        
+
         this.setState({
             selectedLocations: locations,
         });
-    
+
         this.props.selectionChanged(locations);
     }
 
     onLocationDeselected = (location) => {
         var locations = this.state.selectedLocations;
-        
+
         const index = locations.indexOf(location);
         if (index != -1) {
             locations.splice(index, 1);
@@ -94,7 +96,7 @@ export default class Locations extends React.Component {
     render() {
         return (
             <div style={style}>
-                {this.state.locations}       
+                {this.state.locations}
             </div>
         );
     }

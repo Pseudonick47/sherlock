@@ -12,7 +12,7 @@ import * as actionCreators from '../actions/auth';
 const style = {
     padding: 20,
     margin: 10,
-    height: 300,
+    height: 150,
     width: 300,
     marginRight: "auto",
     marginBottom: 20,
@@ -33,7 +33,7 @@ export default class Location extends React.Component {
         this.setState({
             selected: false
         });
-        
+
         this.props.deselect(this.props.data);
     }
 
@@ -41,7 +41,7 @@ export default class Location extends React.Component {
         this.setState({
             selected: true
         });
-        
+
         this.props.select(this.props.data);
     }
 
@@ -59,7 +59,7 @@ export default class Location extends React.Component {
                         style={{margin: 10, right: 0, position: "absolute", bottom: 0}}
                     >
 
-                        {this.state.selected ? <ActionDone /> : 
+                        {this.state.selected ? <ActionDone /> :
                          this.props.actionType === 'add' ? <ContentAdd /> :
                          this.props.actionType === 'remove' ? <ContentRemove /> : ""
                         }

@@ -122,13 +122,13 @@ export default class ChooseLocationsDialog extends React.Component {
         if (index != -1) {
             const country = this.props.countries[index];
             this.setState({
-                country: country, 
-                cities: [], 
+                country: country,
+                cities: [],
                 locations: [],
-                countryError: '',    
+                countryError: '',
             });
             this.fetchCities(country.id);
-        } 
+        }
         else {
             this.setState({countryError: 'Country doesn\'t exist!'})
         }
@@ -141,7 +141,7 @@ export default class ChooseLocationsDialog extends React.Component {
             if (index != -1) {
             const city = this.state.cities[index];
             this.setState({
-                city: city, 
+                city: city,
                 cityError: '',
                 locations: [],
             });
@@ -195,7 +195,7 @@ export default class ChooseLocationsDialog extends React.Component {
     onSubmit = () => this.props.submit(this.state.selectedLocations);
 
     render() {
-        const { 
+        const {
             fetchingCountries,
             countriesError,
             fetchingCities,
@@ -218,6 +218,12 @@ export default class ChooseLocationsDialog extends React.Component {
                 primary
                 keyboardFocused
                 onTouchTap={this.onSubmit}
+            />,
+            <RaisedButton
+                label="Add new location"
+                style={{margin: "15 0 10 20"}}
+                onTouchTap={() => this.setState({newLocationOpen: true})}
+                disabled={this.state.city ? false : true}
             />
         ]
 
@@ -226,20 +232,10 @@ export default class ChooseLocationsDialog extends React.Component {
                 actions={actions}
                 modal
                 open={this.state.open}
-                style={{height: "100%"}}
             >
-            <div style={{overflow: "auto"}}> 
-                <h1 style={{padding: 40, marginTop: 20}}>What would you like them to visit?</h1>
-                <p style={{padding: 20,}}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                    Sed pretium lacus felis, ut condimentum massa ornare id. 
-                    Vivamus laoreet tortor eu justo posuere dictum. 
-                    Etiam risus diam, laoreet vel lacus sit amet, ultricies 
-                    tincidunt ipsum. Pellentesque sodales enim ligula, quis 
-                    iaculis ipsum eleifend et. Integer ornare tincidunt 
-                    hendrerit. Curabitur ullamcorper ac eros sit amet euismod. 
-                </p>
-                <AutoComplete 
+            <div style={{heigth: "100%"}}>
+                <h1 style={{}}>What would you like them to visit?</h1>
+                <AutoComplete
                     hintText={fetchingCountries ? "Loading countries.." : "Countries"}
                     errorText={
                         countriesError ? "Oops, something went wrong! Please try reloading the page." :
@@ -249,10 +245,10 @@ export default class ChooseLocationsDialog extends React.Component {
                     style={{width: "80%", margin: "20 0 5 20",}}
                     onNewRequest={this.onCountryRequest}
                 />
-                <AutoComplete 
+                <AutoComplete
                     hintText={fetchingCities ? "Loading cities.." : "Cities"}
                     errorText={
-                        citiesError ? "Oops, something went wrong! Please try reloading the page." : 
+                        citiesError ? "Oops, something went wrong! Please try reloading the page." :
                         this.state.cityError
                     }
                     disabled={this.state.cityNames.length ? false : true}
@@ -261,42 +257,38 @@ export default class ChooseLocationsDialog extends React.Component {
                     onNewRequest={this.onCityRequest}
                     defaultValue={this.state.city ? this.state.city.name : ""}
                 />
-                <RaisedButton 
+                <RaisedButton
                     label="Add new city"
                     style={{float: "right", margin: "5 20 20 0",}}
                     onTouchTap={() => this.setState({newCityOpen: true})}
                     disabled={this.state.country ? false : true}
                 />
                 <Divider />
-                {this.state.locations.length ? "" : 
+                {this.state.locations.length ? "" :
                     <h4 style={{padding: "5 20 0 20"}}>Please select country and city..</h4>
                 }
-                <Locations 
-                    data={this.state.locations} 
-                    selectionChanged={(selectedLocations) => this.setState({selectedLocations: selectedLocations})}
-                    actionType="add"
-                />
-                <Divider />
-                <RaisedButton 
-                    label="Add new location"
-                    style={{margin: "15 0 10 20"}}
-                    onTouchTap={() => this.setState({newLocationOpen: true})}
-                    disabled={this.state.city ? false : true}
-                />
+                <div style={{overflow: "hidden",  maxHeigth:"400",}}>
+                    <Locations
+                        data={this.state.locations}
+                        selectionChanged={(selectedLocations) => this.setState({selectedLocations: selectedLocations})}
+                        actionType="add"
+                    />
+                    <Divider />
+                </div>
             </div>
-            {newCityOpen ? 
-                <NewCityDialog 
-                    cancel={this.onNewCityCancel} 
-                    submit={this.onNewCitySubmit} 
-                    country={this.state.country} 
+            {newCityOpen ?
+                <NewCityDialog
+                    cancel={this.onNewCityCancel}
+                    submit={this.onNewCitySubmit}
+                    country={this.state.country}
                 />
             : "" }
             {newLocationOpen ?
-                <NewLocationDialog 
-                    cancel={this.onNewLocationCancel} 
-                    submit={this.onNewLocationSubmit} 
+                <NewLocationDialog
+                    cancel={this.onNewLocationCancel}
+                    submit={this.onNewLocationSubmit}
                     country={this.state.country}
-                    city={this.state.city} 
+                    city={this.state.city}
                 />
             : ""}
             </Dialog>
