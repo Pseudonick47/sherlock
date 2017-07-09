@@ -50,7 +50,6 @@ export default class ProfileView extends React.Component {
 
     componentWillMount() {
         const { name, surname, email, biography, birthday, image } = this.props.user;
-
         this.setState({
             biography: biography,
             birthday: birthday,
@@ -69,9 +68,9 @@ export default class ProfileView extends React.Component {
         }
     }
 
-    imageUploadCallback(imageIds) {
-        alert(imageIds[0]);
-    }
+    imageUploadCallback = (images) => this.setState({
+        image: images[0].src,
+    })
 
     edit(e) {
         var novo = window.prompt("Edit info","Name");

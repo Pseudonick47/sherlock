@@ -230,15 +230,6 @@ export default class ChooseLocationsDialog extends React.Component {
             >
             <div style={{overflow: "auto"}}> 
                 <h1 style={{padding: 40, marginTop: 20}}>What would you like them to visit?</h1>
-                <p style={{padding: 20,}}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                    Sed pretium lacus felis, ut condimentum massa ornare id. 
-                    Vivamus laoreet tortor eu justo posuere dictum. 
-                    Etiam risus diam, laoreet vel lacus sit amet, ultricies 
-                    tincidunt ipsum. Pellentesque sodales enim ligula, quis 
-                    iaculis ipsum eleifend et. Integer ornare tincidunt 
-                    hendrerit. Curabitur ullamcorper ac eros sit amet euismod. 
-                </p>
                 <AutoComplete 
                     hintText={fetchingCountries ? "Loading countries.." : "Countries"}
                     errorText={

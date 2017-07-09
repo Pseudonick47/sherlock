@@ -46,6 +46,11 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(actionCreators, dispatch);
 }
+
+const style = {
+    margin: 12,
+};
+
 @connect(mapStateToProps, mapDispatchToProps)
 export default class SingleTour extends React.Component {
 
@@ -92,7 +97,7 @@ export default class SingleTour extends React.Component {
 
         if(!nextProps.isFetchingTour) {
             const { tour } = nextProps;
-
+            
             var locationList = [];
             for (var loc in tour.locations) {
                 locationList.push(
@@ -153,12 +158,6 @@ export default class SingleTour extends React.Component {
     }
 
     render() {
-        const style = {
-            margin: 12,
-        };
-        
-        console.log(this.props.tour);
-        console.log(this.props.isFetchingTour);
         return (
             <div className="container">
                 <div className="row">
@@ -190,7 +189,7 @@ export default class SingleTour extends React.Component {
                                     name="rating"
                                     value={this.props.tour.rating}
                                     onStarClick={this.rateTour}
-                                    editing={this.props.user.name}
+                                    editing={this.props.user}
                                 />
                             }
                         </div>

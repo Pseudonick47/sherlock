@@ -89,7 +89,7 @@ export default class Comments extends React.Component {
         return (
             <div>
                 {this.state.comments}
-                {this.props.user.name ?
+                {this.props.user ?
                   <Paper style={styles.wrapper}>
                     <Chip style={styles.chip}>
                       <Avatar src={this.props.user.image} />
