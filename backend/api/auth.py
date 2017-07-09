@@ -18,7 +18,7 @@ def get_user():
 @mod.route("/create_user", methods=["POST"])
 def create_user():
     incoming = request.get_json()
-    print(incoming["role"])
+
     user = User(
         email=incoming["email"],
         password=incoming["password"],

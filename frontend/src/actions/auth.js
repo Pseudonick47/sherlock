@@ -20,7 +20,6 @@ import {
 
 export function loginUserFailure(error) {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     return {
         type: USER_LOGIN_FAILED,
         payload: {
@@ -98,7 +97,6 @@ export function redirectToRoute(route) {
 
 export function registerUserFailure(error) {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     return {
         type: USER_REGISTER_FAILED,
         payload: {
@@ -122,10 +120,10 @@ export function registerUserSuccess(token) {
     };
 }
 
-export function registerUser(email, password, first_name, surname, role) {
+export function registerUser(email, password, firstName, surname, role) {
     return function (dispatch) {
         dispatch(registerUserRequest());
-        return create_user(email, password, first_name, surname, role)
+        return create_user(email, password, firstName, surname, role)
             .then(parseJSON)
             .then(response => {
                 try {
