@@ -222,7 +222,6 @@ class TourListAPI(Resource):
         """
 
         req = request.get_json(force=True, silent=True)
-        print(req)
         if req:
             tour = Tour(
                 name=req['name'],

@@ -25,9 +25,9 @@ export function create_user(email, password, first_name, surname, role) {
     return axios.post('/api/create_user', {
         email,
         password,
-		first_name,
-		surname,
-		role
+        first_name,
+        surname,
+        role
     });
 }
 

@@ -60,48 +60,48 @@ export default class RegisterView extends React.Component {
 
         if (this.state.email === '') {
             this.setState({
-                email_error_text: null,
+                emailErrorText: null,
             });
         } else if (validateEmail(this.state.email)) {
             isEmailValid = true;
             this.setState({
-                email_error_text: null,
+                emailErrorText: null,
             });
 
         } else {
             this.setState({
-                email_error_text: 'Sorry, this is not a valid email',
+                emailErrorText: 'Sorry, this is not a valid email',
             });
         }
 
 		if (this.state.role === '') {
             this.setState({
-                role_error_text: null,
+                roleErrorText: null,
             });
         } else if (this.state.role==="tourist" || this.state.role==="guide") {
             isRoleValid = true;
             this.setState({
-                role_error_text: null,
+                roleErrorText: null,
             });
 
         } else {
             this.setState({
-                role_error_text: 'Sorry, this is invalid role',
+                roleErrorText: 'Sorry, this is invalid role',
             });
         }
 
         if (this.state.password === '' || !this.state.password) {
             this.setState({
-                password_error_text: null,
+                passwordErrorText: null,
             });
         } else if (this.state.password.length >= 6) {
             isPasswordValid = true;
             this.setState({
-                password_error_text: null,
+                passwordErrorText: null,
             });
         } else {
             this.setState({
-                password_error_text: 'Your password must be at least 6 characters',
+                passwordErrorText: 'Your password must be at least 6 characters',
             });
 
         }
@@ -172,7 +172,7 @@ export default class RegisterView extends React.Component {
                               hintText="Name"
                               floatingLabelText="Name"
                               type="first_name"
-                              onChange={(e) => this.changeValue(e, 'first_name')}
+                              onChange={(e) => this.changeValue(e, 'firstName')}
                             />
                         </div>
 						<div className="col-md-12">

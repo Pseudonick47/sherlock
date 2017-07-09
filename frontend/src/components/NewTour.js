@@ -27,9 +27,9 @@ import * as actionCreators from '../actions/data/tours';
 
 function mapStateToProps(state) {
     return {
-        id: state.data.tourId,
-        insertError: state.data.tour.insertError,
-        insertErrorMessage: state.data.tour.insertErrorMessage,
+        id: state.data.tours.id,
+        insertError: state.data.tours.insertError,
+        insertErrorMessage: state.data.tours.insertErrorMessage,
     };
 }
 
@@ -176,24 +176,24 @@ export default class NewTour extends React.Component {
     onSubmit = () => {
         this.setState({waitForRequest: true});
 
-        const {title, description, locations, photos, thumbnail, fee} = this.state;
+        const {title, description, locations, images, thumbnail, fee} = this.state;
         console.log(thumbnail);
         var locationIds = [];
         locations.forEach((e) => locationIds.push(e.id));
-        var photoIds = [];
-        photos.forEach((e) => photoIds.push(e.id));
+        var imageIds = [];
+        images.forEach((e) => imageIds.push(e.id));
 
         const tour = {
             name: title,
             description: description,
             locations: locationIds,
             guide_fee: fee,
-            images: photoIds,
+            images: imageIds,
             thumbnail: thumbnail.id,
         }
 
         console.log(tour);
-        this.props.insertTour(title, description, fee, locationIds, thumbnail.id, photoIds);
+        this.props.insertTour(title, description, fee, locationIds, thumbnail.id, imageIds);
     }
 
     onTitleChanged = (event, value) => {
