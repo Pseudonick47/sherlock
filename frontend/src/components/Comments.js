@@ -73,12 +73,12 @@ export default class Comments extends React.Component {
         e.preventDefault();
         this.props.postComment(this.state.newCommentText, this.state.tourId, this.props.user.id);
         this.props.fetchComments(this.state.tourId);
-        
+
         this.setState({
             newCommentText: "",
         });
     }
-  
+
     commentChanged = (e, text) => {
         this.setState({
             newCommentText: text,
@@ -92,7 +92,7 @@ export default class Comments extends React.Component {
                 {this.props.user.name ?
                   <Paper style={styles.wrapper}>
                     <Chip style={styles.chip}>
-                      <Avatar src={this.props.user.image} />
+                      <Avatar src={this.props.user.image.src} />
                         <Link to={"profile/" + this.props.user.id}>{this.props.user.name}</Link>
                     </Chip>
                     <TextField
@@ -106,7 +106,7 @@ export default class Comments extends React.Component {
                     <RaisedButton onClick={this.postComment}>
                       Comment
                     </RaisedButton>
-                  </Paper> : "" 
+                  </Paper> : ""
                 }
             </div>
         );

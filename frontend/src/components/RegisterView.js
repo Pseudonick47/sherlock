@@ -171,8 +171,8 @@ export default class RegisterView extends React.Component {
                             <TextField
                               hintText="Name"
                               floatingLabelText="Name"
-                              type="first_name"
-                              onChange={(e) => this.changeValue(e, 'first_name')}
+                              type="firstName"
+                              onChange={(e) => this.changeValue(e, 'firstName')}
                             />
                         </div>
 						<div className="col-md-12">
