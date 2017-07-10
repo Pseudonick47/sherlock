@@ -1,10 +1,124 @@
 import unittest
 
-from flask import jsonify, json
+from flask import jsonify, json, request
 
 from app import app, db
 from config import TestConfig
+from models.data import Location
 
+class LocationTestCase(unittest.TestCase):
+
+    def setUp(self):
+        app.config.from_object(TestConfig)
+        self.app = app.test_client()
+
+    def test_location(self):
+        location = {
+            "name": 'TestLocation',
+            "description": 'TestLocationDescription',
+            "city_id": 1,
+            "country_id": 1,
+            "price": 100
+        }
+
+        location = json.dumps(location);
+
+        response = self.app.post('/api/locations', data=location)
+
+        print()
+        print("Test: Post new location")
+        print(response)
+        assert response.status == "200 OK"
+
+        data = json.loads(response.data)
+
+        response = self.app.get('/api/locations/' + str(data['id']))
+        print()
+        print("Test: Get location")
+        print(response)
+        assert response.status == "200 OK"
+        new_location = json.loads(response.data)
+
+        response = self.app.get('/api/locations/' + str(-1))
+        print()
+        print("Test: Wrong location id")
+        print(response)
+        assert response.status[:3] == "403"
+
+class CityTestCase(unittest.TestCase):
+
+    def setUp(self):
+        app.config.from_object(TestConfig)
+        self.app = app.test_client()
+
+    def test_city(self):
+        city = {
+            "name": "TestCity",
+            "country_id": 1,
+            "thumbnail": 2,
+            "images": [],
+        }
+
+        city = json.dumps(city);
+
+        response = self.app.post('/api/cities', data=city)
+
+        print()
+        print("Test: Post new city")
+        print(response)
+        assert response.status == "200 OK"
+
+        data = json.loads(response.data)
+
+        response = self.app.get('/api/cities/' + str(data['id']))
+        print()
+        print("Test: Get city")
+        print(response)
+        assert response.status == "200 OK"
+        new_city = json.loads(response.data)
+
+        response = self.app.get('/api/cities/' + str(-1))
+        print()
+        print("Test: Wrong city id")
+        print(response)
+        assert response.status[:3] == "403"
+
+class CountryTestCase(unittest.TestCase):
+
+    def setUp(self):
+        app.config.from_object(TestConfig)
+        self.app = app.test_client()
+
+    def test_country(self):
+        country = {
+            "name": "TestCountry",
+            "continent": 1,
+            "cities": []
+        }
+
+        country = json.dumps(country);
+
+        response = self.app.post('/api/countries', data=country)
+
+        print()
+        print("Test: Post new country")
+        print(response)
+        assert response.status == "200 OK"
+
+        data = json.loads(response.data)
+
+        response = self.app.get('/api/countries/' + str(data['id']))
+        print()
+        print("Test: Get country")
+        print(response)
+        assert response.status == "200 OK"
+        new_country = json.loads(response.data)
+
+        response = self.app.get('/api/countries/' + str(-1))
+        print()
+        print("Test: Wrong country id")
+        print(response)
+        assert response.status[:3] == "403"        
 
 class TourTestCase(unittest.TestCase):
 
