@@ -35,12 +35,11 @@ export default class Comment extends React.Component {
     clickDelete = (e) => { };
 
     render() {
-        console.log(this.props.comment.comment);
         return (
             <Paper style={styles.wrapper}>
                 <Chip style={styles.chip}>
                     <Avatar src={this.props.comment.userPhoto} />
-                    <Link to={"profile/" + this.props.comment.userId}>{this.props.comment.userName}</Link>
+                    <Link to={"/profile/" + this.props.comment.userId}>{this.props.comment.userName}</Link>
                 </Chip>
                 <p style={styles.p}>{this.props.comment.comment}</p>
 
@@ -59,5 +58,3 @@ export default class Comment extends React.Component {
         );
     }
 }
-
-//TODO: PropTypes

@@ -56,8 +56,6 @@ class Continent(enum.Enum):
     NorthAmerica = 6
     SouthAmerica = 7
 
-#TODO(all): Discuss possibility to add continent regions.
-
 
 class Country(db.Model):
     """SQLAlchemy table representing countries.
@@ -120,15 +118,10 @@ class Price(db.Model):
                             primary_key=True)
     amount = db.Column(db.Float, nullable=False)
 
-#TODO(all): Discuss limit_for_children.
-
     def __init__(self, location_id, amount):
         self.location_id = location_id
         self.amount = amount
 
-
-#TODO(all): Discuss the idea to create a new class which would
-#           describe what sort of activity would be done on a location.
 
 class Location(db.Model):
     """SQLAlchemy table representing locations.

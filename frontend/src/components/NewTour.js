@@ -177,7 +177,7 @@ export default class NewTour extends React.Component {
         this.setState({waitForRequest: true});
 
         const {title, description, locations, images, thumbnail, fee} = this.state;
-        console.log(thumbnail);
+
         var locationIds = [];
         locations.forEach((e) => locationIds.push(e.id));
         var imageIds = [];
@@ -192,7 +192,6 @@ export default class NewTour extends React.Component {
             thumbnail: thumbnail.id,
         }
 
-        console.log(tour);
         this.props.insertTour(title, description, fee, locationIds, thumbnail.id, imageIds);
     }
 

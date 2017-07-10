@@ -51,7 +51,6 @@ export function loginUser(email, password) {
             .then(parseJSON)
             .then(data => {
                 try {
-                    console.log(data);
                     dispatch(loginUserSuccess(data));
                     browserHistory.push('/main');
                 } catch (e) {

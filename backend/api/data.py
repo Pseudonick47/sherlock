@@ -1148,18 +1148,6 @@ class FilesAPI(Resource):
 
         return (image_ids)
 
-#TODO(aleksandar=varga): Delete this.
-class ImageAPI(Resource):
-
-    def get(self, oid):
-        image = db.session.query(Image).filter_by(oid=oid).one_or_none()
-        if image:
-            UPLOAD_FOLDER = '../static'
-            return send_from_directory(UPLOAD_FOLDER, image.file_name)
-
-        return ({'success':False,
-                 'message':'Specified image not found'}, 404)
-
 
 class CommentOnTourAPI(Resource):
     def get(self, tour_id):
@@ -1298,6 +1286,7 @@ class RatingAPI(Resource):
 
         return ({'success':False, 'message':'Not JSON'}, 400)
 
+
 api.add_resource(TourListAPI, '/tours')
 api.add_resource(SpecificTourListAPI, '/tours/specific')
 api.add_resource(TourAPI, '/tours/<int:oid>')
@@ -1311,7 +1300,6 @@ api.add_resource(CitiesByCountryAPI, '/country/<int:oid>/cities')
 api.add_resource(CountryListAPI, '/countries')
 api.add_resource(CountryAPI, '/countries/<int:oid>')
 api.add_resource(FilesAPI, '/upload')
-api.add_resource(ImageAPI, '/images/<int:oid>')
 api.add_resource(CommentOnTourAPI, '/comment/<int:tour_id>')
 api.add_resource(CommentAPI, '/comment')
 api.add_resource(RatingAPI, '/rating')

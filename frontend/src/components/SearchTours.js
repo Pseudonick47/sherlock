@@ -47,6 +47,10 @@ export default class SearchTours extends React.Component {
         };
     }
 
+    componentWillMount() {
+        this.props.fetchTours();
+    }
+
     render() {
         return (
             <div>

@@ -8,7 +8,7 @@ def main():
     if len(sys.argv) == 2:
         if (sys.argv[1] == '--db-reset'):
             db_main(drop_all=True)
-        elif (sys.argv[1] == '--db-feed'):
+        elif (sys.argv[1] == '--db-create'):
             db_main()
 
     app.run()
