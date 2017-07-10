@@ -17,7 +17,7 @@ def get_user():
 
 @mod.route("/create_user", methods=["POST"])
 def create_user():
-    incoming = request.get_json()
+    incoming = request.get_json(force=True)
 
     user = User(
         email=incoming["email"],
@@ -43,7 +43,7 @@ def create_user():
 
 @mod.route("/get_token", methods=["POST"])
 def get_token():
-    incoming = request.get_json()
+    incoming = request.get_json(force=True)
     user = User.get_user_with_email_and_password(incoming["email"], incoming["password"])
     if user:
         token = generate_token(user)
@@ -54,7 +54,7 @@ def get_token():
 
 @mod.route("/is_token_valid", methods=["POST"])
 def is_token_valid():
-    incoming = request.get_json()
+    incoming = request.get_json(force=True)
     is_valid = verify_token(incoming["token"])
 
     if is_valid:
