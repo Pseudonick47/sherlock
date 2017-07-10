@@ -1,14 +1,19 @@
 from flask import Flask, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from random import randint
-from config import BaseConfig
 
 app = Flask(__name__, static_folder="./static/dist", template_folder="./static")
+
+
+from config import BaseConfig, TestConfig
+
 app.config.from_object(BaseConfig)
+
+
 db = SQLAlchemy(app)
 
 from models.users import User
-from models.data import City, Continent, Country, Location, Tour, Price, Comment, SpecificTour, Payment, Image
+from models.data import City, Continent, Country, Location, Tour, Price,\
+                        Comment, SpecificTour, Payment, Image
 
 db.create_all()
 db.session.commit()

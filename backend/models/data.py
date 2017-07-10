@@ -200,7 +200,7 @@ class Tour(db.Model):
     name = db.Column(db.Unicode, nullable=False)
     description = db.Column(db.Unicode)
     guide_fee = db.Column(db.Float, nullable=False)
-    thumbnail_id = db.Column(db.ForeignKey('images.id'))
+    thumbnail_id = db.Column(db.ForeignKey('images.id'), default=3)
     locations = db.relationship('Location', secondary=tours_on_locations,
                                 backref='tours')
     images = db.relationship('Image', secondary=images_of_tours)

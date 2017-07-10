@@ -46,15 +46,17 @@ def insert_countries():
     db.session.commit()
 
 
-def main(drop_all=False):
+def main(drop_all=False, insert=False):
     if drop_all:
         db.engine.execute('drop schema if exists public cascade')
         db.engine.execute('create schema public')
 
         db.create_all()
-
+    else:
+        db.create_all()
+    
+    if insert:
         insert_countries()
         insert_default_images()
         insert_cities()
-    else:
-        db.create_all()
+    

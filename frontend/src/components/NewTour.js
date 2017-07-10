@@ -183,16 +183,18 @@ export default class NewTour extends React.Component {
         var imageIds = [];
         images.forEach((e) => imageIds.push(e.id));
 
+        const thumbnailId = thumbnail ? thumbnail.id : 3;
+
         const tour = {
             name: title,
             description: description,
             locations: locationIds,
             guide_fee: fee,
             images: imageIds,
-            thumbnail: thumbnail.id,
+            thumbnail: thumbnailId,
         }
-
-        this.props.insertTour(title, description, fee, locationIds, thumbnail.id, imageIds);
+        
+        this.props.insertTour(title, description, fee, locationIds, thumbnailId, imageIds);
     }
 
     onTitleChanged = (event, value) => {

@@ -1,16 +1,20 @@
 import unittest
+import os
 
-from flask import jsonify, json, request
+from flask import json, request
 
 from app import app, db
-from config import TestConfig
+
 from models.data import Location
 
-class LocationTestCase(unittest.TestCase):
+test_app = app.test_client()
 
-    def setUp(self):
-        app.config.from_object(TestConfig)
-        self.app = app.test_client()
+from dev_database import main as dev_main
+
+dev_main(drop_all=True, insert=True)
+
+
+class LocationTestCase(unittest.TestCase):
 
     def test_location(self):
         location = {
@@ -23,7 +27,7 @@ class LocationTestCase(unittest.TestCase):
 
         location = json.dumps(location);
 
-        response = self.app.post('/api/locations', data=location)
+        response = test_app.post('/api/locations', data=location)
 
         print()
         print("Test: Post new location")
@@ -32,36 +36,32 @@ class LocationTestCase(unittest.TestCase):
 
         data = json.loads(response.data)
 
-        response = self.app.get('/api/locations/' + str(data['id']))
+        response = test_app.get('/api/locations/' + str(data['id']))
         print()
         print("Test: Get location")
         print(response)
         assert response.status == "200 OK"
         new_location = json.loads(response.data)
 
-        response = self.app.get('/api/locations/' + str(-1))
+        response = test_app.get('/api/locations/' + str(-1))
         print()
         print("Test: Wrong location id")
         print(response)
-        assert response.status[:3] == "403"
+        assert response.status[:3] == "404"
 
 class CityTestCase(unittest.TestCase):
-
-    def setUp(self):
-        app.config.from_object(TestConfig)
-        self.app = app.test_client()
 
     def test_city(self):
         city = {
             "name": "TestCity",
             "country_id": 1,
             "thumbnail": 2,
-            "images": [],
+            "images": []
         }
 
         city = json.dumps(city);
 
-        response = self.app.post('/api/cities', data=city)
+        response = test_app.post('/api/cities', data=city)
 
         print()
         print("Test: Post new city")
@@ -70,24 +70,20 @@ class CityTestCase(unittest.TestCase):
 
         data = json.loads(response.data)
 
-        response = self.app.get('/api/cities/' + str(data['id']))
+        response = test_app.get('/api/cities/' + str(data['id']))
         print()
         print("Test: Get city")
         print(response)
         assert response.status == "200 OK"
         new_city = json.loads(response.data)
 
-        response = self.app.get('/api/cities/' + str(-1))
+        response = test_app.get('/api/cities/' + str(-1))
         print()
         print("Test: Wrong city id")
         print(response)
-        assert response.status[:3] == "403"
+        assert response.status[:3] == "404"
 
 class CountryTestCase(unittest.TestCase):
-
-    def setUp(self):
-        app.config.from_object(TestConfig)
-        self.app = app.test_client()
 
     def test_country(self):
         country = {
@@ -98,7 +94,7 @@ class CountryTestCase(unittest.TestCase):
 
         country = json.dumps(country);
 
-        response = self.app.post('/api/countries', data=country)
+        response = test_app.post('/api/countries', data=country)
 
         print()
         print("Test: Post new country")
@@ -107,25 +103,21 @@ class CountryTestCase(unittest.TestCase):
 
         data = json.loads(response.data)
 
-        response = self.app.get('/api/countries/' + str(data['id']))
+        response = test_app.get('/api/countries/' + str(data['id']))
         print()
         print("Test: Get country")
         print(response)
         assert response.status == "200 OK"
         new_country = json.loads(response.data)
 
-        response = self.app.get('/api/countries/' + str(-1))
+        response = test_app.get('/api/countries/' + str(-1))
         print()
         print("Test: Wrong country id")
         print(response)
-        assert response.status[:3] == "403"        
+        assert response.status[:3] == "404"        
+
 
 class TourTestCase(unittest.TestCase):
-
-    def setUp(self):
-        app.config.from_object(TestConfig)
-        self.app = app.test_client()
-
 
     def test_tour(self):
         tour = {
@@ -137,20 +129,21 @@ class TourTestCase(unittest.TestCase):
             "images": [],
         }
 
-        response = self.app.post('/api/tours', data=json.dumps(tour))
+        response = test_app.post('/api/tours', data=json.dumps(tour))
 
         print()
         print("Test: Post new tour")
         print(response)
-        assert response.status == "200 OK"
+        assert response.status[:3] == "200"
 
         data = json.loads(response.data)
 
-        response = self.app.get('/api/tours/' + str(data['id']))
+        response = test_app.get('/api/tours/' + str(data['id']))
         print()
         print("Test: Get tour")
         print(response)
-        assert response.status == "200 OK"
+
+        assert response.status[:3] == "200"
 
         new_tour = json.loads(response.data)
 
@@ -160,13 +153,27 @@ class TourTestCase(unittest.TestCase):
         assert tour['thumbnail'] == new_tour['thumbnail']['id']
         assert tour['locations'] == new_tour['locations']
         assert tour['images'] == new_tour['images']
+        assert not new_tour['rating']
+        assert not new_tour['commentIds']
+
+        response = test_app.get('/api/tours/' + str(-1))
+        
+        print()
+        print("Test: Request tour, invalid id")
+        print(response)
+        assert response.status[:3] == "404"
+
+
+        response = test_app.post('/api/tours', data="lasldl")
+
+        print()
+        print("Test: Post tour, request not JSON")
+        print(response)
+        assert response.status[:3] == "400"
+
+
 
 class RegistrationTestCase(unittest.TestCase):
-
-    def setUp(self):
-        app.config.from_object(TestConfig)
-        self.app = app.test_client()
-
 
     def test_registration(self):
         user = {
@@ -179,13 +186,13 @@ class RegistrationTestCase(unittest.TestCase):
 
         user = json.dumps(user);
 
-        response = self.app.post('/api/create_user', data=user)
+        response = test_app.post('/api/create_user', data=user)
         print()
         print("Test: Register new user")
         print(response)
         assert response.status == "200 OK"
 
-        response = self.app.post('/api/create_user', data=user)
+        response = test_app.post('/api/create_user', data=user)
         print()
         print("Test: Register new user with existing email")
         print(response)
@@ -198,7 +205,7 @@ class RegistrationTestCase(unittest.TestCase):
             "password": "hunter2",
         }
         user = json.dumps(user);
-        response = self.app.post('/api/get_token', data=user)
+        response = test_app.post('/api/get_token', data=user)
         print()
         print("Test: Login")
         print(response)
@@ -206,14 +213,14 @@ class RegistrationTestCase(unittest.TestCase):
 
         t = json.loads(response.data)
         token = {"token": t}
-        response = self.app.post('/api/is_token_valid', data=json.dumps(token))
+        response = test_app.post('/api/is_token_valid', data=json.dumps(token))
         print()
         print("Test: Chech token validity")
         print(response)
         assert response.status == "200 OK"
 
         token = {"token": "invalid token"}
-        response = self.app.post('/api/is_token_valid', data=json.dumps(token))
+        response = test_app.post('/api/is_token_valid', data=json.dumps(token))
         print()
         print("Test: Chech token validity (invalid)")
         print(response)
@@ -224,15 +231,16 @@ class RegistrationTestCase(unittest.TestCase):
             "password": "wrong password",
         }
         user = json.dumps(user);
-        response = self.app.post('/api/get_token', data=user)
+        response = test_app.post('/api/get_token', data=user)
         print()
         print("Test: Login user with wrong password")
         print(response)
         assert response.status[:3] == "403"
->>>>>>> master
+
 
 def main():
     unittest.main()
+
 
 if __name__ == '__main__':
     main()
