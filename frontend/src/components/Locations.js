@@ -13,7 +13,7 @@ const style = {
     alignContent: "flex-start",
     width: 1000,
     maxWidth: "100%",
-    overflow: "scroll",
+    overflow: "auto",
     height: 150,
 };
 
