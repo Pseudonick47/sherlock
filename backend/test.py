@@ -23,19 +23,24 @@ class TourTestCase(unittest.TestCase):
             "images": [],
         }
 
-        tour = json.dumps(tour);
-
-        response = self.app.post('/api/tours', data=tour)
+        response = self.app.post('/api/tours', data=json.dumps(tour))
 
         assert response.status == "200 OK"
 
         data = json.loads(response.data)
 
         response = self.app.get('/api/tours/' + str(data['id']))
-        print(response)
+
         assert response.status == "200 OK"
         
         new_tour = json.loads(response.data)
+
+        assert tour['name'] == new_tour['name']
+        assert tour['description'] == new_tour['description']
+        assert tour['guide_fee'] == new_tour['guide_fee']
+        assert tour['thumbnail'] == new_tour['thumbnail']['id']
+        assert tour['locations'] == new_tour['locations']
+        assert tour['images'] == new_tour['images']
 
 
 def main():
