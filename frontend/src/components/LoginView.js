@@ -1,18 +1,23 @@
 /* eslint camelcase: 0, no-underscore-dangle: 0 */
 
 import React from 'react';
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
+
 import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+
 import * as actionCreators from '../actions/auth';
+
 import { validateEmail } from '../utils/misc';
+
 
 function mapStateToProps(state) {
     return {
         isAuthenticating: state.auth.isAuthenticating,
-        statusText: state.auth.statusText,
+        statusText: state.auth.loginStatusText,
     };
 }
 

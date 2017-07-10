@@ -2,16 +2,32 @@ from functools import wraps
 from flask import Flask,request, g, jsonify
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired, BadSignature
-from app import app
+from app import app, db
+from models.data import Image
 
 TWO_WEEKS = 1209600
 
 
 def generate_token(user, expiration=TWO_WEEKS):
     s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+
+    image = db.session.query(Image).filter_by(oid=user.image).one()
+
     token = s.dumps({
-        'id': user.id,
+        'biography': user.biography,
+        'dateOfBirth': user.dateOfBirth,
         'email': user.email,
+        'id': user.id,
+        'image': {
+            'id': image.oid,
+            'src': 'http://localhost:5000/static/' + image.file_name,
+            'width': image.width,
+            'height': image.height,
+            'alt': 'image'
+        },
+        'name': user.first_name,
+        'role': user.role,
+        'surname': user.surname,
     }).decode('utf-8')
     return token
 

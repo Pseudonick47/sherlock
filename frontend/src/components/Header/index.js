@@ -1,27 +1,26 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { browserHistory } from 'react-router';
+
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+
 import AppBar from 'material-ui/AppBar';
+import Divider from 'material-ui/Divider';
+import FlatButton from 'material-ui/FlatButton';
 import LeftNav from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import FlatButton from 'material-ui/FlatButton';
-import Divider from 'material-ui/Divider';
 
 import * as authActions from '../../actions/auth';
 import * as componentActions from '../../actions/components';
-
 
 const actionCreators = Object.assign({}, authActions, componentActions);
 
 
 function mapStateToProps(state) {
     return {
-        token: state.auth.token,
-        userName: state.auth.userName,
         isAuthenticated: state.auth.isAuthenticated,
+        leftNavDisplayed: state.components.isDisplayed,
         user: state.auth.user,
-        leftNavDisplayed: state.components.leftNavDisplayed,
     };
 }
 
@@ -30,7 +29,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 @connect(mapStateToProps, mapDispatchToProps)
-export class Header extends Component {
+export class Header extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -61,15 +60,15 @@ export class Header extends Component {
                 <LeftNav open={this.props.leftNavDisplayed}>
                     {
                         !this.props.isAuthenticated ?
-                            <div>
-                                <MenuItem onClick={() => this.dispatchNewRoute('/login')}>
-                                    Login
-                                </MenuItem>
-                                <MenuItem onClick={() => this.dispatchNewRoute('/register')}>
-                                    Register
-                                </MenuItem>
-                            </div>
-                            : ""
+                        <div>
+                            <MenuItem onClick={() => this.dispatchNewRoute('/login')}>
+                                Login
+                            </MenuItem>
+                            <MenuItem onClick={() => this.dispatchNewRoute('/register')}>
+                                Register
+                            </MenuItem>
+                        </div>
+                        : ""
                     }
                     {
                         <div>
@@ -82,39 +81,39 @@ export class Header extends Component {
                         </div>
                     }
                     {
-                            this.props.isAuthenticated ? this.props.user.role == "guide" ?
-                            <div>
-                                <MenuItem onClick={() => this.dispatchNewRoute('/new_tour')}>
-                                    New Tour
-                                </MenuItem>
-                                <Divider />
-	                              <MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
-                                    ProfileView
-                                </MenuItem>
-				                        <Divider />
-                                <MenuItem onClick={(e) => this.logout(e)}>
-                                    Logout
-                                </MenuItem>
-                            </div>
-                            :
-                            <div>
-                                <Divider />
-	                              <MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
-                                    ProfileView
-                                </MenuItem>
-				                        <Divider />
-                                <MenuItem onClick={(e) => this.logout(e)}>
-                                    Logout
-                                </MenuItem>
-                            </div>
-                            : ""
+                        this.props.isAuthenticated ? this.props.user.role == "guide" ?
+                        <div>
+                            <MenuItem onClick={() => this.dispatchNewRoute('/tour/new')}>
+                                New Tour
+                            </MenuItem>
+                            <Divider />
+                                <MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
+                                ProfileView
+                            </MenuItem>
+                                    <Divider />
+                            <MenuItem onClick={(e) => this.logout(e)}>
+                                Logout
+                            </MenuItem>
+                        </div>
+                        :
+                        <div>
+                            <Divider />
+                                <MenuItem onClick={() => this.dispatchNewRoute('/profile')}>
+                                ProfileView
+                            </MenuItem>
+                                    <Divider />
+                            <MenuItem onClick={(e) => this.logout(e)}>
+                                Logout
+                            </MenuItem>
+                        </div>
+                        : ""
                     }
                 </LeftNav>
                 <AppBar
-                  title="Sherlock"
-                  onLeftIconButtonTouchTap={() => this.openNav()}
-                  iconElementRight={
-                      <FlatButton label="Home" onClick={() => this.dispatchNewRoute('/')} />
+                    title="Sherlock"
+                    onLeftIconButtonTouchTap={() => this.openNav()}
+                    iconElementRight={
+                        <FlatButton label="Home" onClick={() => this.dispatchNewRoute('/')} />
                     }
                 />
             </header>
@@ -124,7 +123,6 @@ export class Header extends Component {
 }
 
 Header.propTypes = {
-    logoutAndRedirect: React.PropTypes.func,
     isAuthenticated: React.PropTypes.bool,
     leftNavDisplayed: React.PropTypes.bool,
     leftNavToggle: React.PropTypes.func,

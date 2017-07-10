@@ -1,5 +1,5 @@
 node_modules/
-
+ 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -100,8 +100,10 @@ ENV/
 # mypy
 .mypy_cache/
 
+
 # upload files
-static/
+static/*
+
 !static/city.jpg
 !static/location.png
 !static/profile.jpg
@@ -109,3 +111,6 @@ static/
 
 # vscode
 .vscode/
+
+# vim files
+.*.swp

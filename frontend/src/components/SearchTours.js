@@ -1,21 +1,25 @@
-/* eslint camelcase: 0, no-underscore-dangle: 0 */
-
 import React from 'react';
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
+
 import Paper from 'material-ui/Paper';
-import * as actionCreators from '../actions/auth';
-import { validateEmail } from '../utils/misc';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+
 import SearchBar from 'material-ui-search-bar' 
 
 import Tours from './Tours';
 
+import * as actionCreators from '../actions/data/tours';
+
+import { validateEmail } from '../utils/misc';
+
+
 function mapStateToProps(state) {
     return {
-        tours: state.auth.tours,
-        isLoading: state.auth.isLoading,
+        isFetching: state.data.tours.isFetching,
+        tours: state.data.tours.data,
     };
 }
 
@@ -43,12 +47,16 @@ export default class SearchTours extends React.Component {
         };
     }
 
+    componentWillMount() {
+        this.props.fetchTours();
+    }
+
     render() {
         return (
             <div>
                 <SearchBar
-                    onChange={this.props.searchTours}
-                    onRequestSearch={this.props.searchTours}
+                    onChange={this.props.fetchTours}
+                    onRequestSearch={this.props.fetchTours}
                     style={{
                         margin: '0 auto',
                         maxWidth: 800,
@@ -62,7 +70,7 @@ export default class SearchTours extends React.Component {
 }
 
 SearchTours.propTypes = {
-    tours: React.PropTypes.array,
+    fetchTours: React.PropTypes.func,
     searchTerm: React.PropTypes.string,
-    searchTours: React.PropTypes.func,
+    tours: React.PropTypes.array,
 };

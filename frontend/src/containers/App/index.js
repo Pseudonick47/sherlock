@@ -17,7 +17,7 @@ import * as actionCreators from '../../actions/components';
 
 function mapStateToProps(state) {
     return {
-        leftNavDisplayed: state.components.leftNavDisplayed,
+        leftNavDisplayed: state.components.isDisplayed,
     };
 }
 

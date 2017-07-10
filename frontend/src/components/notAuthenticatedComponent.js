@@ -6,9 +6,9 @@ import * as actionCreators from '../actions/auth';
 
 function mapStateToProps(state) {
     return {
-        token: state.auth.token,
-        userName: state.auth.userName,
         isAuthenticated: state.auth.isAuthenticated,
+        token: state.auth.token,
+        user: state.auth.user,
     };
 }
 
@@ -43,7 +43,7 @@ export function requireNoAuthentication(Component) {
             } else {
                 const token = localStorage.getItem('token');
                 if (token) {
-                    fetch('api/is_token_valid', {
+                    fetch('/api/is_token_valid', {
                         method: 'post',
                         credentials: 'include',
                         headers: {
@@ -62,7 +62,8 @@ export function requireNoAuthentication(Component) {
                                     loaded: true,
                                 });
                             }
-                        });
+                        })
+                        .catch(error => alert(error));
                 } else {
                     this.setState({
                         loaded: true,
@@ -85,8 +86,9 @@ export function requireNoAuthentication(Component) {
     }
 
     notAuthenticatedComponent.propTypes = {
-        loginUserSuccess: React.PropTypes.func,
         isAuthenticated: React.PropTypes.bool,
+        loginUserSuccess: React.PropTypes.func,
+        token: React.PropTypes.string,
     };
 
     return connect(mapStateToProps, mapDispatchToProps)(notAuthenticatedComponent);

@@ -4,29 +4,32 @@ import {browserHistory} from 'react-router';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { Step, Stepper, StepLabel} from 'material-ui/Stepper';
-import { List, ListItem } from 'material-ui/List';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
-import NumberInput from 'material-ui-number-input';
+import Dialog from 'material-ui/Dialog';
 import Divider from 'material-ui/Divider';
-import Paper from 'material-ui/Paper';
-import Locations from './Locations';
+import FlatButton from 'material-ui/FlatButton';
 import Gallery from 'react-photo-gallery';
 import Lightbox from 'react-images';
-import PropTypes from 'prop-types';
-import AddLocations from './Dialogs/AddLocations';
-import FileUpload from './FileUpload';
-import Dialog from 'material-ui/Dialog';
+import { List, ListItem } from 'material-ui/List';
+import Locations from './Locations';
+import NumberInput from 'material-ui-number-input';
+import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
+import { Step, StepLabel, Stepper } from 'material-ui/Stepper';
+import TextField from 'material-ui/TextField';
 
-import * as actionCreators from '../actions/data'
+import PropTypes from 'prop-types';
+
+import ChooseLocationsDialog from './Dialogs/ChooseLocationsDialog';
+import FileUpload from './FileUpload';
+
+import * as actionCreators from '../actions/data/tours';
+
 
 function mapStateToProps(state) {
     return {
-        insertError: state.data.insertError,
-        message: state.data.message,
-        id: state.data.tourId,
+        id: state.data.tours.id,
+        insertError: state.data.tours.insertError,
+        insertErrorMessage: state.data.tours.insertErrorMessage,
     };
 }
 
@@ -35,28 +38,28 @@ function mapDispatchToProps(dispatch) {
 }
 
 @connect(mapStateToProps, mapDispatchToProps)
-export default class AddTour extends React.Component {
+export default class NewTour extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            title: '',
-            titleError: null,
+            chooseLocationsDialogOpen: false,
+            currentPhoto: 1,
             description: '',
+            fee: 0,
             finished: false,
             stepIndex: 0,
             locations: [],
+            locationsDisplay: [],
             locationsError: 'To add some locations click on the button below..',
-            locationDisplay: [],
+            images: [],
             isLigthboxOpen: false,
-            currentPhoto: 1,
-            addLocationsDialogOpen: false,
-            photos: [],
             thumbnail: null,
-            uploadDialogOpen: false,
             thumbnailDialogOpen: false,
+            title: '',
+            titleError: null,
+            uploadDialogOpen: false,
             waitForRequest: false,
-            fee: 0,
         };
     };
 
@@ -81,7 +84,9 @@ export default class AddTour extends React.Component {
         }
         else if (stepIndex === 1) {
             if (locations.length == 0) {
-                this.setState({locationsError: <font color="red">At least one location should be added!</font>});
+                this.setState({
+                    locationsError: <font color="red">At least one location should be added!</font>
+                });
             } else {
                 this.setState({
                     stepIndex: stepIndex + 1,
@@ -120,7 +125,7 @@ export default class AddTour extends React.Component {
 
     openLightbox = (index, event) => {
         event.preventDefault();
-        this.setState({ isLigthboxOpen: true, currentPhoto: index });
+        this.setState({isLigthboxOpen: true, currentPhoto: index});
     }
 
     closeLightbox = () => this.setState({ 
@@ -135,22 +140,24 @@ export default class AddTour extends React.Component {
         currentPhoto: this.state.currentPhoto - 1 
     });
 
-    onAddLocationsCancel = () => this.setState({addLocationsDialogOpen: false});
-    onAddLocationsSubmit = (locations) => {
+    onChooseLocationsCancel = () => this.setState({chooseLocationsDialogOpen: false});
+    
+    onChooseLocationsSubmit = (locations) => {
         var locs = this.state.locations;
         locations.forEach((e) => locs.push(e))
         this.setState({
             locations: locs,
-            addLocationsDialogOpen: false
+            chooseLocationsDialogOpen: false
         });
     }
+
     thumbnailUploaded = (images) => this.setState({
         thumbnail: images[0],
         thumbnailDialogOpen: false,
     });
 
     imagesUploaded = (images) => {
-        var photos = this.state.photos;
+        var photos = this.state.images;
         images.forEach((image) => photos.push(image));
         this.setState({photos: photos, uploadDialogOpen: false});
     }
@@ -169,24 +176,23 @@ export default class AddTour extends React.Component {
     onSubmit = () => {
         this.setState({waitForRequest: true});
 
-        const {title, description, locations, photos, thumbnail, fee} = this.state;
-        console.log(thumbnail);
+        const {title, description, locations, images, thumbnail, fee} = this.state;
+
         var locationIds = [];
         locations.forEach((e) => locationIds.push(e.id));
-        var photoIds = [];
-        photos.forEach((e) => photoIds.push(e.id));
+        var imageIds = [];
+        images.forEach((e) => imageIds.push(e.id));
 
         const tour = {
             name: title,
             description: description,
             locations: locationIds,
             guide_fee: fee,
-            images: photoIds,
+            images: imageIds,
             thumbnail: thumbnail.id,
         }
 
-        console.log(tour);
-        this.props.insertTour(title, description, fee, locationIds, thumbnail.id, photoIds);
+        this.props.insertTour(title, description, fee, locationIds, thumbnail.id, imageIds);
     }
 
     onTitleChanged = (event, value) => {
@@ -279,16 +285,16 @@ export default class AddTour extends React.Component {
                     <RaisedButton
                         style={{margin: "10 10 15 20"}}
                         label="Add locations"
-                        onTouchTap={() => this.setState({addLocationsDialogOpen: true})}
+                        onTouchTap={() => this.setState({chooseLocationsDialogOpen: true})}
                     />
                     <RaisedButton
                         style={{margin: "10 10 15 20"}}
                         label="Remove locations"
                     />
-                    {this.state.addLocationsDialogOpen ?
-                        <AddLocations
-                            cancel={this.onAddLocationsCancel}
-                            submit={this.onAddLocationsSubmit}
+                    {this.state.chooseLocationsDialogOpen ?
+                        <ChooseLocationsDialog
+                            cancel={this.onChooseLocationsCancel}
+                            submit={this.onChooseLocationsSubmit}
                         />
                     : "" }
                 </div>
@@ -298,12 +304,12 @@ export default class AddTour extends React.Component {
                 <div>
                     <div style={{marginTop: 20, marginBottom: 20}}>
                         <Gallery 
-                            photos={this.state.photos}
+                            photos={this.state.images}
                             onClickPhoto={this.openLightbox}
                         />
                     </div>
                     <Lightbox
-                        images={this.state.photos}
+                        images={this.state.images}
                         isOpen={this.state.isLigthboxOpen}
                         onClose={this.closeLightbox}
                         onClickNext={this.nextPhoto}
@@ -425,9 +431,9 @@ export default class AddTour extends React.Component {
     }
 }
 
-AddTour.propTypes = {
+NewTour.propTypes = {
+    id: React.PropTypes.number,
     insertTour: React.PropTypes.func,
     insertError: React.PropTypes.bool,
-    message: React.PropTypes.string,
-    id: React.PropTypes.number,
+    insertErrorMessage: React.PropTypes.string,
 };

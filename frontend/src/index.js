@@ -20,9 +20,9 @@ ReactDOM.render(
     <Provider store={store}>
         <Router history={history} >
             <Redirect from="/" to="main" />
-            <Redirect from="/tour" to="tours" /> 
+            <Redirect from="/tour" to="tours" />
             {routes}
-        </Router>    
+        </Router>
     </Provider>,
     document.getElementById('root')
 );

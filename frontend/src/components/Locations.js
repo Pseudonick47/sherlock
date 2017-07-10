@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Location from './Location';
 
 
@@ -12,13 +13,15 @@ const style = {
     alignContent: "flex-start",
     width: 1000,
     maxWidth: "100%",
+    overflow: "auto",
+    height: 150,
 };
 
 export default class Locations extends React.Component {
 
     constructor() {
         super();
-    
+
         this.state = {
             locations: [],
             selectedLocations: [],
@@ -29,8 +32,8 @@ export default class Locations extends React.Component {
         var locations = [];
         this.props.data.forEach((location) => {
             locations.push(
-                <Location 
-                    data={location} 
+                <Location
+                    data={location}
                     select={this.onLocationSelected}
                     deselect={this.onLocationDeselected}
                     showButton={true}
@@ -38,7 +41,9 @@ export default class Locations extends React.Component {
             );
         });
 
-        this.setState({locations: locations});
+        this.setState({
+            locations: locations,
+        });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -46,8 +51,8 @@ export default class Locations extends React.Component {
             var locations = [];
             nextProps.data.forEach((location) => {
                 locations.push(
-                    <Location 
-                        data={location} 
+                    <Location
+                        data={location}
                         select={this.onLocationSelected}
                         deselect={this.onLocationDeselected}
                         showButton={true}
@@ -56,27 +61,34 @@ export default class Locations extends React.Component {
                 );
             });
 
-            this.setState({locations: locations});
+            this.setState({
+                locations: locations,
+            });
         }
     }
 
     onLocationSelected = (location) => {
         var locations = this.state.selectedLocations;
         locations.push(location);
-        this.setState({selectedLocations: locations});
-    
+
+        this.setState({
+            selectedLocations: locations,
+        });
+
         this.props.selectionChanged(locations);
     }
 
     onLocationDeselected = (location) => {
         var locations = this.state.selectedLocations;
-        
+
         const index = locations.indexOf(location);
         if (index != -1) {
             locations.splice(index, 1);
         }
 
-        this.setState({selectedLocations: locations});
+        this.setState({
+            selectedLocations: locations,
+        });
 
         this.props.selectionChanged(locations);
     }
@@ -84,8 +96,14 @@ export default class Locations extends React.Component {
     render() {
         return (
             <div style={style}>
-                {this.state.locations}       
+                {this.state.locations}
             </div>
         );
     }
+}
+
+Locations.PropTypes = {
+    actionType: React.PropTypes.string,
+    data: React.PropTypes.array,
+    selectionChanged: React.PropTypes.func,
 }

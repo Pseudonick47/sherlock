@@ -1,21 +1,24 @@
 /* eslint camelcase: 0, no-underscore-dangle: 0 */
 
-import React, { Component } from 'react';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import Dropzone from 'react-dropzone';
-import FontIcon from 'material-ui/FontIcon';
-import { blue500, red500, greenA200 } from 'material-ui/styles/colors';
-import RaisedButton from 'material-ui/RaisedButton';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import * as actionCreators from '../actions/data'
+import React from 'react';
+
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
+import { blue500, red500, greenA200 } from 'material-ui/styles/colors';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import FontIcon from 'material-ui/FontIcon';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import RaisedButton from 'material-ui/RaisedButton';
+
+import Dropzone from 'react-dropzone';
+
+import * as actionCreators from '../actions/util'
+
+
 function mapStateToProps(state) {
     return {
-        isUploaded: state.data.isUploaded,
-        imageIds: state.data.imageIds,
     };
 }
 
@@ -31,7 +34,7 @@ export default class FileUpload extends React.Component {
         this.state = {
             filesPreview: [],
             filesToBeSent: [],
-            printcount: 10,
+            printCount: 10,
         };
     }
 
@@ -81,4 +84,8 @@ export default class FileUpload extends React.Component {
             </div>
         );
     }
+}
+
+FileUpload.PropTypes = {
+    fileUpload: React.PropTypes.func,
 }

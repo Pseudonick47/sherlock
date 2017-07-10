@@ -1,38 +1,41 @@
 import React from 'react';
 
-
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
 import AutoComplete from 'material-ui/AutoComplete';
-import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
-import Divider from 'material-ui/Divider';
-import {Table, TableBody, TableRowColumn} from 'material-ui/Table';
 import {Card, CardHeader, CardText} from 'material-ui/Card';
+import Dialog from 'material-ui/Dialog';
+import Divider from 'material-ui/Divider';
+import FlatButton from 'material-ui/FlatButton';
+import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
+import {Table, TableBody, TableRowColumn} from 'material-ui/Table';
+import TextField from 'material-ui/TextField';
 
 import FileUpload from '../FileUpload';
-
-import * as actionCreators from '../../actions/data'
-
+import Locations from '../Locations';
 import NewCityDialog from './NewCityDialog';
 import NewLocationDialog from './NewLocationDialog';
-import Locations from '../Locations';
+
+import * as citiesActions from '../../actions/data/citiesByCountry';
+import * as countriesActions from '../../actions/data/countries';
+import * as locationsActions from '../../actions/data/locations';
+
+const actionCreators = Object.assign({}, citiesActions, countriesActions, locationsActions);
+
 
 function mapStateToProps(state) {
     return {
-        countries: state.data.countries,
-        countriesError: state.data.countriesError,
-        fetchingCountries: state.data.fetchingCountries,
-        citiesByCountry: state.data.citiesByCountry,
-        citiesByCountryError: state.data.citiesByCountryError,
-        fetchingCitiesByCountry: state.data.fetchingCitiesByCountry,
-        locationsByCity: state.data.locationsByCity,
-        locationsByCityError: state.data.locationsByCityError,
-        fetchingLocationsByCity: state.data.fetchingLocationsByCity,
+        citiesByCountry: state.data.citiesByCountry.data,
+        citiesByCountryError: state.data.citiesByCountry.fetchErrorMessage,
+        countries: state.data.countries.data,
+        countriesError: state.data.countries.fetchErrorMessage,
+        fetchingCitiesByCountry: state.data.citiesByCountry.isFetching,
+        fetchingCountries: state.data.countries.isFetching,
+        fetchingLocations: state.data.locations.isFetching,
+        locations: state.data.locations.data,
+        locationsError: state.data.locations.fetchErrorMessage,
     };
 }
 
@@ -41,25 +44,24 @@ function mapDispatchToProps(dispatch) {
 }
 
 @connect(mapStateToProps, mapDispatchToProps)
-export default class AddLocations extends React.Component {
+export default class ChooseLocationsDialog extends React.Component {
 
     constructor() {
         super();
 
         this.state = {
-            open: false,
-            country: null,
-            countryNames: [],
-            countryError: '',
-            city: null,
             cities: [],
-            cityNames: [],
+            city: null,
             cityError: '',
-            newCityName: null,
+            cityNames: [],
+            country: null,
+            countryError: '',
+            countryNames: [],
             locations: [],
-            // locationsDisplay: [],
+            newCityName: null,
             newCityOpen: false,
             newLocationOpen: false,
+            open: false,
             selectedLocations: [],
         }
     }
@@ -87,9 +89,9 @@ export default class AddLocations extends React.Component {
             });
             this.setState({cityNames: c, cities: nextProps.citiesByCountry});
         }
-        if(this.props.locationsByCity != nextProps.locationsByCity) {
+        if(this.props.locations != nextProps.locations) {
             var locations = [];
-            nextProps.locationsByCity.forEach((location) => {
+            nextProps.locations.forEach((location) => {
                 locations.push(location);
             });
             this.setState({locations: locations,});
@@ -110,7 +112,7 @@ export default class AddLocations extends React.Component {
     }
 
     fetchLocations(id) {
-        this.props.fetchLocationsByCity(id);
+        this.props.fetchLocations(id);
     }
 
     onCountryRequest = (value, index) => {
@@ -120,13 +122,13 @@ export default class AddLocations extends React.Component {
         if (index != -1) {
             const country = this.props.countries[index];
             this.setState({
-                country: country, 
-                cities: [], 
+                country: country,
+                cities: [],
                 locations: [],
-                countryError: '',    
+                countryError: '',
             });
             this.fetchCities(country.id);
-        } 
+        }
         else {
             this.setState({countryError: 'Country doesn\'t exist!'})
         }
@@ -139,7 +141,7 @@ export default class AddLocations extends React.Component {
             if (index != -1) {
             const city = this.state.cities[index];
             this.setState({
-                city: city, 
+                city: city,
                 cityError: '',
                 locations: [],
             });
@@ -193,7 +195,7 @@ export default class AddLocations extends React.Component {
     onSubmit = () => this.props.submit(this.state.selectedLocations);
 
     render() {
-        const { 
+        const {
             fetchingCountries,
             countriesError,
             fetchingCities,
@@ -216,6 +218,12 @@ export default class AddLocations extends React.Component {
                 primary
                 keyboardFocused
                 onTouchTap={this.onSubmit}
+            />,
+            <RaisedButton
+                label="Add new location"
+                style={{margin: "15 0 10 20"}}
+                onTouchTap={() => this.setState({newLocationOpen: true})}
+                disabled={this.state.city ? false : true}
             />
         ]
 
@@ -224,20 +232,10 @@ export default class AddLocations extends React.Component {
                 actions={actions}
                 modal
                 open={this.state.open}
-                style={{height: "100%"}}
             >
-            <div style={{overflow: "auto"}}> 
+            <div style={{overflow: "auto"}}>
                 <h1 style={{padding: 40, marginTop: 20}}>What would you like them to visit?</h1>
-                <p style={{padding: 20,}}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                    Sed pretium lacus felis, ut condimentum massa ornare id. 
-                    Vivamus laoreet tortor eu justo posuere dictum. 
-                    Etiam risus diam, laoreet vel lacus sit amet, ultricies 
-                    tincidunt ipsum. Pellentesque sodales enim ligula, quis 
-                    iaculis ipsum eleifend et. Integer ornare tincidunt 
-                    hendrerit. Curabitur ullamcorper ac eros sit amet euismod. 
-                </p>
-                <AutoComplete 
+                <AutoComplete
                     hintText={fetchingCountries ? "Loading countries.." : "Countries"}
                     errorText={
                         countriesError ? "Oops, something went wrong! Please try reloading the page." :
@@ -247,10 +245,10 @@ export default class AddLocations extends React.Component {
                     style={{width: "80%", margin: "20 0 5 20",}}
                     onNewRequest={this.onCountryRequest}
                 />
-                <AutoComplete 
+                <AutoComplete
                     hintText={fetchingCities ? "Loading cities.." : "Cities"}
                     errorText={
-                        citiesError ? "Oops, something went wrong! Please try reloading the page." : 
+                        citiesError ? "Oops, something went wrong! Please try reloading the page." :
                         this.state.cityError
                     }
                     disabled={this.state.cityNames.length ? false : true}
@@ -259,42 +257,38 @@ export default class AddLocations extends React.Component {
                     onNewRequest={this.onCityRequest}
                     defaultValue={this.state.city ? this.state.city.name : ""}
                 />
-                <RaisedButton 
+                <RaisedButton
                     label="Add new city"
                     style={{float: "right", margin: "5 20 20 0",}}
                     onTouchTap={() => this.setState({newCityOpen: true})}
                     disabled={this.state.country ? false : true}
                 />
                 <Divider />
-                {this.state.locations.length ? "" : 
+                {this.state.locations.length ? "" :
                     <h4 style={{padding: "5 20 0 20"}}>Please select country and city..</h4>
                 }
-                <Locations 
-                    data={this.state.locations} 
-                    selectionChanged={(selectedLocations) => this.setState({selectedLocations: selectedLocations})}
-                    actionType="add"
-                />
-                <Divider />
-                <RaisedButton 
-                    label="Add new location"
-                    style={{margin: "15 0 10 20"}}
-                    onTouchTap={() => this.setState({newLocationOpen: true})}
-                    disabled={this.state.city ? false : true}
-                />
+                <div style={{overflow: "hidden",  maxHeigth:"400",}}>
+                    <Locations
+                        data={this.state.locations}
+                        selectionChanged={(selectedLocations) => this.setState({selectedLocations: selectedLocations})}
+                        actionType="add"
+                    />
+                    <Divider />
+                </div>
             </div>
-            {newCityOpen ? 
-                <NewCityDialog 
-                    cancel={this.onNewCityCancel} 
-                    submit={this.onNewCitySubmit} 
-                    country={this.state.country} 
+            {newCityOpen ?
+                <NewCityDialog
+                    cancel={this.onNewCityCancel}
+                    submit={this.onNewCitySubmit}
+                    country={this.state.country}
                 />
             : "" }
             {newLocationOpen ?
-                <NewLocationDialog 
-                    cancel={this.onNewLocationCancel} 
-                    submit={this.onNewLocationSubmit} 
+                <NewLocationDialog
+                    cancel={this.onNewLocationCancel}
+                    submit={this.onNewLocationSubmit}
                     country={this.state.country}
-                    city={this.state.city} 
+                    city={this.state.city}
                 />
             : ""}
             </Dialog>
@@ -302,16 +296,16 @@ export default class AddLocations extends React.Component {
     }
 }
 
-AddLocations.propTypes = {
+ChooseLocationsDialog.propTypes = {
     cancel: React.PropTypes.func,
-    submit: React.PropTypes.func,
-    fetchCountries: React.PropTypes.func,
-    fetchCitiesByCountry: React.PropTypes.func,
-    fetchLocationsByCity: React.PropTypes.func,
-    countries: React.PropTypes.array,
-    countriesError: React.PropTypes.bool,
-    fetchingCountries: React.PropTypes.bool,
     citiesByCountry: React.PropTypes.array,
     citiesByCountryError: React.PropTypes.bool,
-    fetchingCitiesByCountry: React.PropTypes.bool,
+    countries: React.PropTypes.array,
+    countriesError: React.PropTypes.bool,
+    fetchCitiesByCountry: React.PropTypes.func,
+    fetchCountries: React.PropTypes.func,
+    fetchLocations: React.PropTypes.func,
+    locations: React.PropTypes.array,
+    locationsError: React.PropTypes.bool,
+    submit: React.PropTypes.func,
 }

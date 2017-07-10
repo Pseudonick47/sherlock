@@ -1,5 +1,5 @@
 import {
-    FETCH_PROTECTED_DATA_REQUEST, 
+    FETCH_PROTECTED_DATA_REQUEST,
     RECEIVE_PROTECTED_DATA,
     FETCH_COUNTRIES_REQUEST,
     FETCH_COUNTRIES_FAILED,
@@ -22,26 +22,19 @@ import {
     INSERT_TOUR_FAILED,
     RECEIVE_TOURS,
     FETCH_TOURS_REQUEST,
-    FETCH_TOURS_FAILED,
-    INSERT_SPECIFIC_TOUR_SUCCEEDED,
-    INSERT_SPECIFIC_TOUR_FAILED,
-    RECEIVE_SPECIFIC_TOURS,
-    FETCH_SPECIFIC_TOURS_REQUEST,
-    FETCH_SPECIFIC_TOURS_FAILED,
+    FETCH_TOURS_FAILED
 } from '../constants/index';
 import { parseJSON } from '../utils/misc';
-import { 
-    data_about_user, 
-    get_countries, 
-    get_cities, 
+import {
+    data_about_user,
+    get_countries,
+    get_cities,
     get_cities_by_country,
     get_locations_by_city,
-    post_city, 
+    post_city,
     post_location,
     upload_file,
     post_tour,
-    post_specific_tour,
-    get_specific_tours,
 } from '../utils/http_functions';
 import { logoutAndRedirect } from './auth';
 
@@ -272,7 +265,6 @@ export function insertTourFailed(message) {
 }
 
 export function insertTour(name, description, guide_fee, locations, thumbnail, photos) {
-    alert("here");
     return (dispatch) => {
         post_tour(name, description, guide_fee, locations, thumbnail, photos)
             .then(response => {
@@ -294,9 +286,9 @@ export function fileUploadSuccess(response) {
     };
 }
 
-export function fileUpload(fileList, callback) { 
+export function fileUpload(fileList, callback) {
     return (dispatch) => {
-        upload_file(fileList)    
+        upload_file(fileList)
             .then(parseJSON)
             .then(callback)
             .catch(error => {
@@ -305,95 +297,3 @@ export function fileUpload(fileList, callback) {
     };
 }
 
-export function receiveSpecificTour(data) {
-    return {
-        type: RECEIVE_SPECIFIC_TOURS,
-        payload: data,
-    };
-}
-
-export function fetchSpecificTourFailed() {
-    return {
-        type: FETCH_SPECIFIC_TOURS_FAILED,
-    };
-}
-
-export function fetchSpecificTourRequest() {
-    return {
-        type: FETCH_SPECIFIC_TOURS_REQUEST,
-    };
-}
-
-export function fetchSpecificTour(specific_tour_id) {
-    return (dispatch) => {
-        dispatch(fetchSpecificTourRequest());
-        get_specific_tour(specific_tour_id)
-            .then(response => {
-                dispatch(receiveSpecificTour(response.data));
-            })
-            .catch(error => {
-                dispatch(fetchSpecificTourFailed());
-            });
-    };
-}
-
-export function insertSpecificTourSucceeded(id) {
-    return {
-        type: INSERT_SPECIFIC_TOUR_SUCCEEDED,
-        payload: id,
-    };
-}
-
-
-export function insertSpecificTourFailed(message) {
-    return {
-        type: INSERT_SPECIFIC_TOUR_FAILED,
-        payload: message,
-    };
-}
-
-
-export function insertSpecificTour(specificTour) {
-    return (dispatch) => {
-        post_specific_tour(specificTour)
-            .then(response => {
-                dispatch(insertSpecificTourSucceeded(response.data.id));
-            })
-            .catch(error => {
-                dispatch(insertSpecificTourFailed('Specific tour insertion failed!'));
-            });
-    };
-}
-
-export function receiveSpecificTours(data) {
-    return {
-        type: RECEIVE_SPECIFIC_TOURS,
-        payload: data,
-    };
-}
-
-export function fetchSpecificToursFailed(message) {
-    return {
-        type: FETCH_SPECIFIC_TOURS_FAILED,
-        payload: message,
-    };
-}
-
-export function fetchSpecificToursRequest() {
-    return {
-        type: FETCH_SPECIFIC_TOURS_REQUEST,
-    };
-}
-
-export function fetchSpecificTours(tourId) {
-    return (dispatch) => {
-        dispatch(fetchSpecificToursRequest());
-        get_specific_tours(tourId)
-            .then(response => {
-                dispatch(receiveSpecificTours(response.data));
-            })
-            .catch(error => {
-                dispatch(fetchSpecificToursFailed(''));
-            });
-    };
-}

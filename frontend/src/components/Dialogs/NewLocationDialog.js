@@ -3,22 +3,23 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
+import AutoComplete from 'material-ui/AutoComplete';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import AutoComplete from 'material-ui/AutoComplete';
-import TextField from 'material-ui/TextField';
 import NumberInput from 'material-ui-number-input';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 import FileUpload from '../FileUpload';
 
-import * as actionCreators from '../../actions/data'
+import * as actionCreators from '../../actions/data/locations';
+
 
 function mapStateToProps(state) {
     return {
-        insertError: state.data.insertError,
-        message: state.data.message,
-        id: state.data.locationId,
+        id: state.data.locations.id,
+        insertError: state.data.locations.insertError,
+        insertErrorMessage: state.data.locations.insertErrorMessage,
     };
 }
 
@@ -32,12 +33,12 @@ export default class NewLocationDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            open: false,
-            name: '',
-            nameError: '',
             description: '',
-            price: 0.0,
             imageUrl: 'https://cdn2.iconfinder.com/data/icons/lightly-icons/30/location-map-480.png',
+            name: '',
+            nameErrorMessage: '',
+            open: false,
+            price: 0.0,
             uploadDialogOpen: false,
         };
     };
@@ -78,14 +79,16 @@ export default class NewLocationDialog extends React.Component {
             this.props.insertLocation(name, description, city.id, country.id, price);
 
             if (this.props.insertError) {
-                this.setState({location_name_error: this.props.message});
+                this.setState({
+                    nameErrorMessage: this.props.insertErrorMessage,
+                });
             }
         }
     };
 
 
     nameChanged = (event, value) => {
-        if (this.state.nameError != '') {
+        if (this.state.nameErrorMessage != '') {
             this.setState({
                 name: value,
                 nameError: ''
@@ -109,14 +112,10 @@ export default class NewLocationDialog extends React.Component {
         });
     }
 
-    setImage = (imageIds) => {
-        var imageUrl = 'http://localhost:5000/api/images/'.concat(imageIds[0].toString())
-
-        this.setState({
-            uploadDialogOpen: false,
-            imageUrl: imageUrl
-        });
-    }
+    setImage = (images) => this.setState({
+        uploadDialogOpen: false,
+        imageUrl: images[0].src,
+    });
 
     render() {
         const actions = [
@@ -152,7 +151,7 @@ export default class NewLocationDialog extends React.Component {
                     </div>
                     <TextField
                         hintText="Location name"
-                        errorText={this.state.nameError}
+                        errorText={this.state.nameErrorMessage}
                         onChange={this.nameChanged}
                         fullWidth
                     />

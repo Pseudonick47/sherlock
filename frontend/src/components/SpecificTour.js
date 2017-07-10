@@ -1,8 +1,10 @@
 import React from 'react';
-import Paper from 'material-ui/Paper';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
+
 import ActionDone from 'material-ui/svg-icons/action/done';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import Paper from 'material-ui/Paper';
+
 
 const style = {
     padding: 20,
@@ -41,11 +43,10 @@ export default class SpecificTour extends React.Component {
             </Paper>
         );
     }
-
 }
 
 SpecificTour.PropsType = {
-    startDate: React.PropTypes.object,
     endDate: React.PropTypes.object,
     showButton: React.PropTypes.bool,
+    startDate: React.PropTypes.object,
 }
