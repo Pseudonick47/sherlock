@@ -469,7 +469,7 @@ class LocationAPI(Resource):
                 'id':location.oid,
                 'name':location.name,
                 'description':location.description,
-                'price':location.price.amount,
+                'price':location.price[0].amount,
                 'city_id':location.city_id,
                 'country_id':location.country_id
             }
@@ -707,7 +707,7 @@ class CityAPI(Resource):
         response = {}
         if city:
             response = {
-                'id':city.id,
+                'id':city.oid,
                 'name':city.name,
                 'country_id':city.country_id
             }
@@ -990,7 +990,7 @@ class CountryListAPI(Resource):
             db.session.add(country)
             db.session.commit()
 
-            return ({'success': True}, 200)
+            return ({'success': True, 'id': country.oid}, 200)
 
         return ({'success':False, 'message':'Not JSON'}, 400)
 
